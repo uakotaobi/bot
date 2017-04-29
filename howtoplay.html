@@ -1,0 +1,239 @@
+<!--
+    Copyright 2017 Uche Akotaobi.
+
+    This file is part of BOT.
+
+    BOT is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any later
+    version.
+
+    BOT is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+    details.
+
+    You should have received a copy of the GNU General Public License along
+    with BOT.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="description" content="Provides the game story for the BOT project.  Covers tips and strategies."/>
+        <title>B O T :: How to Play</title>
+        <link rel="stylesheet" href="./styles/common.css" type="text/css"/>
+        <link rel="stylesheet" href="./styles/page.css" type="text/css"/>
+        <script type="application/javascript" src="./src/Utils.js"></script>
+        <script type="application/javascript" src="./src/Weapon.js"></script>
+        <script type="application/javascript" src="./src/Robot.js"></script>
+        <script type="application/javascript" src="./src/Sprite.js"></script>
+        <script type="application/javascript" src="./src/GameController.js"></script>
+        <script type="application/javascript" src="./src/PlainView.js"></script>
+        <style type="text/css">
+         /* Page-specific styles. */
+
+         /*******************************************************************
+          * In-article styles.
+          *******************************************************************/
+         article .leader {
+             font-variant: small-caps;
+             font-weight: bold;
+         }
+
+         article img {
+             border: 2px inset black;
+             margin: 10px;
+             width: 10%;
+             border-radius: 50%;
+             border: 10px solid rgb(226, 0, 104);
+         }
+
+         article .button {
+             width: 1em;
+             height: 1em;
+             display: inline-block;
+             text-align: center;
+             line-height: 1em;
+             vertical-align: middle;
+             padding: 0;
+             margin: 0;
+         }
+
+         article .button.add, article .button.remove {
+             border: 5px solid black;
+             border-radius: 50%;
+             font-family: sans-serif;
+             font-weight: bold;
+
+             transition: background 0.33s ease-in,
+                         box-shadow 0.33s ease-in,
+                         border-color 0.33s ease-in;
+         }
+
+         article .button.add:hover, article .button.remove:hover {
+             background-color: green;
+             box-shadow: 0px 0px 10px 5px green;
+         }
+
+         article .button.close {
+             border: 2px outset gray;
+             background-color: #aaa;
+         }
+         article .button.close:hover {
+             border: 2px inset gray;
+             background-color: #bbb;
+         }
+
+         article { padding-bottom: 1em; }
+        </style>
+    </head>
+    <body>
+        <div class="content">
+            <header>
+                <h1 class="title">
+                    <a href="./index.html">
+                        <span class="letter">B</span> <span class="star">&#x2605;</span> <span class="letter">O</span> <span class="star">&#x2605;</span> <span class="letter">T</span>
+                    </a>
+                </h1>
+                <h2 class="subtitle">How to Play</h2>
+            </header>
+            <ul class="menu">
+                <li><a class="menuitem" href="./game.html">New Game</a></li>
+                <li><a class="menuitem" href="./howtoplay.html">How to Play</a></li>
+                <li><a class="menuitem" href="./weapons.html">List of Weapons</a></li>
+                <li><a class="menuitem" href="./about.html">About</a></li>
+            </ul>
+            <article>
+                <ul>
+                    <li><a href="#section1">The Story So Far</a></li>
+                    <li>
+                        <a href="#section2">Playing the Game</a>
+                        <ul>
+                            <li><a href="#section2.1">The Selection Screen</a></li>
+                            <li><a href="#section2.2">The Battle Screen</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#section3">Tips and strategies</a>
+                        <ul>
+                            <li><a href="#section3.1">Bot Tips</a></li>
+                            <li><a href="#section3.2">Weapon Tips</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h2 id="section1">The Story So Far</h2>
+                <!-- This story is basically every single militaristic sci-fi origin story by every single hack writer ever (just treat the Prime Edict as the aliens/Klingons.) -->
+
+                <img src="./assets/images/icons/[CC-BY-3.0] jreijonen - Faction symbols (allies & axis) (star_0_0) [OpenGameArt]-512px.png"
+                     alt="Emblem of the Star Alliance, a star emplaced upon a metallic wreath of laurel leaves."
+                     style="float: left; background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 30%, rgba(0, 0, 128, 1));"
+                     title="The Star Alliance emblem" />
+                <p><span class="leader">Fifty-four years have passed</span> since the founding of the Star Alliance, the mightiest political organization in history.  Thanks to the Alliance's vast resources and knowledge, mankind has colonized a hundred worlds across a hundred different suns.  But all has not been peaceful: since the earliest days after its founding, the Alliance has constantly been dogged by the spectre of war.</p>
+
+                <p><span class="leader">It started with the Rebellion.</span> Led by the free-thinking colonists of Vega, a group of malcontents on the fringes of inhabited space broke free to establish their own territory.  The battles at first were hot, bitter, and bloody, but once it become clear that neither side could completely overcome the other, the situation simmered into an uneasy detente, stoked by the occasional skirmish.</p>
+
+                <p><span class="leader">Meanwhile, war itself began to evolve.</span>  It was more than forty years ago that the first <strong>Bot</strong> was invented.  These versatile, all-terrain, fusion-powered humanoid vehicles were originally intended to help mankind colonize hostile worlds, but they quickly proved to be more useful as battle platforms.  It was not long before all sides realized that the best way to defend territory from Bot encroachment was with <em>more</em> Bots, so these killing machines now see deployment far and wide.</p>
+
+                <h3>The Prime Edict</h3>
+
+                <img src="./assets/images/backgrounds/devnewton - Black metal boss (boss) [OpenGameArt].png"
+                     alt="Portrait of the Prime Edict's leader, The Overseer"
+                     style="float: right; background: radial-gradient(circle, black 50%, red);"
+                     title="The Overseer" />
+
+                <p><span class="leader">No one is quite sure how</span> the force now known as the Prime Edict broke away from the Rebel faction.  All we know is that the Rebels were unprepared.  Half of their stars fell within months, and by now even the once-mighty fleets of Vega teeter on the edge of defeat.</p>
+
+                <p>Named after the supposed order that drives all of its forces to battle, the Edict proved to be skilled and relentless.  Bots were their hammer and lightly-defended worlds were their nail.  Each planet or colony taken over by the Edict has cut off all communication with Earth, separating countless families from their loved ones.  It is known that some of these colonists now fight for the Edict.</p>
+
+                <p>A mysterious, taciturn entity known only as <strong>The Overseer</strong> appears to be the spiritual leader of these forces.  All efforts to reach it through diplomatic efforts have proven fruitless.  It will not listen to reason.  It is driven by one purpose and one purpose only: the complete takeover of the planet Earth, which by definition requires the <strong>liquidation</strong> of the Star Alliance.</p>
+
+                <p>And that is why we fight.</p>
+
+                <h2 id="section2">Playing the Game</h2>
+                <h3 id="section2.1">The Selection Screen</h3>
+
+                <p>During this screen, human players get an opportunity to choose their forces for the upcoming battle and to see a brief preview of the computer forces they will be attacking (if any.)  All players are allotted a set of points known as the <strong>Combat Strength</strong>; each Bot a player selects subtracts from this total, and the total may not be exceeded.  Computer players normally follow the same rules, but human players wishing for a challenge can increase or decrease the computer players' point totals by selecting a new <strong>Computer Difficulty</strong>.</p>
+
+                <p>Each player is assigned to a <strong>Faction</strong> when it is created.  You may change the faction at any time, but no two players are allowed to belong to the same faction, and there are no faction alliances in this game.  The factions are fungible, and none have any advantage over another.</p>
+
+                <p>Use the <span class="button remove" title="remove">-</span> and <span class="button add" title="add">+</span> buttons to add or remove Bots and players.  Removing a player or changing its type to Computer discards whatever Bots that player has currently selected.</p>
+
+
+                <h3 id="section2.2">The Battle Screen</h3>
+
+                <p>During combat, the game selects a Bot from each side in order of speed (faster Bots go first.)  The player controlling this Bot must click on the weapon they intend to use and on a foe that they intend to attack.  The order in which these two selections are done does not matter, but once both items are chosen, the attack is committed and the game generates a <strong>Damage Report dialog</strong> showing the damage that the attack caused.  Damage dealt during combat is always rounded <em>up</em> if it is fractional; damage prevented during combat is always rounded <em>down</em>.</p>
+
+                <p>A bot with 0 or fewer hitpoints is instantly destroyed.  A bot running out of ammo will skip its turn; most Bots have at least one weapon with limitless ammunition, making this a rare occurrence.  When a Bot on your side has been destroyed, you can click on the <span class="button close" title="close">x</span> button to close that Bot's view.</p>
+
+                <p>Victory is achieved when only one faction still has functioning Bots.</p>
+
+                <h2 id="section3">Tips and Strategies</h2>
+                <h3 id="section3.1">Bot Tips</h3>
+                <ul>
+                    <li>
+                        <span class="leader">A jump-capable Bot</span>
+                        effectively has 40-50% more hitpoints than a a Bot
+                        without jump capabilities.  The usual trade-off is
+                        that these sorts of Bots have low armor ratings.
+                        <br />
+                        However, at least one jump-capable Bot
+                        <em>also</em> has high armor ratings.
+                    </li>
+                    <li>
+                        <span class="leader">Under harder difficulty
+                        levels</span>, expect to face more heavily-armored
+                        <strong>assault-class</strong> Bots.  You should have
+                        at least one Bot with strong weaponry that can pierce
+                        that kind of armor.
+                    </li>
+                    <li>
+                        <span class="leader">Scarabs are only useful</span>
+                        when they are paired with Bots too dangerous to
+                        ignore.
+                    </li>
+                    <li>
+                        <span class="leader">Gang up</span> on enemy Bots.
+                        Try to kill one before your next turn starts.
+                    </li>
+                </ul>
+
+                <h3 id="section3.2">Weapon Tips</h3>
+                <ul>
+                    <li>
+                        <span class="leader">When a Bot has more than one
+                        weapon of the same type</span>, firing any of those
+                        weapons will fire all of them at once.  This
+                        multiplying effect can make weak weapons <em>much</em>
+                        more dangerous.
+                    </li>
+                    <li>
+                        <span class="leader">Carefully observe</span> the
+                        weapons that the computer players use when attacking
+                        you.  The computer players are aware of the laws of
+                        probability and will usually attack with weapons that
+                        deal the highest damage in the long run.  These are
+                        <em>not necessarily</em> the weapons that deal the
+                        highest theoretical damage on paper.
+                    </li>
+                    <li>
+                        <span class="leader">To draw the fire</span> of
+                        computer-controlled Bots, you need a Bot that can
+                        withstand punishment <em>and</em> which possesses a
+                        dangerous weapon which is likely to cause a kill on
+                        the CPU's side.  You may wish to keep one powerful
+                        shell in your arsenal just for that purpose instead of
+                        pummelling someone with it the first chance you get.
+                    </li>
+                    <li>
+                        <span class="leader">It seems fairly
+                        obvious,</span> but if your Bot has a powerful weapon,
+                        don't waste its limited ammunition on Bots that don't
+                        pose a threat to you.
+                    </li>
+                </ul>
+            </article>
+        </div>
+    </body>
+</html>

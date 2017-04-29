@@ -1,0 +1,190 @@
+<!--
+    Copyright 2017 Uche Akotaobi.
+
+    This file is part of BOT.
+
+    BOT is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any later
+    version.
+
+    BOT is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+    details.
+
+    You should have received a copy of the GNU General Public License along
+    with BOT.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="description" content="The homepage for the BOT project, which is an HTML5 and JavaScript dice game."/>
+        <title>B O T :: Main Menu</title>
+        <link rel="stylesheet" href="./styles/common.css" type="text/css"/>
+        <script type="application/javascript" src="./src/Utils.js"></script>
+        <script type="application/javascript" src="./src/Weapon.js"></script>
+        <script type="application/javascript" src="./src/Robot.js"></script>
+        <script type="application/javascript" src="./src/Sprite.js"></script>
+        <script type="application/javascript" src="./src/GameController.js"></script>
+        <script type="application/javascript" src="./src/PlainView.js"></script>
+        <script type="application/javascript" src="./src/Game.js"></script>
+        <style type="text/css">
+         /* Page-specific styles.
+
+            The menu looks very different on the homepage in order to
+            incorporate the background image. */
+
+         html {
+             height: 100vh; /* 100% of the viewport height. */
+         }
+         body, .content {
+             min-height: 100vh;
+             /* Pevent scrollbars from showing up in Firefox. */
+             height: auto;
+         }
+         html, body, .content {
+             padding: 0px;
+             margin: 0px;
+             border: none;
+             width: 100%;
+         }
+
+         /* Style the header text. */
+         .content h1 {
+             text-align: center;
+             margin-left: auto;
+             margin-right: auto;
+             margin-top: 0px;
+             margin-bottom: 0px;
+             width: 6em;
+             padding: 0px;
+             font-size: 128pt;
+
+             color: rgb(137, 143, 148);
+             text-shadow: 0 0 40px rgb(78, 101, 89);
+             text-shadow: 0 0 40px rgb(78, 101, 89);
+             text-shadow: 0 0 40px rgb(78, 101, 89);
+             text-shadow: 0 0 40px rgb(78, 101, 89);
+             text-shadow: 0 0 40px rgb(78, 101, 89);
+
+             font-family: Ikarus, serif;
+         }
+         .content h1 .star {
+             font-size: 64pt;
+             line-height: 100%;
+             vertical-align: middle;
+             color: rgb(30,0,30);
+         }
+         .content .subtitle {
+             text-align: center;
+             width: 100%;
+         }
+
+         /* Style the main menu. */
+         .content ul {
+             position: relative;
+             z-index: 200;
+             margin-left: auto;
+             margin-right: auto;
+             text-align: center;
+         }
+         .content li {
+             /* Kill the bullet points. */
+             list-style: none;
+             margin: 0;
+             padding: 0;
+         }
+         .content li .menuitem {
+             display: block;
+             margin-left: auto;
+             margin-right: auto;
+             width: 12em;
+             font-family: serif;
+             font-size: 28pt;
+             color: rgb(226, 0, 104);
+             background-color: rgb(9, 25, 19);
+             border-radius: 10px;
+             border: 2px outset rgb(78, 101, 89);
+             padding: 10px;
+             margin-bottom: 0.5ex;
+             text-decoration: none;
+         }
+         .content ul li:nth-child(1) .menuitem {
+             border-top-left-radius: 30px;
+             border-top-right-radius: 30px;
+         }
+         .content ul li:nth-child(4) .menuitem {
+             border-bottom-left-radius: 30px;
+             border-bottom-right-radius: 30px;
+         }
+         .content li .menuitem:hover {
+             background-color: rgb(226, 0, 104);
+             color: rgb(137, 143, 148);
+         }
+         .content li .menuitem:active {
+             border: 2px inset rgb(78, 101, 89);;
+         }
+
+         /* Starfield. */
+         .content {
+             background-image: url("./assets/images/backgrounds/[CC0] SethByrd - Starry Night Background (Stars iphone6+) [OpenGameArt].png");
+             background-repeat: no-repeat;
+             background-position: right 0% top 0%;
+         }
+
+         /* The wreckage--my favorite. */
+         .wreckage {
+             position: absolute;
+             right: 0px;
+             top: 0px;
+             width: 1024px;
+             height: 100vh;
+             background-image: url("./assets/images/backgrounds/[CC0] City Building Game Art - Spacewreck (Space_DestroyedStructure) [OpenGameArt]-1024px.png");
+             background-repeat: no-repeat;
+             background-size: 1024px 1055px;
+             background-position: 420px -62px; /* 120px -62px; */
+             z-index: 100;
+         }
+        </style>
+    </head>
+    <body>
+        <div class="menu">
+        </div>
+        <div class="content">
+            <div>
+                <h1><span class="letter">B</span> <span class="star">&#x2605;</span> <span class="letter">O</span> <span class="star">&#x2605;</span> <span class="letter">T</span></h1>
+            </div>
+            <ul>
+                <li><a class="menuitem" href="./game.html">New Game</a></li>
+                <li><a class="menuitem" href="./howtoplay.html">How to Play</a></li>
+                <li><a class="menuitem" href="./weapons.html">List of Weapons</a></li>
+                <li><a class="menuitem" href="./about.html">About</a></li>
+            </ul>
+            <div class="wreckage"></div>
+        </div>
+        <script type="text/javascript">
+         // Page-specific scripts.  We only execute these after the DOM tree
+         // has been loaded.
+         let c = new GameController();
+         let v = new PlainView(c, null, null);
+
+         let content = document.getElementsByClassName("content")[0];
+         let effectiveHeight = window.getComputedStyle(content).height;
+         effectiveHeight = effectiveHeight.substr(0, effectiveHeight.length - 2); // Cut off the "px" suffix.
+
+         let wreckage = document.getElementsByClassName("wreckage")[0];
+         // fire1 = v.createEffect(wreckage, "f2", 820, effectiveHeight - 123, 0);
+         // fire1.layer = 50;
+         let delayMilliseconds = 4500;
+         let explosionDuration = 1500;
+         fire2      = v.createEffect(wreckage, "f2", 820, 180, 0,    explosionDuration - 2000 + delayMilliseconds);
+         explosion1 = v.createEffect(wreckage, "e1", 820-128/2+81/2, 180-128/2+123*.75, explosionDuration, delayMilliseconds);
+         explosion2 = v.createEffect(wreckage, "e2", 820-128/2+81/2, 180-128/2+123*.75, explosionDuration*1.5, delayMilliseconds-500);
+         fire2.preload();
+         explosion1.preload();
+         explosion2.preload();
+        </script>
+    </body>
+</html>

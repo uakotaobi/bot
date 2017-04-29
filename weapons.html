@@ -1,0 +1,355 @@
+<!--
+    Copyright 2017 Uche Akotaobi.
+
+    This file is part of BOT.
+
+    BOT is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any later
+    version.
+
+    BOT is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+    details.
+
+    You should have received a copy of the GNU General Public License along
+    with BOT.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="description" content="An interactive review of the weapons in the game of BOT."/>
+        <title>B O T :: List of Weapons</title>
+        <link rel="stylesheet" href="./styles/common.css" type="text/css"/>
+        <link rel="stylesheet" href="./styles/page.css" type="text/css"/>
+        <script type="application/javascript" src="./src/Utils.js"></script>
+        <script type="application/javascript" src="./src/Weapon.js"></script>
+        <script type="application/javascript" src="./src/Robot.js"></script>
+        <script type="application/javascript" src="./src/Sprite.js"></script>
+        <script type="application/javascript" src="./src/GameController.js"></script>
+        <script type="application/javascript" src="./src/PlainView.js"></script>
+        <script type="application/javascript" src="./lib/RGraph.common.core.js"></script>
+        <script type="application/javascript" src="./lib/RGraph.common.key.js"></script>
+        <script type="application/javascript" src="./lib/RGraph.common.dynamic.js"></script>
+        <script type="application/javascript" src="./lib/RGraph.bar.js"></script>
+        <script type="application/javascript" src="./lib/RGraph.line.js"></script>
+        <style type="text/css">
+         /* Page-specific styles. */
+
+         #weapon-row-template {
+             display: none;
+         }
+
+         .weapons {
+             font-family: sans-serif;
+             border-collapse: separate;
+             border-spacing: 5px;
+         }
+         .weapons td, .weapons th {
+             border: 1px outset white;
+             padding: 3px;
+         }
+         .weapons tr {
+             background: #eee;
+             color: black;
+             transition: background-color .4s ease-in,
+                         color .4s ease-in;
+         }
+         .weapons tr:hover {
+             background: #224;
+             color: white;
+         }
+         .weapons .shortName, .weapons .damageString {
+             font-family: monospace;
+         }
+         .weapons .unlimited { text-align: center; }
+
+         /* The canvas "pop-up." */
+         #wrapper {
+             background-color: white;
+             border: 1px solid black;
+             box-shadow: 5px 5px 10px 0px black;
+             display: none;
+             transition: opacity 0.3s ease-in;
+         }
+
+         /*******************************************************************
+          * In-article styles.
+          *******************************************************************/
+         article { padding-bottom: 1em; }
+        </style>
+    </head>
+    <body>
+        <div class="content">
+            <header>
+                <h1 class="title">
+                    <a href="./index.html">
+                        <span class="letter">B</span> <span class="star">&#x2605;</span> <span class="letter">O</span> <span class="star">&#x2605;</span> <span class="letter">T</span>
+                    </a>
+                </h1>
+                <h2 class="subtitle">List of Weapons</h2>
+            </header>
+            <ul class="menu">
+                <li><a class="menuitem" href="./game.html">New Game</a></li>
+                <li><a class="menuitem" href="./howtoplay.html">How to Play</a></li>
+                <li><a class="menuitem" href="./weapons.html">List of Weapons</a></li>
+                <li><a class="menuitem" href="./about.html">About</a></li>
+            </ul>
+            <article>
+
+                <h2 id="section1">Weapons in the Game</h2>
+
+                <p>Knowledge of the damage characteristics of each weapon at
+                your disposable is crucial if you are to meet the challenges
+                that lie ahead.</p>
+
+                <table class="weapons">
+                    <tr>
+                        <th>Weapon</th>
+                        <th>Class</th>
+                        <th><abbr title="Each weapon is backed by an equation used to calculate the damage it deals.  These equations contain Dungeons and Dragons-style dice notation&mdash; for instance, 2D6 means to roll two six-sided dice.">Damage Expression</abbr></th>
+                        <th>Minimum Damage</th>
+                        <th>Maximum Damage</th>
+                        <th>Ammo per Round</th>
+                        <th>Total Ammo</th>
+                        <th><abbr title="Produces a chart which lists all possible damage values the weapon can deal, sorted by their probability.">Distribution</abbr></th>
+                    </tr>
+                    <tr id="weapon-row-template">
+                        <td class="name"></td>
+                        <td class="class"></td>
+                        <td class="damageString"></td>
+                        <td class="min"></td>
+                        <td class="max"></td>
+                        <td class="ammoPerRound"></td>
+                        <td class="ammo"></td>
+                        <td class="dist"><a href="#">Show</a></td>
+                    </tr>
+                </table>
+                <div id="wrapper">
+                    <canvas id="cvs" width="900" height="300">[No canvas support]</canvas>
+                </div>
+            </article>
+        </div>
+        <script type="application/javascript">
+
+         const canvasId = "cvs";
+
+         // The default order in the Weapon.dataTable is roughly weakest to
+         // strongest.  Since we don't want to give that away, we sort the
+         // weapons by name instead.
+         let dataTable = [];
+         for (let internalName in Weapon.dataTable) {
+             if (internalName === "invalid") {
+                 // Skip the Ukulele Bot weaponry.
+                 continue;
+             }
+
+             dataTable.push(new Weapon(internalName));
+         }
+         dataTable.sort(function(item1, item2) {
+             if (item1.shortName > item2.shortName) {
+                 return 1;
+             } else if (item1.shortName < item2.shortName) {
+                 return -1;
+             }
+             return 0;
+         });
+
+         // This is just a miniature version of the sort of thing I've been
+         // doing repeatedly in Select.js.
+         let weaponRowTemplate = document.querySelector("#weapon-row-template");
+
+         for (let i = 0; i < dataTable.length; ++i) {
+             let weaponData = dataTable[i];
+
+             let newRow = weaponRowTemplate.cloneNode(true);
+             newRow.removeAttribute("id");
+             newRow.setAttribute("class", weaponData.internalName); // This will make individual rows easier to find.
+             newRow.style.display = "";
+
+             newRow.querySelector(".name").innerHTML = String.format("<span class='shortName'>{0}</span>&mdash;<span class='longName'>{1}</span>", weaponData.shortName, weaponData.longName);
+             newRow.querySelector(".class").textContent = weaponData.class[0].toUpperCase() + weaponData.class.substr(1).toLowerCase();
+             newRow.querySelector(".damageString").textContent = weaponData.damage;
+
+             newRow.querySelector(".min").textContent = Number(Weapon.calculateDamage(weaponData.damage, Weapon.useMinimumValues).damage).toFixed(1);
+             newRow.querySelector(".max").textContent = Number(Weapon.calculateDamage(weaponData.damage, Weapon.useMaximumValues).damage).toFixed(1);
+
+             if (weaponData.ammoPerRound === 0) {
+                 newRow.querySelector(".ammoPerRound").remove();
+                 newRow.querySelector(".ammo").setAttribute("colspan", "2");
+                 newRow.querySelector(".ammo").setAttribute("class", "ammo unlimited");
+                 newRow.querySelector(".ammo").textContent = "Unlimited";
+             } else {
+                 newRow.querySelector(".ammo").textContent = weaponData.ammo;
+                 newRow.querySelector(".ammoPerRound").textContent = weaponData.ammoPerRound;
+             }
+
+             // nth-of-type is 1-based.
+             // The first row is the header (no .dist.)
+             // The second row is the template.
+             let anchor = newRow.querySelector(".dist a");
+             anchor.setAttribute("href",
+                                 String.format("javascript:showCanvas('{0}', document.querySelector('.weapons tr:nth-of-type({1}) .dist a'), '{2}');",
+                                               weaponData.internalName, i + 3, canvasId));
+
+             weaponRowTemplate.parentNode.appendChild(newRow);
+         }
+
+         // Install a passive onmousemove() handler to keep track of the mouse
+         // coordinates.
+         let mouse = { x: 0, y: 0 };
+         document.onmousemove = function(mouseEvent) {
+             mouse.x = mouseEvent.clientX;
+             mouse.y = mouseEvent.clientY;
+         }
+
+         // Renders a bar chart on the given canvas and then a line graph on top of that.
+         function renderGraphOnCanvas(weaponInternalName, canvasId) {
+
+             let weapon = new Weapon(weaponInternalName);
+
+             // Generate some data for a weapon.  I dunno, the MRM.
+             let originalData = [];
+             let trials = 2000;
+             for (let i = 0; i < trials; ++i) {
+                 let d = Weapon.calculateDamage(weapon.damage, Weapon.useRandomValues).damage;
+                 d = Math.round(d);
+                 if (originalData[d] === null || originalData[d] === undefined) {
+                     originalData[d] = 0;
+                 }
+                 originalData[d]++;
+             }
+
+             // Ignore the data which never came up.  Normalize the graph.
+             let data = [];
+             let labels = [];
+             let ymax = 0;
+             for (let i = 0; i < originalData.length; ++i) {
+                 if (originalData[i] === null || originalData[i] === undefined || originalData[i] === 0) {
+                     continue;
+                 }
+
+                 let frequency = originalData[i];
+
+                 // Normalize the frequencies into percentages.
+                 let percentage = frequency / trials * 100;
+
+                 if (percentage > ymax) {
+                     ymax = percentage;
+                 }
+
+                 labels.push(i);
+                 data.push(percentage);
+             }
+
+             var bar = new RGraph.Bar({
+                 id: canvasId,
+                 data: data,
+                 // [
+                 //     [12,15,16],[16,13,12],[13,11,12],
+                 //     [15,35,41],[19,14,10],[16,15,13]
+                 // ],
+                 options: {
+                     // colors: ['#7CB5EC','#434348','#90ED7D'],
+                     colors: ['Gradient(white:red)'],
+
+                     textAccessible: false, // I am seriously sick and tired of .rgraph_domtext_wrapper.
+                     textSize: 14,
+                     // variant: '3d', gutterBottom: 150,
+                     gutterLeft: 60,
+                     gutterTop: 40,
+                     // labels: ['January','Febuary','March','April','May','June'],
+                     labels: labels,
+                     shadow: true,
+                     unitsPost: '%',
+                     backgroundGridVlines: true,
+                     backgroundGridBorder: true,
+                     //hmargin: 15,
+                     //hmarginGrouped: 5,
+                     noxaxis: false,
+                     noyaxis: false,
+                     title: String.format("Frequency Distribution for {0}", weapon.longName),
+                     // key: ['Fructon Road','Lewisham Avenue','Carnival Mar-de-Gras'],
+                     // key: ['Distribution'],
+                     // keyPosition: 'gutter',
+                     // keyTextSize: 12,
+                     labelsAbove: true,
+                     ymax: ymax
+                 }
+             }); // .wave();
+
+             // The bar chart doesn't have coords yet; drawing it the first
+             // time will create them.
+             //RGraph.clear(bar.canvas);
+
+
+             var line = new RGraph.Line({
+                 id: canvasId,
+                 data: data,
+                 options: {
+                     colors: ['#000'],
+                     xaxispos: 'center',
+                     ymax: ymax,
+                     linewidth: 4,
+                     tickmarks: null,
+                     textAccessible: false
+                 }
+             });
+
+             // https://www.rgraph.net/canvas/docs/api.html
+             // https://www.rgraph.net/demos/index.html#canvas
+             // https://www.rgraph.net/demos/bar-line-combo.html
+             // http://www.cmsws.com/examples/applications/rgraph/RGraph_20091010/docs/api.html
+             var combo = new RGraph.CombinedChart(bar, line);
+             combo.draw();
+
+             //RGraph.redraw();
+             // bar.draw();
+         }
+
+         let showCanvas = function(weaponInternalName, parentElement, canvasId) {
+
+             hideCanvas(canvasId);
+
+             let canvas = document.createElement("canvas");
+             canvas.width = 900;
+             canvas.height = 300;
+             canvas.textContent = "[No canvas support.]";
+             canvas.setAttribute("id", canvasId);
+
+             // Clicking on the graph (well, on the whole canvas, regardless
+             // of what's drawn beneath) dismisses it.
+             canvas.onclick = function() {
+                 hideCanvas(canvasId);
+                 //Event.stopPropagation(); // Don't let rgraph know.
+             };
+
+             let wrapper = document.getElementById("wrapper");
+             wrapper.appendChild(canvas);
+
+             // Create content.
+             renderGraphOnCanvas(weaponInternalName, canvasId);
+
+             // Make it appear on screen.
+             wrapper.style.left = String.format("{0}px", mouse.x - canvas.width);
+             wrapper.style.top = String.format("{0}px", mouse.y);
+             wrapper.style.position = "absolute";
+             wrapper.style.display = "block";
+         }
+
+         let hideCanvas = function(canvasId) {
+             let canvas = document.getElementById(canvasId);
+             if (canvas) {
+                 let wrapper = canvas.parentNode;
+                 RGraph.Reset(canvas);
+
+                 canvas.remove();
+
+                 wrapper.style.display = "none";
+             }
+         }
+        </script>
+    </body>
+</html>

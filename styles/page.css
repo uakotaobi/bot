@@ -1,0 +1,189 @@
+/**********************************************************************************/
+/* Styles for "ordinary pages" in the BOT project -- that is, pages which are not */
+/* the game page and not the homepage.                                            */
+/*                                                                                */
+/* Distinguishing features of such pages:                                         */
+/*                                                                                */
+/* - The .content div contains a <header/> that shows a miniature version of the  */
+/*   main logo.                                                                   */
+/* - After the header comes a ul.menu which must be styled to be horizontal.      */
+/* - After the menu comes an <article/> which contains the actual content of the  */
+/*   webpage.                                                                     */
+/*                                                                                */
+/* Many of these styles override styles in common.css.                            */
+/**********************************************************************************/
+
+/****************************************************************************
+ * Surround the content area with stars.  Narrow it.
+ ****************************************************************************/
+
+body {
+    background-image: url("../assets/images/backgrounds/[CC-BY-SA-3.0] fraang - Space backgrounds (space-2) [OpenGameArt].png");
+    background-repeat: repeat;
+    background-position: right 0% top 0%;
+}
+
+.content {
+    width: 70% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    color: black;
+    background: #ccd;
+/*background: rgb(10, 5, 30);*/
+}
+
+/****************************************************************************
+ * Header bar.
+ ****************************************************************************/
+
+.content header {
+    background-image: url("../assets/images/backgrounds/[CC0] SethByrd - Starry Night Background (Stars iphone6+) [OpenGameArt].png");
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    /* Without this, our floating elements' height would not count
+       toward our own height, so our height would be - and the
+       background wouldn't show up.  That's CSS for you. */
+    overflow: hidden;
+}
+.content header > * {
+    text-shadow: 0 0 40px rgb(78, 101, 89);
+    text-shadow: 0 0 40px rgb(78, 101, 89);
+    text-shadow: 0 0 40px rgb(78, 101, 89);
+    text-shadow: 0 0 40px rgb(78, 101, 89);
+    text-shadow: 0 0 40px rgb(78, 101, 89);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.content header .title {
+    font-size: 32pt;
+    float: left;
+
+    color: rgb(137, 143, 148);
+    font-family: Ikarus, serif;
+}
+.content header .title a {
+    color: inherit;
+    text-decoration: none;
+}
+.content header .title .star {
+    font-size: 16pt;
+    line-height: 100%;
+    vertical-align: middle;
+    color: rgb(30,0,30);
+}
+.content .subtitle {
+    color: white;
+    text-shadow: 2px 2px 1px rgb(78, 101, 89);
+    font-family: sans-serif;
+    font-size: 32pt;
+    float: right;
+}
+.content article {
+    clear: both;
+}
+
+/****************************************************************************
+ * Horizontal main menu.
+ ****************************************************************************/
+
+.content ul.menu {
+    overflow: hidden; /* In case I add a background later. */
+    background: none;
+    padding: 0;
+    clear: both;
+    position: relative;
+    z-index: 200;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0px;
+    text-align: center;
+}
+.content ul.menu li {
+    float: left;
+    width: 25%;
+
+    /* Kill the bullet points. */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.content ul.menu li .menuitem {
+    display: block;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+
+    font-family: serif;
+    font-size: 150%;
+    color: rgb(226, 0, 104);
+    background-color: rgb(9, 25, 19);
+    border-radius: 10px;
+    border: 2px outset rgb(78, 101, 89);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 0.5ex;
+    text-decoration: none;
+}
+.content ul.menu li:nth-child(1) .menuitem {
+    border-bottom-left-radius: 30px;
+}
+.content ul.menu li:nth-child(4) .menuitem {
+    border-bottom-right-radius: 30px;
+}
+.content ul.menu li .menuitem:hover {
+    background-color: rgb(226, 0, 104);
+    color: rgb(137, 143, 148);
+}
+.content ul.menu li .menuitem:active {
+    border: 2px inset rgb(78, 101, 89);;
+}
+
+/****************************************************************************
+ * Article styles.
+ ****************************************************************************/
+
+.content article abbr {
+    font-style: italic;
+    font-weight: bold;
+}
+.content article ul {
+    list-style: none;
+}
+.content article li::before {
+    color: rgb(226, 0, 104);
+    padding-right: 0.5em;
+    content: "\2605";
+}
+
+.content article p {
+    padding: 10px;
+}
+.content article p, .content article li {
+    font-family: sans-serif;
+}
+.content article h2 {
+    color: rgb(226, 0, 104);
+    background-color: rgb(9, 25, 19);
+    text-shadow: 1px 1px 0px rgb(78, 101, 89);
+
+    font-family: Ikarus;
+    font-size: 14pt;
+    text-align: center;
+}
+
+.content article h3 {
+    color: rgb(226, 0, 104);
+    /*background-color: rgb(9, 25, 19);*/
+    text-shadow: 1px 1px 0px rgb(78, 101, 89);
+
+    font-family: Ikarus;
+    font-size: 12pt;
+    text-align: left;
+    padding: 10px;
+}

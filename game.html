@@ -1,0 +1,243 @@
+<!--
+    Copyright 2017 Uche Akotaobi.
+
+    This file is part of BOT.
+
+    BOT is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any later
+    version.
+
+    BOT is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+    details.
+
+    You should have received a copy of the GNU General Public License along
+    with BOT.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>B O T :: Battle Screen</title>
+        <link rel="stylesheet" href="./styles/common.css" type="text/css"/>
+        <script type="application/javascript" src="./src/Utils.js"></script>
+        <script type="application/javascript" src="./src/Weapon.js"></script>
+        <script type="application/javascript" src="./src/Robot.js"></script>
+        <script type="application/javascript" src="./src/Sprite.js"></script>
+        <script type="application/javascript" src="./src/GameController.js"></script>
+        <script type="application/javascript" src="./src/PlainView.js"></script>
+        <script type="application/javascript" src="./src/AiPlayer.js"></script>
+        <script type="application/javascript" src="./src/Select.js"></script>
+        <script type="application/javascript" src="./src/Game.js"></script>
+        <style type="text/css">
+         /* Page-specific styles. */
+        </style>
+    </head>
+    <body>
+        <div class="menu">
+        </div>
+        <div class="content">
+
+            <form id="faction-template" class="faction active">
+                <div id="robot-template" class="robot active">
+                    <div class="top-bar">
+                        <input type="radio" name="botselect" tabindex="0" />
+                        <div class="name">The Munchkin Bot</div>
+                        <div class="hp"><span class="number">777</span> hp</div>
+                        <div class="close" title="Close">&#xd7;</div>
+                    </div>
+                    <div class="main-image">
+                        <div class="healthbar"></div>
+                        <img src="./assets/images/bots/300px-tzunghaor - robot.png" />
+                    </div>
+                    <div class="weapons">
+                        <table>
+                            <tr class="active">
+                                <td><input type="radio" name="weaponselect" tabindex="0"/></td>
+                                <td class="name">WEAPON1 NAME</td>
+                                <td class="ammo">100</td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="weaponselect" tabindex="0"/></td>
+                                <td class="name">WEAPON2 NAME</td>
+                                <td class="ammo insufficient">0</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+        <div class="dialog" id="dialog-template">
+            <div class="overlay"></div>
+            <div class="content">
+                <h2 class="title primary-fg">Title</h2>
+                <div class="text">Placeholder text.</div>
+            </div>
+        </div>
+        <div class="dialog small" id="small-dialog-template">
+            <div class="overlay"></div>
+            <div class="content">
+                Placeholder text.
+            </div>
+        </div>
+        <div class="dialog turn" id="turn-dialog-template">
+            <div class="overlay"></div>
+            <div class="content">
+                <div class="logo"></div>
+                <table>
+                    <tr>
+                        <td class="title"><h2>Faction Name</h2></td>
+                    </tr>
+                    <tr>
+                        <td class="text">It's the enemy's turn.</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="dialog endgame green" id="endgame-dialog-template">
+            <div class="overlay"></div>
+            <div class="content success">
+                <div class="background">
+                    <div class="logo"></div>
+                    <div class="header"><span class='letter'>V</span><span class='star'>&#x2605;</span><span class='letter'>I</span><span class='star'>&#x2605;</span><span class='letter'>C</span><span class='star'>&#x2605;</span><span class='letter'>T</span><span class='star'>&#x2605;</span><span class='letter'>O</span><span class='star'>&#x2605;</span><span class='letter'>R</span><span class='star'>&#x2605;</span><span class='letter'>Y</span></div>
+                    <div class="text">
+                        <p><strong>Congratulations, Commander.</strong></p>
+                        <p>You have successfully driven the forces of <span class='enemy name'>the Edict</span> off of this world.  But there are surely more battles to come.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content failure">
+                <div class="background">
+                    <div class="logo"></div>
+                    <div class="header">Defeat</div>
+                    <div class="text">
+                        <div class="right"><span>The <strong>final sound</strong></span></div>
+                        <div class="right"><span>You hear</span></div>
+                        <div class="left"><span>Before facing</span></div>
+                        <div class="left"><span><strong>Inexorable oblivion</strong></span></div>
+                        <div class="right"><span>Is the</span></div>
+                        <div class="right"><span><strong>Relentless stomping</strong></span></div>
+                        <div class="center"><span>Of <strong>huge, mechanical feet</strong></span></div>
+                        <div class="left"><span>As they get closer</span></div>
+                        <div class="center"><span>And closer</span></div>
+                        <div class="right"><span>And <strong>closer</strong></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="select-a-mech">
+            <div class="content">
+                <div class="top-bar"></div>
+                <div class="panel left">
+                    <!-- The only purpose of the nested div is to hide the vertical scrollbar. -->
+                    <div>
+                        <div class="player-list">
+                            <label>Players</label>
+                            <div id="player-row-template">
+                                <button class="remove" title="Removes this player.">-</button>
+                                <button class="add" title="Adds another player.">+</button>
+                                <select class="type">
+                                    <option value="human" selected="selected">Human</option>
+                                    <option value="ai">Computer</option>
+                                </select>
+                                <select class="team">
+                                </select>
+                                <div class="flag"></div>
+                            </div>
+                        </div>
+                        <div class="points-section">
+                            <label class="points-label">Combat Strength</label>
+                            <select class="points">
+                                <option value="30">30 points (Small)</option>
+                                <option value="45">45 points</option>
+                                <option value="60" selected="selected">60 points (Normal)</option>
+                                <option value="75">75 points</option>
+                                <option value="90">90 points (Large)</option>
+                            </select>
+                        </div>
+                        <div class="difficulty-section">
+                            <label class="difficulty-label">Computer Difficulty</label>
+                            <select class="difficulty">
+                                <option value="0.75">Easy</option>
+                                <option value="1.0" selected="selected">Normal</option>
+                                <option value="1.25">Hard</option>
+                                <option value="1.5">Very Hard</option>
+                                <option value="2.0">Die</option>
+                            </select>
+                        </div>
+                        <div class="robot-list">
+                            <div id="robot-row-template">
+                                <button class="remove" title="Removes this 'Bot from the combat roster.">-</button>
+                                <button class="add" title="Adds another 'Bot to the combat roster.">+</button>
+                                <select class="type">
+                                </select>
+                                <div class="portrait"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel center">
+                    <!-- The only purpose of the nested div is to hide the vertical scrollbar. -->
+                    <div>
+                        <table class="stats">
+                            <caption class="bot-name">ROBOT NAME</caption>
+                            <tr>
+                                <td rowspan="5" class="adornment"></td>
+                                <td class="label">Class</td>
+                                <td class="bot-class">Light</td>
+                            </tr>
+                            <tr><td class="label">Speed</td><td class="bot-speed">0</td></tr>
+                            <tr><td class="label">Armor</td><td class="bot-armor">0 cm (approx.)</td></tr>
+                            <tr><td class="label">Jump&nbsp;Capable</td><td class="bot-jump">No</td></tr>
+                            <tr>
+                                <td class="label">Armaments</td>
+                                <td class="bot-arsenal">
+                                    <table class="weapons">
+                                        <tr>
+                                            <th>Class</th>
+                                            <th>Weapon</th>
+                                            <th>Qty.</th>
+                                            <th>Ammo</th>
+                                        </tr>
+                                        <tr id="weapon-row-template">
+                                            <td class="class">Invalid</td>
+                                            <td class="name">Slingshot</td>
+                                            <td class="quantity">1</td>
+                                            <td class="ammo">5</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        <span class="description">It was the best of times.</span>
+                    </div>
+                </div>
+                <div class="panel right">
+                    <div class="danger">
+                        <h2><span>WARNING</span></h2>
+                        <p>Long-range scanners have estimated the combat strength of enemy forces to be as follows:</p>
+                        <p class="estimates"></p>
+                    </div>
+                    <p class="go-message">Proceed with caution, Commander.</p>
+                    <div class="button-bar">
+                        <a href="./index.html"><button class="cancel">Return to Main Menu</button></a>
+                        <button class="go">Launch Mission</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="application/javascript">
+         // After the page has loaded, activate the selection screen.
+         let g = new Game();
+         let c = g.controller();
+         let v = g.view();
+         let s = g.select();
+
+         // g.launchTestGame();
+         g.launchSelectScreen();
+        </script>
+    </body>
+</html>

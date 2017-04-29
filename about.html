@@ -1,0 +1,730 @@
+<!--
+    Copyright 2017 Uche Akotaobi.
+
+    This file is part of BOT.
+
+    BOT is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option) any later
+    version.
+
+    BOT is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+    details.
+
+    You should have received a copy of the GNU General Public License along
+    with BOT.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="description" content="Describes the origin of the BOT project.  Lists credits and copyrights."/>
+        <title>B O T :: About This Game</title>
+        <link rel="stylesheet" href="./styles/common.css" type="text/css"/>
+        <link rel="stylesheet" href="./styles/page.css" type="text/css"/>
+        <script type="application/javascript" src="./src/Utils.js"></script>
+        <script type="application/javascript" src="./src/Weapon.js"></script>
+        <script type="application/javascript" src="./src/Robot.js"></script>
+        <script type="application/javascript" src="./src/Sprite.js"></script>
+        <script type="application/javascript" src="./src/GameController.js"></script>
+        <script type="application/javascript" src="./src/PlainView.js"></script>
+        <style type="text/css">
+         /* Page-specific styles. */
+
+         /*******************************************************************
+          * License table.
+          *******************************************************************/
+         .copyrights {
+             border-collapse: separate;
+             border-spacing: 1px;
+             background: linear-gradient(to right, red, black, blue);
+             text-align: left;
+             font-family: sans-serif;
+             width: 100%;
+         }
+         .copyrights tr th {
+             background-image: linear-gradient(to right, red, black, blue);
+             color: white;
+         }
+         .copyrights tr {
+             color: black;
+             background-image: linear-gradient(to right, #faa, #aaa, #aaf);
+         }
+         .copyrights tr:hover {
+             background-image: linear-gradient(to right, #8aa, #888, #aa8);
+         }
+         .copyrights tr td:nth-child(2) {
+             background-size: cover;
+             background-repeat: no-repeat;
+             background-color: #551a8b;
+             width: 88px;
+             transition: background-position 1s ease-in;
+         }
+         .copyrights tr:hover td:nth-child(2) {
+             background-position: 50% bottom !important;
+         }
+         .copyrights .license {
+             background-position: 50% 50%;
+             background-size: contain;
+             background-repeat: no-repeat;
+             margin: 0;
+             padding: 0;
+             border: none;
+             width: 88px;
+             height: 31px;
+             float: left;
+             box-shadow: 2px 2px 5px 0px gray;
+         }
+         .copyrights .license span {
+             display: none;
+         }
+         .copyrights .license.cc0       { background-image: url("./assets/images/licenses/cc-zero.svg"); }
+         .copyrights .license.cc-by-sa  { background-image: url("./assets/images/licenses/by-sa.svg"); }
+         .copyrights .license.cc-by     { background-image: url("./assets/images/licenses/by.svg"); }
+         .copyrights .license.pd        { background-image: url("./assets/images/licenses/Pd-banner.svg"); }
+         .copyrights .license.gpl2      { background-image: url("./assets/images/licenses/Official_gnu.svg"); background-color: white; }
+         .copyrights .license.gpl3      { background-image: url("./assets/images/licenses/GPLv3_Logo.svg");background-color: white;  }
+         .copyrights .license.copyright { background-image: url("./assets/images/licenses/License_icon-copyright-88x31.png"); }
+
+         article quote {
+             display: block;
+             width: 60%;
+             border: 1px solid blue;
+             background-color: #aaf;
+             margin-left: 20%;
+         }
+         article quote img {
+             width: 88px;
+             float: left;
+             margin: 10px;
+         }
+        </style>
+    </head>
+    <body>
+        <div class="content">
+            <header>
+                <h1 class="title">
+                    <a href="./index.html">
+                        <span class="letter">B</span> <span class="star">&#x2605;</span> <span class="letter">O</span> <span class="star">&#x2605;</span> <span class="letter">T</span>
+                    </a>
+                </h1>
+                <h2 class="subtitle">About This Game</h2>
+            </header>
+            <ul class="menu">
+                <li><a class="menuitem" href="./game.html">New Game</a></li>
+                <li><a class="menuitem" href="./howtoplay.html">How to Play</a></li>
+                <li><a class="menuitem" href="./weapons.html">List of Weapons</a></li>
+                <li><a class="menuitem" href="./about.html">About</a></li>
+            </ul>
+            <article>
+                <ul>
+                    <li><a href="#section1">The sorts of things bored kids do</a></li>
+                    <li><a href="#section2">Battletech</a></li>
+                    <li><a href="#section3">"Want to play again?"</a></li>
+                    <li><a href="#section4">So you're telling me that this whole thing is just math.</a></li>
+                    <li><a href="#credits">Credits and acknowledgements</a></li>
+                </ul>
+
+                <h2 id="section1">The sorts of things bored kids do</h2>
+
+                <p>
+                    Growing up as a young lad, I was often taken to parties
+                    and meetings which I felt had nothing to do with me.  For
+                    one, there weren't many kids my age at those parties; my
+                    family immigrated to the United States fairly early among
+                    our diaspora, so I was slightly older than most of the
+                    other kids.  Besides, all these gatherings were the same
+                    from my point of view: loud music (if it was a party),
+                    grown-ups talking about local politics (if it wasn't), and
+                    nothing entertaining to do either way.
+                </p>
+
+                <p>
+                    But that was fine; I have a brother two years younger than
+                    me, and he was dragged to the same functions for the same
+                    reasons.  As siblings often do in trying situations such as
+                    these, we made our own fun.  But no running around and
+                    chasing each other in circles for <em>us</em>;
+                    besides being expressly forbidden at these venues, we
+                    preferred more intellectual styles of play.
+                </p>
+
+                <p>
+                    Thus at some point we made sure to always surreptitiously
+                    sneak a few pieces of blank paper into these venues.
+                    Paper's good for all sorts of things: there was drawing,
+                    of course; pencil-and-paper games (to this day, I remain
+                    an <strong>expert</strong> at Tic-Tac-Toe);
+                    and when you were done writing on both sides, you could
+                    always fold the sheets into paper airplanes or the like.
+                </p>
+
+                <p>
+                    That continued for a little while.  But things changed
+                    when we plucked a handful of dice from our <em>Parcheesi</em>
+                    and <em>Ludo</em> boards and secreted them into these
+                    facilities.  Our play had suddenly gained <strong>dimensions</strong> of
+                    nuance!  But what was there that we could do with these
+                    raw materials?
+                </p>
+
+                <h2 id="section2">Battletech</h2>
+
+                <img style="float: right; border: 2px inset black; width: 25%; margin: 10px;"
+                     src="./assets/images/fairuse/3634-mechwarrior-dos-screenshot-mechwarrior-splash-screen.gif"
+                     alt="A picture of a giant attack robot smashing buildings and firing into the air.  A large logo behind it says 'MECHWARRIOR'."
+                     title="Splash screen from the old 1989 DOS MechWarrior game." />
+                <p>
+                    In the late 80s and early 90s, the table-top game
+                    Battletech/MechWarrior began to come into its own as a
+                    cultural phenomenon.  In short, it was a game about future
+                    humans colonizing the galaxy, but <em>who
+                    cares about that since they're pummeling one another with
+                    giant attack robots.</em>
+                </p>
+                <p>
+                    While I never played the official game itself (and still
+                    haven't), I followed the stories of the <em>Inner Sphere</em> and the <em>Steiner-Davions</em> with
+                    more than a passing enthusiasm.  We had a couple of novels
+                    set in that universe which we read and re-read (mostly
+                    because of the fanciful <abbr title="Battlemech, the nickname for the aforementioned giant attack robots">mech</abbr>
+                    <a href="http://www.sarna.net/wiki/Category:Works_by_Duane_Loose">illustrations</a>
+                    in the back of the books.)  I even recall a short-lived
+                    cartoon being created at some point and never coming to a
+                    satisfactory conclusion&mdash;just like most other late
+                    80s, early 90s cartoons.
+                </p>
+
+                <p>
+                    By now, you can perhaps see where I am going with this: I
+                    invented a new paper-and pencil game <em>very</em> loosely
+                    based on the MechWarrior stories I loved.  A game where
+                    players would roll dice to attack each other and mark the
+                    results on the paper.
+                </p>
+
+                <p>I called that game "<strong>Bot</strong>."</p>
+
+                <h2 id="section3">"Want to play again?"</h2>
+
+                <p>
+                    <strong>Bot was not a video game.</strong>  It could be
+                    played anytime, anywhere, with just a piece of paper, a
+                    pencil, some dice (the more, the merrier), and at least
+                    two minds.  One started by agreeing on the hitpoints and
+                    weapons that the available 'Bots for both players should have&mdash;for
+                    instance, a <em>Locust</em> might use two dice to attack,
+                    no dice to defend, and have 10 hitpoints.  Since this was
+                    a fairly weak 'Bot, we'd mutually agree to assign it a low
+                    "score" of (say) 5 points.
+                </p>
+
+                <p>
+                    Players agree beforehand on a limit for their total 'Bot scores&mdash;their <em>budget</em>,
+                    more or less&mdash;and then "purchase" as many 'Bots as
+                    they can with the budget allotted by writing them on their
+                    side of the sheet.  Then the game begins!  One by one,
+                    each player selects their next available 'Bot, selects a
+                    target enemy Bot, and rolls dice to determine how much the
+                    one wallops the other.  Repeat until dead.
+                </p>
+
+                <p>
+                    Some easy variations arose to break the monotony: bigger
+                    'Bots would roll an armor die to prevent some incoming
+                    damage, while other smaller 'Bots might be equipped with
+                    "jump thrusters", allowing them to completely bypass an
+                    attack by rolling an even number on a die.  Bots might
+                    have a variety of weapons to choose from with different
+                    attack formulae, and my brother and I would carefully
+                    select the weapon that seemed most likely to deal the
+                    finising blow in a given situation.
+                </p>
+
+                <p>
+                    Like all things, we grew weary of even this game after a
+                    while and moved on, but for those couple of years in the
+                    early 90s, Bot was our go-to means of evading
+                    boredom...provided our parents didn't hear us quietly
+                    rolling dice at parties and move to confiscate them, which
+                    happened a number of times.  For some reason, we were
+                    always able to find more dice.
+                </p>
+
+                <h2 id="section4">So you're telling me that this whole thing is just math.</h2>
+
+                <p>
+                    Well, yeah.
+                </p>
+
+                <p>
+                    Obviously, without the ability to move the 'Bots in any
+                    way, this is strictly a game of probabalistic likelihoods
+                    and subtraction&mdash;those are definitely math, so that's
+                    what this game is, too.  But it is my hope that with these
+                    improved graphics and special effects, the game won't <em>feel</em> like
+                    it's just a math game, and that you will derive a sense of
+                    satisfaction from successfully walloping the bad guy's
+                    giant attack robots.
+                </p>
+
+                <h2 id="credits">Credits and Acknowledgments</h2>
+
+                <quote>
+                    <img src="./assets/images/licenses/GPLv3_Logo.svg" alt="GNU GPL v3 Logo" />
+                    BOT is free software: you can redistribute it
+                    and/or modify it under the terms of the <a href="https://www.gnu.org/licenses/gpl.html">GNU
+                    General Public License</a> as published by the Free
+                    Software Foundation, either version 3 of the License, or
+                    (at your option) any later version.
+                </quote>
+
+                <p>I am <strong>not</strong> an artist.  Yet a surfeit of fantastic, professional artwork was available for me to choose from thanks to the Open Content community.  I am extremely grateful for all of their contributions.</p>
+                <p>Any missing entries in this list are my fault entirely; please let me know if that is the case.</p>
+
+                <table class="copyrights">
+                    <tr>
+                        <th colspan="4">Backgrounds</th>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/cuzco">Cuzco</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/[CC0] Cuzco - Space background (bg5) [OpengameArt]-85%25.jpg'); background-position: center 50%"></td>
+                        <td>Defeat <a href="https://opengameart.org/content/space-background">background</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/dklon">dklon</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/[CC-BY-SA-3.0] dklon - Grungy Title Screen Background (scifi_main_menu_0) [OpenGameArt].jpg'); background-position: center 50%"></td>
+                        <td>Standard dialog <a href="https://opengameart.org/content/grungy-title-screen-background">backgrounds</a></td>
+                        <td>
+                            <a class="license cc-by" title="Creative Commons Attribution 3.0 Unported" href="https://creativecommons.org/licenses/by/3.0"><span>CC-BY-3.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://eol.jsc.nasa.gov/sseop/">Earth Sciences and Image Analysis Laboratory at Johnson Space Center</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/ISS001-421-24_lrg-1080px.jpg'); background-position: center 0%"></td>
+                        <td><a href="https://earthobservatory.nasa.gov/IOTD//view.php?id=3338">Planetscape #2</a></td>
+                        <td>
+                            <a class="license pd" title="Public Domain"><span>PD</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/fraang">fraang</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/[CC-BY-SA-3.0] fraang - Space backgrounds (space-2) [OpenGameArt].png'); background-position: center 0%"></td>
+                        <td>Tileable background for <a href="https://opengameart.org/content/space-backgrounds-0">minor pages</a></td>
+                        <td>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><a href="http://trak.mercenariesguild.net/">Georges "TRaK" Grondin</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/[CC-BY-SA-3.0] [GPL-2.0] [GPL-3.0] TRaK - Acid green warning stripes (trak2_warn2b) [OpenGameArt].png'); background-position: center 0%"></td>
+                        <td>Reminder and victory dialog <a href="https://opengameart.org/content/acid-green-warning-stripes">borders</a></td>
+                        <td>
+                            <a class="license gpl2" title="GNU General Public License, version 2" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><span>GPLv2</span></a>
+                            <a class="license gpl3" title="GNU General Public License, version 3" href="https://www.gnu.org/licenses/gpl.html"><span>GPLv3</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://trak.mercenariesguild.net/">Georges "TRaK" Grondin</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/[CC-BY-SA-3.0] [GPL-2.0] [GPL-3.0] TRaK - Dull yellow warning stripes (trak2_warn2a) [OpenGameArt].png'); background-position: center 50%"></td>
+                        <td>Standard dialog <a href="https://opengameart.org/content/dull-yellow-warning-stripes">borders</a></td>
+                        <td>
+                            <a class="license gpl2" title="GNU General Public License, version 2" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><span>GPLv2</span></a>
+                            <a class="license gpl3" title="GNU General Public License, version 3" href="https://www.gnu.org/licenses/gpl.html"><span>GPLv3</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://trak.mercenariesguild.net/">Georges "TRaK" Grondin</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/[CC-BY-SA-3.0] [GPL-2.0] [GPL-3.0] TRaK - Red warning stripes (trak2_warn2d) [OpenGameArt].png'); background-position: center 18%"></td>
+                        <td>Defeat and enemy dialog <a href="https://opengameart.org/content/red-warning-stripes">borders</a></td>
+                        <td>
+                            <a class="license gpl2" title="GNU General Public License, version 2" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><span>GPLv2</span></a>
+                            <a class="license gpl3" title="GNU General Public License, version 3" href="https://www.gnu.org/licenses/gpl.html"><span>GPLv3</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/rawdanitsu">Rawdanitsu</a><br />NASA/GSFC/Arizona State University</td>
+                        <td style="background-image: url('./assets/images/backgrounds/limb-planetscape-1-85%25.jpg'); background-position: center 0%"></td>
+                        <td><a href="https://commons.wikimedia.org/wiki/File:Limb_view_of_Moon_captured_during_LRO_commissioning_phase_%28M106797147%29.jpg">Planetscape</a> <a href="http://opengameart.org/content/space-backgrounds-2">#1</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/rawdanitsu">Rawdanitsu</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/[CC0] Rawdanitsu - Another Space Backgrounds (space-background-10) [OpenGameArt]-85%25.jpg'); background-position: center 50%"></td>
+                        <td>Victory <a href="https://opengameart.org/content/another-space-backgrounds">background</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/rawdanitsu">Rawdanitsu</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/[CC0] Rawdanitsu - Space Backgrounds 8 (Scene-2) [OpenGameArt]-85%25.jpg'); background-position: center 50%"></td>
+                        <td>Selection Screen <a href="https://opengameart.org/content/space-backgrounds-8">background</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://sethbyrd.com">SethByrd</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/[CC0] SethByrd - Starry Night Background (Stars iphone6+) [OpenGameArt].png'); background-position: center 50%"></td>
+                        <td>Title screen <a href="https://opengameart.org/content/starry-night-background">background</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/silver-iv">Silver IV</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/[CC-BY-3.0] [GPL-2.0] [GPL-3.0] Silver IV - Grid HUD (Grid3) [OpenGameArt]-tileable.png'); background-position: center 50%"></td>
+                        <td>Selection Screen <a href="https://opengameart.org/content/grid-hud">panel background</a></td>
+                        <td>
+                            <a class="license gpl2" title="GNU General Public License, version 2" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><span>GPLv2</span></a>
+                            <a class="license gpl3" title="GNU General Public License, version 3" href="https://www.gnu.org/licenses/gpl.html"><span>GPLv3</span></a>
+                            <a class="license cc-by" title="Creative Commons Attribution 3.0 Unported" href="https://creativecommons.org/licenses/by/3.0"><span>CC-BY-3.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="4">Bots</th>
+                    </tr>
+                    <tr>
+                        <td><a href="https://openclipart.org/user-detail/culturalibre">culturalibre</a></td>
+                        <td style="background-image: url('./assets/images/bots/500px-culturalibre - Nomad-Desert Mech.png'); background-position: center 0%"></td>
+                        <td>The "<a href="https://openclipart.org/detail/268350/nomaddesert-mech">Nomad</a>"</td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://openclipart.org/user-detail/edsonsantos">edsonsantos</a></td>
+                        <td style="background-image: url('./assets/images/bots/500px-edsonsantos - Mecha Warrior.png'); background-position: center 0%"></td>
+                        <td>The "<a href="https://openclipart.org/detail/3505/mecha-warrior">Stormcrow</a>"</td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://www.johnnyautomatic.com">johnny_automatic</a>/<a href="https://openclipart.org/user-detail/orru">orru</a></td>
+                        <td style="background-image: url('./assets/images/bots/700px-johnny_automatic and orru - robot color simply.png'); background-position: center 0%"></td>
+                        <td>The "<a href="https://openclipart.org/detail/173068/robot-color-simply">Big Zero 6</a>"</td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://freeforall.cc/">Justin Nichol</a></td>
+                        <td style="background-image: url('./assets/images/bots/500px-Justin Nichol - Bullfrog.png'); background-position: center 44%"></td>
+                        <td>The <a href="https://opengameart.org/content/bullfrog-support-mech">Bullfrog</a></td>
+                        <td>
+                            <a class="license gpl2" title="GNU General Public License, version 2" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><span>GPLv2</span></a>
+                            <a class="license gpl3" title="GNU General Public License, version 3" href="https://www.gnu.org/licenses/gpl.html"><span>GPLv3</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 4.0 International" href="https://creativecommons.org/licenses/by-sa/4.0"><span>CC-BY-SA-4.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://freeforall.cc/">Justin Nichol</a></td>
+                        <td style="background-image: url('./assets/images/bots/700px-Justin Nichol - Charon.png'); background-position: center 0%"></td>
+                        <td>The <a href="http://opengameart.org/content/charon-assault-mech">Charon</a></td>
+                        <td>
+                            <a class="license gpl2" title="GNU General Public License, version 2" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><span>GPLv2</span></a>
+                            <a class="license gpl3" title="GNU General Public License, version 3" href="https://www.gnu.org/licenses/gpl.html"><span>GPLv3</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 4.0 International" href="https://creativecommons.org/licenses/by-sa/4.0"><span>CC-BY-SA-4.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://freeforall.cc/">Justin Nichol</a></td>
+                        <td style="background-image: url('./assets/images/bots/700px-Justin Nichol - Imp.png'); background-position: center 20%"></td>
+                        <td>The <a href="https://opengameart.org/content/sci-fi-vehicles-collection">Imp</a></td>
+                        <td>
+                            <a class="license gpl2" title="GNU General Public License, version 2" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><span>GPLv2</span></a>
+                            <a class="license gpl3" title="GNU General Public License, version 3" href="https://www.gnu.org/licenses/gpl.html"><span>GPLv3</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 4.0 International" href="https://creativecommons.org/licenses/by-sa/4.0"><span>CC-BY-SA-4.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://freeforall.cc/">Justin Nichol</a></td>
+                        <td style="background-image: url('./assets/images/bots/700px-Justin Nichol - Kappa.png'); background-position: center 17%"></td>
+                        <td>The <a href="http://opengameart.org/content/the-kappa-power-armor">Kappa</a></td>
+                        <td>
+                            <a class="license gpl2" title="GNU General Public License, version 2" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><span>GPLv2</span></a>
+                            <a class="license gpl3" title="GNU General Public License, version 3" href="https://www.gnu.org/licenses/gpl.html"><span>GPLv3</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 4.0 International" href="https://creativecommons.org/licenses/by-sa/4.0"><span>CC-BY-SA-4.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://freeforall.cc/">Justin Nichol</a></td>
+                        <td style="background-image: url('./assets/images/bots/700px-Justin Nichol - Kraken.png'); background-position: center 35%"></td>
+                        <td>The <a href="https://opengameart.org/content/sci-fi-vehicles-collection">Kraken</a></td>
+                        <td>
+                            <a class="license gpl2" title="GNU General Public License, version 2" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><span>GPLv2</span></a>
+                            <a class="license gpl3" title="GNU General Public License, version 3" href="https://www.gnu.org/licenses/gpl.html"><span>GPLv3</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 4.0 International" href="https://creativecommons.org/licenses/by-sa/4.0"><span>CC-BY-SA-4.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/killyoverdrive">killyoverdrive</a></td>
+                        <td style="background-image: url('./assets/images/bots/300px-killyoverdrive - Combat Android.png'); background-position: center 8%"></td>
+                        <td>The "<a href="https://opengameart.org/content/combat-android">Scarab</a>"</td>
+                        <td>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/piacenti">piacenti</a></td>
+                        <td style="background-image: url('./assets/images/bots/700px-piacenti - Robot.png'); background-position: center 0%"></td>
+                        <td>The "<a href="http://opengameart.org/content/robot-5">Executioner</a>"</td>
+                        <td>
+                            <a class="license cc-by" title="Creative Commons Attribution 3.0 Unported" href="https://creativecommons.org/licenses/by/3.0"><span>CC-BY-3.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://primandras.hu">tzunghaor</a></td>
+                        <td style="background-image: url('./assets/images/bots/300px-tzunghaor - robot.png'); background-position: center 19%"></td>
+                        <td>The "<a href="https://openclipart.org/detail/125863/robot">Munchkin</a>"</td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://www.techietips.net/user/1">wildchief</a></td>
+                        <td style="background-image: url('./assets/images/bots/350px-wildchief - Robot Walker.png'); background-position: center 8%"></td>
+                        <td>The "<a href="https://openclipart.org/detail/82855/robot-walker">Hermes</a>"</td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="4">Emblems</th>
+                    </tr>
+                    <tr>
+                        <td><a href="https://openclipart.org/user-detail/ENTREPRENEUR">ENTREPRENEUR</a></td>
+                        <td style="background-image: url('./assets/images/icons/[PD] ENTREPRENEUR - Torn flag (torn-flag) [OpenClipArt].png'); background-position: center 25%"></td>
+                        <td>The Rebel <a href="https://openclipart.org/detail/235028/torn-flag">emblem</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://openclipart.org/user-detail/Firkin">Firkin</a>/<a href="https://openclipart.org/user-detail/inky2010">inky2010</a>/<a href="https://openclipart.org/user-detail/Anonymous">Anonymous</a></td>
+                        <td style="background-image: url('./assets/images/icons/world-gear-grid-icon.png'); background-position: center 50%"></td>
+                        <td>The <a href="https://openclipart.org/detail/248841/50tooth-gear-with-radial-spokes">Machinists'</a> <a href="https://openclipart.org/detail/80965/globe5">Guild</a> <a href="https://openclipart.org/detail/13063/northern-hemisphere-globe">emblem</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/jreijonen">jreijonen</a></td>
+                        <td style="background-image: url('./assets/images/icons/[CC-BY-3.0] jreijonen - Faction symbols (allies & axis) (star_0_0) [OpenGameArt]-512px.png'); background-position: center 45%"></td>
+                        <td>The Star Alliance <a href="https://opengameart.org/content/faction-symbols-allies-axis">emblem</a></td>
+                        <td>
+                            <a class="license cc-by" title="Creative Commons Attribution 3.0 Unported" href="https://creativecommons.org/licenses/by/3.0"><span>CC-BY-3.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/myckel">Myckel</a></td>
+                        <td style="background-image: url('./assets/images/icons/[CC-BY-SA-3.0] Myckel - 6 Sci-Fi symbols (sci-fi_symbols) [OpenGameArt]-%235.png'); background-position: center 63%"></td>
+                        <td>The Prime Edict <a href="http://opengameart.org/content/6-sci-fi-symbols">emblem</a></td>
+                        <td>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="4">Fair Use Images</th>
+                    </tr>
+                    <tr>
+                        <td><a href="https://activision.com/">Activision</a></td>
+                        <td style="background-image: url('./assets/images/fairuse/3634-mechwarrior-dos-screenshot-mechwarrior-splash-screen.gif'); background-position: center 0%"></td>
+                        <td>Old MS-DOS MechWarrior <a href="http://www.mobygames.com/game/dos/mechwarrior/screenshots/gameShotId,3634/">splash screen</a></td>
+                        <td>
+                            <a class="license copyright" title="Copyright 1989 Activision, all rights reserved."><span>(C)</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="4">Foreground Objects</th>
+                    </tr>
+                    <tr>
+                        <td><a href="https://citybuildingkit.com/">CityBuildingKit.com</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/[CC0] City Building Game Art - Spacewreck (Space_DestroyedStructure) [OpenGameArt]-1024px.png'); background-position: center 40%"></td>
+                        <td>Title screen <a href="http://opengameart.org/content/spacewreck">wreckage</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://freegamer.blogspot.com/">Julius</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/Julius - MCU-43 Gryphon Mech (mcu-43 gryphon) [OpenGameArt].png'); background-position: center 10%"></td>
+                        <td>Selection screen <a href="http://opengameart.org/content/mcu-43-gryphon-mech">panel adornment</a></td>
+                        <td>
+                            <a class="license gpl2" title="GNU General Public License, version 2" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><span>GPLv2</span></a>
+                            <a class="license gpl3" title="GNU General Public License, version 3" href="https://www.gnu.org/licenses/gpl.html"><span>GPLv3</span></a>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://bci.im/">devnewton</a></td>
+                        <td style="background-image: url('./assets/images/backgrounds/devnewton - Black metal boss (boss) [OpenGameArt].png'); background-position: center 30%"></td>
+                        <td>Portrait of the <a href="https://opengameart.org/content/black-metal-boss">Overseer</a></td>
+                        <td>
+                            <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="4">Special effects</th>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/cuzco">cuzco</a></td>
+                        <td style="background-image: url('./assets/images/effects/[CC0] Cuzco - Explosion (exp2_0) [OpenGameArt].png'); background-position: center top"></td>
+                        <td>Explosion <a href="https://opengameart.org/content/explosion">E5</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/elnineo">elnineo</a></td>
+                        <td style="background-image: url('./assets/images/effects/[CC0] elmineo - Explosion Tilesets (Explosion_001_Tile_8x8_256x256) [OpenGameArt].png'); background-position: center top"></td>
+                        <td>Explosion <a href="http://opengameart.org/content/explosion-tilesets">E6</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/elnineo">elnineo</a></td>
+                        <td style="background-image: url('./assets/images/effects/[CC0] elmineo - Explosion Tilesets (Explosion_002_Tile_8x8_256x256) [OpenGameArt].png'); background-position: center top"></td>
+                        <td>Explosion <a href="http://opengameart.org/content/explosion-tilesets">E7</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/elnineo">elnineo</a></td>
+                        <td style="background-image: url('./assets/images/effects/[CC0] elmineo - Explosion Tilesets (Explosion_003_Tile_8x8_256x256) [OpenGameArt].png'); background-position: center top"></td>
+                        <td>Explosion <a href="http://opengameart.org/content/explosion-tilesets">E8</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://www.nyrthos.com/">Mikodrak</a></td>
+                        <td style="background-image: url('./assets/images/effects/fire_1f-40-frames-81x123.png'); background-position: center top"></td>
+                        <td>Fire <a href="http://opengameart.org/content/fire-fx-burning-fire-animation">F2</a></td>
+                        <td>
+                            <a class="license cc-by" title="Creative Commons Attribution 3.0 Unported" href="https://creativecommons.org/licenses/by/3.0"><span>CC-BY-3.0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/skorpio">Skorpio</a></td>
+                        <td style="background-image: url('./assets/images/effects/[CC-BY-3.0] [GPL-3.0] Skorpio - Warp effect 2 (Warp_effect2C) [openGameArt]-9-frames-320x320 [OpenGameArt].png'); background-position: center top"></td>
+                        <td>Explosion <a href="http://opengameart.org/content/warp-effect-2">E9</a></td>
+                        <td>
+                            <a class="license gpl3" title="GNU General Public License, version 3" href="https://www.gnu.org/licenses/gpl.html"><span>GPLv3</span></a>
+                            <a class="license cc-by" title="Creative Commons Attribution 3.0 Unported" href="https://creativecommons.org/licenses/by/3.0"><span>CC-BY-3.0</span></a>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><a href="http://www.solunasoftware.com/">Soluna Software</a></td>
+                        <td style="background-image: url('./assets/images/effects/[CC0] [CC-BY-3.0] Soluna Software - Explosion effects and more (Effect95) [OpenGameArt].png'); background-position: center top"></td>
+                        <td>Explosion <a href="http://opengameart.org/content/explosion-effects-and-more">E10</a></td>
+                        <td>
+                            <a class="license cc-by" title="Creative Commons Attribution 3.0 Unported" href="https://creativecommons.org/licenses/by/3.0"><span>CC-BY-3.0</span></a>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://www.solunasoftware.com/">Soluna Software</a></td>
+                        <td style="background-image: url('./assets/images/effects/[CC0] [CC-BY-3.0] Soluna Software - Explosion effects and more (Explosion03) [OpenGameArt].png'); background-position: center top"></td>
+                        <td>Explosion <a href="http://opengameart.org/content/explosion-effects-and-more">E1</a></td>
+                        <td>
+                            <a class="license cc-by" title="Creative Commons Attribution 3.0 Unported" href="https://creativecommons.org/licenses/by/3.0"><span>CC-BY-3.0</span></a>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://www.solunasoftware.com/">Soluna Software</a></td>
+                        <td style="background-image: url('./assets/images/effects/[CC0] [CC-BY-3.0] Soluna Software - Explosion effects and more (Explosion21) [OpenGameArt].png'); background-position: center top"></td>
+                        <td>Explosion <a href="http://opengameart.org/content/explosion-effects-and-more">E2</a></td>
+                        <td>
+                            <a class="license cc-by" title="Creative Commons Attribution 3.0 Unported" href="https://creativecommons.org/licenses/by/3.0"><span>CC-BY-3.0</span></a>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://www.solunasoftware.com/">Soluna Software</a></td>
+                        <td style="background-image: url('./assets/images/effects/[CC0] Soluna Software - Explosion effects and more (Explosion25) [OpenGameArt].png'); background-position: center top"></td>
+                        <td>Explosion <a href="https://opengameart.org/content/lots-of-game-effects">E3</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://www.solunasoftware.com/">Soluna Software</a></td>
+                        <td style="background-image: url('./assets/images/effects/[CC0] Soluna Software - Explosion effects and more (Fire01) [OpenGameArt].png'); background-position: center top"></td>
+                        <td>Fire <a href="https://opengameart.org/content/lots-of-game-effects">F1</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://opengameart.org/users/stumpystrust">StumpyStrust</a></td>
+                        <td style="background-image: url('./assets/images/effects/[CC0] StumpyStrust - Explosion Sheet (boom3) [OpenGameArt].png'); background-position: center top"></td>
+                        <td>Explosion <a href="http://opengameart.org/content/explosion-sheet">E4</a></td>
+                        <td>
+                            <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="http://wrathgames.com/blog">WrathGames Studio</a></td>
+                        <td style="background-image: url('./assets/images/effects/FireLoop1-50-frames-256x256.png'); background-position: center top"></td>
+                        <td>Fire <a href="https://opengameart.org/content/wgstudio-fire-animation-loop">F3</a></td>
+                        <td>
+                            <a class="license cc-by" title="Creative Commons Attribution 3.0 Unported" href="https://creativecommons.org/licenses/by/3.0"><span>CC-BY-3.0</span></a>
+                        </td>
+                    </tr>
+                    <!--
+                      <tr>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td>
+                              <a class="license cc-by" title="Creative Commons Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0"><span>CC-BY-4.0</span></a>
+                              <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 4.0 International" href="https://creativecommons.org/licenses/by-sa/4.0"><span>CC-BY-SA-4.0</span></a>
+                              <a class="license cc-by" title="Creative Commons Attribution 3.0 Unported" href="https://creativecommons.org/licenses/by/3.0"><span>CC-BY-3.0</span></a>
+                              <a class="license cc-by-sa" title="Creative Commons Attribution-ShareAlike 3.0 Unported" href="https://creativecommons.org/licenses/by-sa/3.0"><span>CC-BY-SA-3.0</span></a>
+                              <a class="license cc0" title="Creative Commons CC0 1.0 Universal, no rights reserved." href="https://creativecommons.org/publicdomain/zero/1.0/"><span>CC0</span></a>
+                              <a class="license pd" title="Public Domain"><span>PD</span></a>
+                              <a class="license gpl2" title="GNU General Public License, version 2" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><span>GPLv2</span></a>
+                              <a class="license gpl3" title="GNU General Public License, version 3" href="https://www.gnu.org/licenses/gpl.html"><span>GPLv3</span></a>
+                          </td>
+                      </tr>
+                    -->
+                </table>
+
+                <p>
+                    I also used a number of open-source tools to create this
+                    project.  Worthy of particular mention are the
+                    <a href="https://www.gimp.org"><abbr title="GNU Image Manipulation Program">GIMP</abbr></a>,
+                    an all-around image manipulator, and <a href="http://www.antiprism.com">Antiprism</a>,
+                    which I used to generate the polyhedral dice images.
+                </p>
+
+                <p>
+                    Thank you so much for taking the time to read this.  I
+                    hope you have as much fun playing as I had reminiscing.
+                </p>
+            </article>
+        </div>
+    </body>
+</html>

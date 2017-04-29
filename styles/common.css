@@ -1,0 +1,809 @@
+/* Allow all pages to have background images that extend the full size of the
+   content. */
+
+html {
+    height: 100vh; /* 100% of the viewport height. */
+}
+body, body > .content {
+    min-height: 100vh;
+    /* Pevent scrollbars from showing up in Firefox. */
+    height: auto;
+}
+html, body, body > .content {
+    padding: 0px;
+    margin: 0px;
+    border: none;
+    width: 100%;
+}
+
+/* Animate the fading out of .content (in game.html, this is where the actual
+   game takes place.) */
+body > .content {
+    opacity: 1.0;
+    transition: opacity 1s ease-in;
+}
+
+/* Game backdrops. */
+body > .content.backdrop-1 { background: url("../assets/images/backgrounds/limb-planetscape-1-85%25.jpg") 50% top / cover no-repeat; }
+body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS001-421-24_lrg-1080px.jpg") 50% top / cover no-repeat; }
+
+/* A custom font used for headers. */
+@font-face {
+    src: url("../assets/fonts/ikarrg.ttf");
+    font-family: Ikarus;
+}
+
+/* Global color scheme styles. */
+/* Headers; buttons; bullets, wingdings, highlights. */
+.primary-fg    { color:            rgb(226, 0, 104); }
+.primary-bg    { background-color: rgb(226, 0, 104); }
+/* Background. */
+.secondary-fg  { color:            rgb(9, 25, 19); }
+.secondary-bg  { background-color: rgb(9, 25, 19); }
+/* Logos. */
+.quaternary-fg { color:            rgb(137, 143, 148); }
+.quaternary-bg { background-color: rgb(137, 143, 148); }
+/* Header and logo outlines. */
+.tertiary-fg   { color:            rgb(78, 101, 89); }
+.tertiary-bg   { background-color: rgb(78, 101, 89); }
+
+/* Markup for the "dialog box" divs. */
+
+.dialog {
+    display: none;
+
+    position: absolute;
+    left: 25%;
+    top: 25%;
+
+    margin: auto;
+    width: 50%;
+    /* No default height.  Dialogs are adjustible by default. */
+    /* height: 50%; */
+    padding: 20px;
+
+    box-shadow: 8px 8px 8px 4px black;
+
+    background-image: url("../assets/images/backgrounds/[CC-BY-SA-3.0] [GPL-2.0] [GPL-3.0] TRaK - Dull yellow warning stripes (trak2_warn2a) [OpenGameArt].png");
+    background-repeat: repeat;
+}
+
+.dialog .overlay {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+
+    left: 0px;
+    top: 0px;
+    background-color: rgba(0,0,0,0.1);
+}
+
+.dialog .content {
+    /* To keep things centered, the padding and margin have to go hand-in hand
+       here. (Also, the padding for .dialog needs to be greater than the
+       padding for .dialog.content.) */
+    margin-left: -10px;
+    margin-top: -10px;
+    padding: 10px;
+    height: 100%;
+    width: 100%;
+    color: white;
+
+    background-image: url("../assets/images/backgrounds/[CC-BY-SA-3.0] dklon - Grungy Title Screen Background (scifi_main_menu_0) [OpenGameArt].jpg");
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+}
+
+.dialog .title {
+    margin: 0px;
+    font-family: Ikarus;
+    font-size: 24pt;
+    text-align: center;
+    text-decoration: underline green;
+    text-shadow: 2px 2px 3px black;
+}
+
+/* Alternate dialog styles. */
+
+.dialog.green {
+    background-image: url("../assets/images/backgrounds/[CC-BY-SA-3.0] [GPL-2.0] [GPL-3.0] TRaK - Acid green warning stripes (trak2_warn2b) [OpenGameArt].png");
+}
+.dialog.red {
+    background-image: url("../assets/images/backgrounds/[CC-BY-SA-3.0] [GPL-2.0] [GPL-3.0] TRaK - Red warning stripes (trak2_warn2d) [OpenGameArt].png");
+}
+
+/* "It's your turn" dialogs. */
+#turn-dialog-template { /*display:block;*/ }
+#turn-dialog-template .logo {
+    background-image: url("../assets/images/icons/[CC-BY-SA-3.0] Myckel - 6 Sci-Fi symbols (sci-fi_symbols) [OpenGameArt]-%235.png");
+}
+.dialog.turn {
+    width: 30%;
+    /* height: 15%; */
+    /* I'd like the bigger AI turn dialogs to expand to fill their content.  You'd
+       think setting a min-height would be enough to do this, but you'd be
+       wrong: the height calculated using min-height is not inherited.  This
+       is a deficiency in the CSS spec that is unlikely to ever change.
+
+       Flexboxes (display: flex; flex-direction: column) work, but they're
+       new.
+
+       The old standby is display:table here and display:table-cell for the
+       .content.  This also works in practice, so that's what we use.  (These
+       are set programmatically.) */
+}
+.dialog.turn .content > table {
+    float: left;
+    width: 80%;
+    /* height: 100%; */
+}
+.dialog.turn .logo {
+    float: left;
+    width: 20%;
+    height: 100%;
+    background-position: left 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.dialog.turn .title { font-size: 14pt; }
+.dialog.turn .title h2 { margin: 0; }
+.dialog.turn .text { text-align: center; }
+
+
+/* Small-border dialogs. */
+.dialog.small {
+    padding: 8px;
+    /* height: 5%; */
+    width: 15%;
+}
+.dialog.small .title { display: none; }
+.dialog.small .content {
+    margin-left: -4px;
+    margin-top: -4px;
+    padding: 4px;
+}
+.dialog.small .content .title { display: none; }
+
+/* Markup to style formulas in the damage reports. */
+.formula {
+    font-weight: bold;
+    font-family: Garamond, Georgia, serif;
+
+    /*
+     * Vertically center all of the floating elements in the formula.
+     *
+     * Floating elements disables vertical-align: middle, so float is not our friend.
+     */
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.dice {
+    /* Make sure the die image is fully visible. */
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: 50% 50%;
+    text-align: center;
+    color: white;
+    /* Repeated shadows effectively become an outline in CSS3. */
+    text-shadow: 0px 0px 2px black;
+    text-shadow: 0px 0px 2px black;
+    text-shadow: 0px 0px 2px black;
+    text-shadow: 0px 0px 2px black;
+}
+
+.dice.dn-1  { background-image: url('../assets/images/dice/dn-1.png');  }
+.dice.dn-2  { background-image: url('../assets/images/dice/dn-2.png');  }
+.dice.dn-3  { background-image: url('../assets/images/dice/dn-3.png');  }
+.dice.d20-1 { background-image: url('../assets/images/dice/d20-1.png'); }
+.dice.d20-2 { background-image: url('../assets/images/dice/d20-2.png'); }
+.dice.d20-3 { background-image: url('../assets/images/dice/d20-3.png'); }
+.dice.d12-1 { background-image: url('../assets/images/dice/d12-1.png'); }
+.dice.d12-2 { background-image: url('../assets/images/dice/d12-2.png'); }
+.dice.d12-3 { background-image: url('../assets/images/dice/d12-3.png'); }
+.dice.d10-1 { background-image: url('../assets/images/dice/d10-1.png'); }
+.dice.d10-2 { background-image: url('../assets/images/dice/d10-2.png'); }
+.dice.d10-3 { background-image: url('../assets/images/dice/d10-3.png'); }
+.dice.d8-1  { background-image: url('../assets/images/dice/d8-1.png');  }
+.dice.d8-2  { background-image: url('../assets/images/dice/d8-2.png');  }
+.dice.d8-3  { background-image: url('../assets/images/dice/d8-3.png');  }
+.dice.d6-1  { background-image: url('../assets/images/dice/d6-1.png');  }
+.dice.d6-2  { background-image: url('../assets/images/dice/d6-2.png');  }
+.dice.d6-3  { background-image: url('../assets/images/dice/d6-3.png');  }
+.dice.d4-1  { background-image: url('../assets/images/dice/d4-1.png');  }
+.dice.d4-2  { background-image: url('../assets/images/dice/d4-2.png');  }
+.dice.d4-3  { background-image: url('../assets/images/dice/d4-3.png');  }
+.dice.d2-1  { background-image: url('../assets/images/dice/d2-1.png');  }
+.dice.d2-2  { background-image: url('../assets/images/dice/d2-2.png');  }
+.dice.d2-3  { background-image: url('../assets/images/dice/d2-3.png');  }
+
+/* Markup to style the damage report dialog. */
+.dialog .text .narrative strong       { color: rgb(30, 220, 30); text-shadow: 1px 1px 1px black; }
+.dialog .text .narrative strong.enemy { color: rgb(220, 30, 30); text-shadow: 1px 1px 1px black; }
+.dialog .text .narrative .name        { color: rgb(10, 255, 0); text-shadow: 1px 1px 1px black; font-weight: bold; }
+.dialog .text .narrative .name.enemy  { color: rgb(255, 10, 0); text-shadow: 1px 1px 1px black; font-weight: bold; }
+.dialog .text { text-align: center; }
+.dialog .text .report { margin-left: auto; margin-right: auto; }
+
+/* Markup to style the damage report dialog....for computer players.
+
+   Neutral markup (like black text shadows or bold font weights) is already inherited.
+ */
+.dialog .text .narrative.enemy strong       { color: rgb(220, 30, 30); }
+.dialog .text .narrative.enemy strong.enemy { color: rgb(30, 220, 30); }
+.dialog .text .narrative.enemy .name        { color: rgb(255, 10, 0);  }
+.dialog .text .narrative.enemy .name.enemy  { color: rgb(10, 255, 0);  }
+
+/* Markup to style the endgame dialog. */
+
+#endgame-dialog-template { /* display: block; */ }
+.dialog.endgame {
+    height: 75%;
+    top: 12%;
+}
+.dialog.endgame .background {
+    height: 100%;
+}
+.dialog.endgame .content {
+    padding: 0px;
+    margin: 0px;
+}
+.dialog.endgame .content .header {
+    text-shadow: 0px 0px 10px white;
+    text-align: center;
+
+    font-family: Ikarus;
+    font-size: 36pt;
+    height: 20%;
+}
+.dialog.endgame .content .text {
+    height: 80%;
+    font-style: oblique;
+    font-family: sans-serif;
+}
+.dialog.endgame .content.success {
+    display: none;
+    background: url("../assets/images/icons/[CC-BY-3.0] jreijonen - star_0_0 [OpenGameArt]-256px.png") 50% 50% / contain no-repeat,
+                url("../assets/images/backgrounds/[CC0] Rawdanitsu - Another Space Backgrounds (space-background-10) [OpenGameArt]-85%25.jpg") 50% 50% / cover no-repeat;
+}
+.dialog.endgame .content.success .header {
+    text-shadow: 0px 0px 1px rgb(128,128,128),
+                 0px 0px 4px rgb(255,255,255),
+                 0px 0px 10px gray;
+    color: yellow;
+}
+.dialog.endgame .content.success .header .letter {
+    text-shadow: 0px 0px 1px white, 0px 0px 1px white, 0px 0px 1px white, 0px 0px 1px white;
+    animation-duration: 10s;
+    animation-name: letter-glow;
+}
+.dialog.endgame .content.success .header .star {
+    animation-duration: 10s;
+    animation-name: star-glow, widen;
+    margin-left: 0.3em;
+    margin-right: 0.3em;
+    color: white;
+}
+
+@keyframes widen {
+    from { margin-left: 0.1em;  margin-right: 0.1em; }
+    to { margin-left: 0.3em; margin-right: 0.3em; }
+}
+@keyframes star-glow {
+    from { color: rgb(226, 0, 104); }
+    to { color: white; }
+}
+@keyframes letter-glow {
+    from {
+        text-shadow: 0px 0px 1px black, 0px 0px 1px black, 0px 0px 1px black, 0px 0px 1px black;
+        color: lime;
+    }
+    to {
+        text-shadow: 0px 0px 1px white, 0px 0px 1px white, 0px 0px 1px white, 0px 0px 1px white;
+        color: yellow;
+    }
+}
+.dialog.endgame .content.success .background {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(255, 255, 255, 0.2))
+}
+.dialog.endgame .content.success .text {
+    color: white;
+    text-shadow: 0px 0px 1px black, 0px 0px 1px black, 0px 0px 1px black, 0px 0px 1px black,
+                 2px 2px 1px rgb(0, 0, 0);
+    font-size: 1.7em;
+}
+.dialog.endgame .content.success .text p {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.dialog.endgame .overlay.failure {
+    background-color: rgba(0, 0, 0, 0);
+    transition: background-color 5s ease-in;
+}
+.dialog.endgame .content.failure {
+    display: none;
+    position: relative; /* Needed for placement over the .overlay.failure. */
+    background: url("../assets/images/icons/[CC-BY-SA-3.0] Myckel - 6 Sci-Fi symbols (sci-fi_symbols) [OpenGameArt]-%235.png") 50% 50% / contain no-repeat,
+                url("../assets/images/backgrounds/[CC0] Cuzco - Space background (bg5) [OpengameArt]-85%25.jpg") 50% 50% / cover no-repeat;
+}
+.dialog.endgame .content.failure .background {
+    /* An alpha of 0.7 looks fine on my monitor, but looks like pure darkness on
+       some other ones. */
+    background-color: rgba(0, 0, 0, 0.3);
+}
+.dialog.endgame .content.failure .header {
+    text-shadow: 2px 2px 1px rgb(128,0,0), 4px 4px 1px rgb(255,0,0), 0px 0px 10px gray;
+    color: black;
+}
+.dialog.endgame .content.failure strong.name { color: red; }
+.dialog.endgame .content.failure .text {
+    color: white;
+    text-shadow: 0px 0px 1px black, 0px 0px 1px black, 0px 0px 1px black, 0px 0px 1px black,
+                 0px 1px 1px rgb(128, 0, 0),
+                 0px 2px 2px rgb(64, 0, 0),
+                 0px 4px 4px rgb(32, 0, 0),
+                 0px 8px 8px rgb(16, 0, 0);
+    font-size: 1.5em;
+}
+.dialog.endgame .content.failure .text div { height: 10%; width: 70%; margin-left: auto; margin-right: auto; }
+.dialog.endgame .content.failure .text .right  { text-align: center; padding-right: 5%; }
+.dialog.endgame .content.failure .text .center { text-align: center; }
+.dialog.endgame .content.failure .text .left   { text-align: center; padding-left: 5%; }
+.dialog.endgame .content.failure .text strong { font-variant: small-caps; color: rgb(196, 40, 20); }
+
+
+
+/* Markup to style the damage report itself. */
+
+.report { font-family: sans-serif; border-spacing: 0; }
+.report tr td:nth-child(4) { padding-left: 1em; }
+.report { text-align: left; }
+.report .label { padding-left: 1em; }
+.report .calculation { padding-left: 1em; }
+.report .value { font-weight: bold; text-align: right; }
+
+.report .status { font-weight: bold; padding-left: 1em; padding-right: 1em; }
+.report .jump .success { font-weight: bold; }
+.report .success { color: green; }
+.report .partial { color: orange; }
+.report .failure { color: red; }
+
+/* Any cell in a damage report that represents a sum needs a line over it
+   so that it can appear the same way a traditional addition problem would
+   appear. */
+.report .sum {
+    font-weight: bold;
+    border-top: 3px solid black;
+}
+
+/* Markup for the PlainView's factions and robots. */
+.faction.faction-0 .robot .main-image { background-color: rgba(160, 255, 255, 0.2); }
+.faction.faction-1 .robot .main-image { background-color: rgba(255, 160, 255, 0.2); }
+.faction.faction-2 .robot .main-image { background-color: rgba(255, 255, 160, 0.2); }
+.faction.faction-3 .robot .main-image { background-color: rgba(160, 160, 255, 0.2); }
+.faction.faction-4 .robot .main-image { background-color: rgba(255, 160, 160, 0.2); }
+.faction.faction-5 .robot .main-image { background-color: rgba(160, 255, 160, 0.2); }
+.faction.faction-6 .robot .main-image { background-color: rgba(160, 160, 160, 0.2); }
+.faction.faction-7 .robot .main-image { background-color: rgba(255, 255, 255, 0.2); }
+.faction {
+    width: 0;
+    height: 0;
+    opacity: 1.0;
+    position: absolute;
+    left: 50%; height: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+
+    /* cubic-bezier(0.6, -0.28, 0.735, 0.045) corresponds to "easeInBack"
+       (see http://easings.net/#easeInBack.) */
+    transition: width 1s ease-in 5s,
+                height 1s ease-in 5s,
+                left 1s cubic-bezier(0.6, -0.28, 0.735, 0.045) 5s,
+                top 1s cubic-bezier(0.6, -0.28, 0.735, 0.045) 5s,
+                background-color 1s ease-in 5s;
+}
+.faction.success { background-color: rgba(0, 0, 0, 0); }
+
+#robot-template { display: none; }
+#faction-template { display: none; }
+
+#faction-template { width: 100%; height: 100vh; } /* Only used for testing */
+#robot-template .main-image { height: 200px; }    /* Only used for testing */
+#robot-template .main-image img { margin-top: 50px; height: 100px; margin-bottom: 50px; } /* Only used for testing */
+
+.robot {
+    border: 2px inset gray;
+    transition: width 1s ease-in,
+                height 1s ease-in,
+                left 1s cubic-bezier(0.6, -0.28, 0.735, 0.045),
+                top 1s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+}
+.robot.active { border: 2px outset gray; }
+.robot.targeted { border: 2px inset red; }
+
+.robot { position: absolute; background-color: rgba(240, 240, 240, 0.4); }
+.robot .top-bar { height: 1em; text-shadow: 1px 1px 1px gray; }
+.robot .top-bar { border: 1px outset black; padding: 3px; }
+.robot .top-bar > input { float: left; display: block; margin-top: 0; }
+.robot .top-bar > .name { float: left; }
+.robot .top-bar > .hp { float: right; width: 4em; text-align: right; }
+.robot .top-bar > .close { display: none; float: right; width: 1em; text-align: center; }
+
+.robot .main-image {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    overflow: hidden;
+}
+.robot .main-image img {
+    /*height: 300px;*/
+    opacity: 1.0;
+    transition: margin-left 1s ease-in,
+                opacity 1s ease-in;
+
+    /* This is *only* needed for PlainView.explode(robot, "jump", 0, duration). */
+    position: relative;
+}
+.robot .main-image .healthbar { display: none; } /* For now. */
+
+.robot .weapons { position: absolute; width: 100%; bottom: 0; display: none; }
+.robot .weapons table { width: 100%; border-collapse: separate; border-spacing: 1px; background-color: rgba(0,0,0,0.5); }
+.robot .weapons { font-family: sans-serif; font-size: x-small; vertical-align: middle; }
+.robot .weapons tr td { background-color: rgba(255, 255, 255, 0.5); }
+.robot .weapons tr td:nth-child(3) { text-align: right; width: 20%; }
+.robot .weapons tr td:nth-child(1) { width: 1em; }
+.robot .weapons .ammo { padding-right: 4px; }
+.robot .weapons .ammo insufficient { color: red; }
+
+.robot.active .top-bar { background-image: linear-gradient(to left, rgb(128, 128, 128), rgb(160, 255, 160)); }
+.robot.active .top-bar input { display: none; }
+.robot.active .top-bar { font-weight: bold; }
+.robot.active .top-bar .hp .number.low { color: red; }
+.robot.active .top-bar .hp .number.medium { color: yellow; }
+.robot.active .top-bar .hp .number.high { color: lime; }
+.robot.active .weapons tr.active td { background-color: rgba(196, 255, 196, 0.75); }
+.robot.active .weapons tr.empty td input { display: none; }
+.robot.active .weapons { display: block; }
+
+.robot.inactive .top-bar input { display: none; }
+.robot.inactive .top-bar .hp .number.low { color: red; }
+.robot.inactive .top-bar .hp .number.medium { color: yellow; }
+.robot.inactive .top-bar .hp .number.high { color: green; }
+.robot.inactive .weapons { display: block; }
+.robot.inactive .weapons td:nth-child(1) { display: none; }
+
+.robot.targeted .top-bar { background-image: linear-gradient(to left, rgb(128, 128, 128), rgb(200, 60, 60)); }
+
+.robot.dead .top-bar .name { color: red; text-decoration: line-through black; }
+.robot.dead .top-bar input { display: none; }
+.robot.dead .top-bar .hp { display: none; }
+.robot.active.dead .top-bar .close { display: block; }
+.robot.inactive.dead .top-bar .close { display: block; }
+.robot.dead .weapons { display: none; }
+
+.faction.flipped .robot .main-image img { transform: scaleX(-1); }
+
+/* Markup to style the Select-a-Mech™ full-screen dialog. */
+.select-a-mech {
+    display: none;
+    position: fixed;
+
+    /*position: absolute;*/
+
+    opacity: 1.0;
+    transition: opacity 1s ease-in;
+
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+
+    background-image: url('../assets/images/backgrounds/[CC0] Rawdanitsu - Space Backgrounds 8 (Scene-2) [OpenGameArt]-85%25.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.select-a-mech .content .panel {
+    position: absolute;
+    overflow: hidden;
+
+    padding: 5px;
+    color: white;
+    opacity: 0.95;
+    font-size: 14pt;
+    text-shadow: 0px 0px 2px black;
+
+    border: 2px solid lime;
+    box-shadow: 0px 0px 20px 2px lime;
+    background: url('../assets/images/backgrounds/[CC-BY-3.0] [GPL-2.0] [GPL-3.0] Silver IV - Grid HUD (Grid3) [OpenGameArt]-tileable.png') 50% 50% repeat;
+}
+
+.select-a-mech .content .panel.left {
+    left: 2%;
+    top: 10%;
+    width: 30%;
+    height: 85%;
+
+    padding-left: 1em;
+
+    /*
+     *
+     * I wish I could say there was a science to this.  I wish I could say *
+     * that I understood it.  But frankly, it's just guesswork and eyeballing.
+     * I visited http://www.useragentman.com/matrix/, tweaked the scaled
+     * quadrilateral into the shape I wanted, and then copied and pasted the
+     * parameters here and tweaked them further.
+     *
+     * First attempt.  This was a bust: the right panel has flipped text, and
+     *   making it look like the left panel is difficult.
+     *
+     * transform: matrix3d(1,       0.00069,  0,       0.00069,
+     *                     0,       1,        0,       0,
+     *                     0,       0,        1,       0,
+     *                     0,       1,        0,       1);
+     */
+
+    /* CHRIST ON TOAST, this works so much better. */
+    transform-origin: left top 0px;
+    transform: perspective(100px) rotate3d(0, 1, 0, 0.5deg);
+}
+
+.select-a-mech .content .panel.center {
+    left: 35%;
+    top: 10%;
+    width: 30%;
+    height: 80%;
+}
+
+.select-a-mech .content .panel.right {
+    right: 2%;
+    top: 10%;
+    width: 30%;
+    height: 85%;
+
+    padding-right: 1em;
+    /*
+     * First attempt.
+     *
+     *
+     * transform: translatex(84%) matrix3d(-1,       0.00069,  0,       0.00069,
+     *                                     0,        1,        0,       0,
+     *                                     0,        0,        1,       0,
+     *                                     0,        1,        0,       1);
+     */
+    transform-origin: right top 0px;
+    transform: perspective(100px) rotate3d(0, 1, 0, -0.5deg);
+}
+
+.select-a-mech .content .panel.left > div,
+.select-a-mech .content .panel.center > div {
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    /*
+     * Be just wide enough to hide the vertical scrollbar, then push the
+     * content back with hopefully-enough padding.  The result is that you can
+     * use your mouse wheel to scroll the inner div.
+     *
+     * Yeah, it's a bad kludge.  But CSS doesn't have a "only show the
+     * scrollbar when needed, but keep the space blank otehrwise" setting.
+     *
+     * Stolen from http://stackoverflow.com/a/16671187.
+     */
+    width: 100%;
+    height: 100%;
+    padding-right: 5%;
+}
+.select-a-mech label {
+    font-size: 1em;
+    font-family: sans-serif;
+}
+
+.select-a-mech .row {
+    transition: opacity 0.5s ease-in;
+}
+
+.select-a-mech button,
+.select-a-mech select {
+    background: none;
+
+    border: 5px solid white;
+    height: 2em;
+    font-size: 1em;
+    color: white;
+    transition: background 0.33s ease-in,
+                box-shadow 0.33s ease-in,
+                border-color 0.33s ease-in;
+}
+.select-a-mech select { border-radius: 2em; }
+.select-a-mech select option { color: black; }
+.select-a-mech *.row button {
+    width: 2em;
+    border-radius: 2em; /* Guarantees a circle. */
+}
+.select-a-mech button:hover {
+    background-color: green;
+    box-shadow: 0px 0px 10px 5px green;
+}
+.select-a-mech .disabled,
+.select-a-mech .disabled:hover {
+    color: gray;
+    border-color: gray;
+    background: none;
+    box-shadow: none;
+}
+.select-a-mech .player.row .team.invalid { color: white; background-color: red; }
+.select-a-mech .player.row .flag {
+    display: inline-block;
+    height: 2em;
+    width: 4em;
+    border: 1px solid white;
+    box-shadow: 2px 2px 2px 0px gray;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: 50% 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.select-a-mech .player.row { line-height: 2.5em; }
+.select-a-mech .player.row > * { vertical-align: middle; }
+.select-a-mech .points-section,
+.select-a-mech .difficulty-section { width: 50%; float: left; margin-top: 1em; }
+.select-a-mech .points-section label,
+.select-a-mech .difficulty-section label { width: 100%; }
+.select-a-mech .points-section select,
+.select-a-mech .difficulty-section select { width: 70%; margin-top: 5px; }
+
+.select-a-mech .robot-list { clear: both; }
+.select-a-mech .robot-list label { float: left; padding-top: 0.5em; }
+.select-a-mech .robot-list select { margin-top: 5px; }
+
+.select-a-mech .robot-list .quota {
+    float: right;
+    font-family: monospace;
+    font-weight: bold;
+    color: green;
+    background-color: black;
+    border: 1px solid white;
+    padding: 3px;
+    margin-right: 10px;
+    transition: color 1s ease-in;
+}
+.select-a-mech .robot-list .quota.exceeded { color: red; }
+.select-a-mech .robot-list .row-container { clear: both; }
+
+.select-a-mech .robot-list .type option { margin-left: 1em; }
+.select-a-mech .robot-list .type option.heading {
+    margin-left: 0;
+    color: gray;
+}
+
+.select-a-mech .stats, .select-a-mech .panel.center .description {
+    display: none;
+}
+.select-a-mech .stats {
+    width: 100%;
+    font-family: sans-serif;
+    font-size: 12pt;
+    border-collapse: collapse;
+}
+.select-a-mech .stats caption { margin-top: 1em; margin-bottom: 1em; }
+.select-a-mech .stats tr:nth-child(1) td:nth-child(2),
+.select-a-mech .stats tr td:nth-child(1) {
+    font-weight: bold;
+    text-align: right;
+    padding-right: 1em;
+}
+.select-a-mech .stats #weapon-row-template { display: none; }
+.select-a-mech .stats .label { color: green; font-size: smaller;  }
+.select-a-mech .stats .bot-name {
+    text-align: center;
+    font-family: serif;
+}
+.select-a-mech .stats .adornment {
+    width: 33%;
+    height: 100%;
+
+    background-image: url("../assets/images/backgrounds/Julius - MCU-43 Gryphon Mech (mcu-43 gryphon) [OpenGameArt].png");
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 0.5;
+}
+.select-a-mech .stats .weapons {
+    font-size: 10pt;
+}
+.select-a-mech .panel.center .description {
+    padding: 1em;
+    font-family: sans-serif;
+    font-weight: 300;
+    font-size: 14pt;
+}
+
+.select-a-mech .panel.center .description strong {
+    text-shadow: 0px 0px 2px green;
+}
+
+.select-a-mech .panel.right {
+    font-family: sans-serif;
+}
+
+.select-a-mech .panel.right .danger {
+    opacity: 0;
+    height: 0;
+    transition: opacity 1s ease-in,
+                height 0.5s ease-in;
+}
+
+.select-a-mech .panel.right .danger dl {
+    margin-left: 10px;
+}
+
+.select-a-mech .panel.right .danger h2 {
+    font-size: 14pt;
+
+    width: 70%;
+    height: 1.3em;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid red;
+    box-shadow: 0px 0px 5px 3px red;
+
+    text-align: center;
+    color: white;
+    font-family: Ikarus;
+
+    background-image: url("../assets/images/backgrounds/[CC-BY-SA-3.0] [GPL-2.0] [GPL-3.0] TRaK - Red warning stripes (trak2_warn2d) [OpenGameArt].png");
+}
+
+.select-a-mech .panel.right .danger h2 > span {
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.1));
+}
+
+.select-a-mech .panel.right ul {
+    list-style: none;
+}
+.select-a-mech .panel.right li::before {
+    color: rgb(226, 0, 104);
+    padding-right: 0.5em;
+    content: "\2605";
+}
+
+.select-a-mech .panel.right .button-bar {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    padding-bottom: 1em;
+    font-size: 12pt;
+}
+
+.select-a-mech .panel.right .button-bar button {
+    /* Guarantees an ellipse. */
+    border-radius: 3em;
+
+    /* The backgrounds are busy, so make the text more readable. */
+    font-weight: bold;
+    text-shadow: 2px 2px 1px black;
+}
+
+.select-a-mech .panel.right .go {
+    float: right;
+    margin-right: 5%;
+    width: 40%;
+
+    padding: 0;
+    background: url("../assets/images/backgrounds/[CC-BY-SA-3.0] [GPL-2.0] [GPL-3.0] TRaK - Dull yellow warning stripes (trak2_warn2a) [OpenGameArt].png");
+}
+
+.select-a-mech .panel.right .cancel {
+    text-decoration: none;
+    color: white;
+    float: left;
+    margin-left: 5%;
+    width: 40%;
+
+    padding: 0;
+    background: url("../assets/images/backgrounds/[CC-BY-SA-3.0] [GPL-2.0] [GPL-3.0] TRaK - Red warning stripes (trak2_warn2d) [OpenGameArt].png");
+}
