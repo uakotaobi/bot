@@ -31,14 +31,10 @@
 // allowed to play.  The minimum is always two (these are in fact
 // automatically added by the constructor); I think screen sizes become
 // unreasonable after four or so.
-//
-// The "allowAiOnly" argument, if false (the default), forces the first player
-// added to the UI to be a human and enforces this constraint.
 
-function Select(controller, view, maxPlayers, allowAiOnly) {
+function Select(controller, view, maxPlayers) {
     "use strict";
 
-    allowAiOnly = allowAiOnly || false;
     maxPlayers = Number(maxPlayers) || 5; // 2 for _this_ release.
 
 
