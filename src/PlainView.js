@@ -17,7 +17,7 @@
 // with BOT.  If not, see <http://www.gnu.org/licenses/>.
 
 ///////////////////////////////////////////////////////////////////////////////////
-// The PlainView is a view that displays the robots in their own floating gives  //
+// The PlainView is a view that displays the robots in their own floating divs   //
 // and looks a lot more like an information panel than a video game.  But it has //
 // the advantage of being quicker to code than the 3D terrain thing I was        //
 // originally planning.                                                          //
@@ -1625,13 +1625,34 @@ function PlainView(controller) {
 
         let maxPossibleDamage =
                 Weapon.calculateDamage(damageReport.originalDamage.damageString,
-                                      Weapon.useMaximumValues).damage;
-        if (damageReport.originalDamage.damage > maxPossibleDamage - damageReport.originalDamage.rolls.length &&
-            damageReport.originalDamage.rolls.length > 1 &&
-            damageAdjective === "") {
-            // If you deal nearly your maximum damage with more than one die,
-            // that's worthy of minor praise.
-            damageAdjective = "an impressive ";
+                                       Weapon.useMaximumValues).damage;
+        let expectedDamage =
+                Weapon.calculateDamage(damageReport.originalDamage.damageString,
+                                       Weapon.useExpectedValues).damage;
+        // Dealing the 75th percentile of damage for your damage curve
+        // (rounded up, of course) is worthy of at least minor praise.
+        let threshold = Math.ceil(expectedDamage + maxPossibleDamage)/2;
+        if (damageReport.originalDamage.damage >= threshold) {
+            // Okay, let's talk numbers:
+            //
+            // - The Cluster Bomb 4x is really an 8d2, and so has an expected
+            //   damage of 12 and a max damage of 16.  You're only
+            //   "impressive" at 14 or more, meaning you only get to miss two
+            //   coin flips out of 8 (a 13% chance of happening.)
+            //
+            // - A theoretical 1d6 + ((1d2 * 1d2) * (1d2 * 1d2)) has a max of
+            //   22, an expected damage of 3.5 + (1.5)^4 = 8.5625 (fairly
+            //   low--coins do that a lot), and would only be "impressive"
+            //   under this new heuristic if it dealt greater than
+            //   ceil(15.28125) damage, which it has a ~6% chance to do.
+            //
+            // - For a mundane amount of damage like the well-studied 3d6,
+            //   "impressive" is ceil(14.25) damage or more (about a 9% chance
+            //   of happening.)
+            damageAdjective = "a respectable ";
+            if (damageReport.originalDamage.damage > threshold) {
+                damageAdjective = "an impressive ";
+            }
         }
 
         // It's like Mad Libs with robots.
@@ -1693,7 +1714,7 @@ function PlainView(controller) {
                                       "its armor plating.  It takes no " +
                                       "damage this round.",
                                       defendingRobot.longName,
-                                      damageReport.originalDamage.damage - damageReport.jumpDamage.damage);
+                                      damageReport.originalDamage.damage - Math.floor(damageReport.jumpDamage.damage));
 
                 }
             } else {

@@ -581,7 +581,7 @@ function AiPlayer(factionName, controller, view) {
                 robotClass = "medium";
             } else if (p <= weights[0] + weights[1] + weights[2]) {
                 robotClass = "heavy";
-            } else /* p <= weights[0] + weights[1] + weights[2] + weights[3] */ {
+            } else /* p <= 1 */ {
                 robotClass = "assault";
             }
 

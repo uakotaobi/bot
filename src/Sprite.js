@@ -350,10 +350,12 @@ function SpecialEffectSprite(effectName) {
             return sprite;
         }
         // 64x64, 16 frames; a hot, fiery piffle that suddenly dissipates.
+        // This is a remix of Cuzco's original explosion -- it features softer
+        // edges and looks less jarring.
         case "e5":
         {
             let sprite = new SpriteBase(64, 64);
-            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC0] Cuzco - Explosion (exp2_0) [OpenGameArt].png", 4, 4);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC0] Cuzco and Charlie - Explosion with alpha (exp2_alpha_1) [OpenGameArt].png", 4, 4);
             sprite.loop = false;
             sprite.maxFrameCount = 16;
             sprite.framesPerSecond = 15;
@@ -410,6 +412,65 @@ function SpecialEffectSprite(effectName) {
             sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC0] [CC-BY-3.0] Soluna Software - Explosion effects and more (Effect95) [OpenGameArt].png", 4, 4);
             sprite.loop = false;
             sprite.maxFrameCount = 16;
+            sprite.framesPerSecond = 30;
+            return sprite;
+        }
+        // 100x100, 30 frames: Burns fiery and hot before quickly turning
+        // into rising soot and ash.
+        case "e11":
+        {
+            let sprite = new SpriteBase(100, 100);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/exports_0-30-frames-100x100 (tests).png", 3, 10);
+            sprite.loop = false;
+            sprite.maxFrameCount = 30;
+            sprite.framesPerSecond = 30;
+            return sprite;
+        }
+        // 100x100, 60 frames: Irregularly-shaped blasts that burn fiery and
+        // hot before quickly turning into rising soot and ash.  It will be
+        // tough for the viewer to distinguish these (which is a good thing.)
+        case "e12":
+        case "e13":
+        case "e14":
+        {
+            let filename = "";
+            switch(effectName) {
+                case "e12": filename = "exports_0-60-frames-100x100 (test4).png"; break;
+                case "e13": filename = "exports_0-60-frames-100x100 (test5).png"; break;
+                case "e14": filename = "exports_0-60-frames-100x100 (test6).png"; break;
+            };
+            let sprite = new SpriteBase(100, 100);
+            sprite.addFramesFromSpriteSheet(String.format("./assets/images/effects/{0}", filename), 6, 10);
+            sprite.loop = false;
+            sprite.maxFrameCount = 60;
+            sprite.framesPerSecond = 30;
+            return sprite;
+        }
+        // 100x100, 81 frames: Burns fiery and hot, spewing about, before
+        // quickly turning into rising soot and ash.
+        //
+        // Honestly, this is the best and most detailed version of
+        // StumpyStrust's export_0 "More Explosions" pack, and all of the
+        // e11-e16 explosions could be replaced with this.  However, variety
+        // is the spice of life.
+        case "e15":
+        {
+            let sprite = new SpriteBase(100, 100);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/exports_0-81-frames-100x100 (test).png", 9, 10);
+            sprite.loop = false;
+            sprite.maxFrameCount = 81;
+            sprite.framesPerSecond = 30;
+            return sprite;
+        }
+        // 100x100, 94 frames: Burns fiery and hot before quickly turning
+        // into rising soot and ash.  The soot and ash itself spews about for
+        // a short time before vanishing.
+        case "e16":
+        {
+            let sprite = new SpriteBase(100, 100);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/exports_0-94-frames-100x100 (test3).png", 10, 10);
+            sprite.loop = false;
+            sprite.maxFrameCount = 94;
             sprite.framesPerSecond = 30;
             return sprite;
         }

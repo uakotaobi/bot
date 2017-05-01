@@ -775,13 +775,20 @@ function GameController() {
                 // negative number.
                 return robot2.speed - robot1.speed;
             });
-            faction.currentRobotIndex = 0;
+
+            // GameController.nextRobot() increments the currentRobotIndex for
+            // each faction as it gets to it, so initializing this to 0 would
+            // mean starting all factions except for player 1 with their
+            // _second_ robot.  We want to start with their _first_  (and
+            // fastest) robot.
+            faction.currentRobotIndex = faction.robots.length - 1;
         }
 
         // Randomize the faction start order.
         let min = 0;
         let max = playingFactions.length - 1;
         currentFactionIndex = (Math.floor(Math.random() * (max - min + 1)) + min);
+        playingFactions[currentFactionIndex].currentRobotIndex = 0;
 
         // The first robot has no weapon or enemy selected yet.
         currentWeapon = null;

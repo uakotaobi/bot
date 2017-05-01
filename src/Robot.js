@@ -184,7 +184,7 @@ function Robot(robotType) {
                 longName     : "Kappa",
                 idPattern    : "[200-209]:[100-999]-[10-99][a-b]",
                 class        : "heavy",
-                arsenal      : ["machinegun", "machinegun", "machinegun", "arc"],
+                arsenal      : ["machinegun-kappa", "machinegun-kappa", "machinegun-kappa", "arc"],
                 hitpoints    : 30,
                 armor        : "1d4",
                 jump         : true,
@@ -804,3 +804,6 @@ function Robot(robotType) {
 
     return this;
 }
+
+
+new Robot(); // Force the dataTable to poof into existence.

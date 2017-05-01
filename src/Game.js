@@ -26,8 +26,6 @@ function Game() {
     let controller = new GameController();
     let view = new PlainView(controller, null, "game-log");
 
-    new Robot(); // Forces Robot.dataTable to poof into existence.
-
     let playerFaction = "The Star Alliance";
     let player2Faction = "The Rebels";
     let aiFaction = "The Prime Edict";

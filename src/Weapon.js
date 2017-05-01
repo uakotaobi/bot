@@ -35,10 +35,18 @@ function Weapon(weaponType) {
         "machinegun"       : {
             longName       : "Machine Gun",
             shortName      : "MACH. GUN",
-            class          : "light",
-            damage         : "1d6", // EV=3.5
+            class          : "medium",
+            damage         : "1d6", // EV=3.5, but used in sets of 2 for 7
             ammoPerRound   : 10,
             ammo           : 200
+        },
+        "machinegun-kappa" : {
+            longName       : "Machine Gun",
+            shortName      : "MACH. GUN",
+            class          : "heavy",
+            damage         : "1d6", // EV=3.5, but used in sets of 3 for 10.5
+            ammoPerRound   : 10,
+            ammo           : 120
         },
         "lightlaser"       : {
             longName       : "Light Laser",
@@ -99,7 +107,7 @@ function Weapon(weaponType) {
         "ac-stormcrow"     : {
             longName       : "Autocannon 5-pack",
             shortName      : "AC/5",
-            class          : "light",
+            class          : "medium",
             damage         : "2d4", // EV=5 (but used in pairs for 10)
             ammoPerRound   : 1,
             ammo           : 5
@@ -124,9 +132,9 @@ function Weapon(weaponType) {
             longName       : "Mortar Cannon",
             shortName      : "MORTAR",
             class          : "medium",
-            damage         : "1 + (1d4)^2", // EV=just 7.25, a wee bit better than 2D6.
+            damage         : "1 + (1d4)^2", // EV=just 7.25, a wee bit better than 2D6.  But 2 of them together are better than a Gauss Gun!
             ammoPerRound   : 1,
-            ammo           : 8
+            ammo           : 6
         },
         "heavymortar"      : {
             longName       : "High-Yield Mortar Cannon",
@@ -173,8 +181,8 @@ function Weapon(weaponType) {
             shortName      : "CLUSTER",
             class          : "heavy",
             damage         : "2d2", // Best used in packs of 4 or 6 (EV=12 or 15.)
-            ammoPerRound   : 1,
-            ammo           : 4
+            ammoPerRound   : 5,
+            ammo           : 20
         },
         "gauss"            : {
             longName       : "Gauss Gun",

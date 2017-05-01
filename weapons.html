@@ -136,22 +136,74 @@
 
          const canvasId = "cvs";
 
+         // What are our weapons?
+         //
+         // Well, we could just go through the Weapon.dataTable.  That's fine,
+         // and that would give us the response characteristics for firing a
+         // single shot of every weapon in the game.  But the thing is that
+         // many Bots double, triple, or even quadruple these weapons, and
+         // since they are always fired together, a realistic assessment of
+         // the damage a weapon deals should combine these values.
+         //
+         // So that is where we're iterating through the Robot.dataTable
+         // instead.
+         let allRobotWeapons = { };
+         for (let robotInternalName in Robot.dataTable) {
+             let robot = Robot.dataTable[robotInternalName];
+             let buckets = { };
+
+             // Find out how many of each weapon this Bot has.
+             for (let j = 0; j < robot.arsenal.length; ++j) {
+                 let weaponInternalName = robot.arsenal[j];
+                 if (!(weaponInternalName in buckets)) {
+                     buckets[weaponInternalName] = 0;
+                 }
+                 buckets[weaponInternalName]++;
+             }
+
+             // If the robot has one of foo, produce an entry for "Foo."  If
+             // they have 12 of foo, then produce an entry for "Foo, 12x."
+             // The latter will add 12 compies of foo's damage string
+             // together.
+             for (let weaponInternalName in buckets) {
+                 if (weaponInternalName === "invalid") {
+                     // Skip the Ukulele Bot weaponry.
+                     continue;
+                 }
+
+                 let weapon = new Weapon(weaponInternalName);
+                 let count = buckets[weaponInternalName];
+                 let key = weapon.longName;
+                 let combinedDamageString = weapon.damage;
+
+                 if (count > 1) {
+                     key = String.format("{0}, {1}x", weapon.longName, count);
+                     for (let i = 0; i < count - 1; ++i) {
+                         combinedDamageString = String.format("{0}) + ({1}", combinedDamageString, weapon.damage);
+                     }
+                     combinedDamageString = String.format("({0})", combinedDamageString);
+                 }
+
+                 allRobotWeapons[key] = {
+                     key: key,
+                     count: count,
+                     weapon: weapon,
+                     combinedDamageString: combinedDamageString
+                 };
+             }
+         }
+
          // The default order in the Weapon.dataTable is roughly weakest to
          // strongest.  Since we don't want to give that away, we sort the
          // weapons by name instead.
          let dataTable = [];
-         for (let internalName in Weapon.dataTable) {
-             if (internalName === "invalid") {
-                 // Skip the Ukulele Bot weaponry.
-                 continue;
-             }
-
-             dataTable.push(new Weapon(internalName));
+         for (let key in allRobotWeapons) {
+             dataTable.push(allRobotWeapons[key]);
          }
          dataTable.sort(function(item1, item2) {
-             if (item1.shortName > item2.shortName) {
+             if (item1.key > item2.key) {
                  return 1;
-             } else if (item1.shortName < item2.shortName) {
+             } else if (item1.key < item2.key) {
                  return -1;
              }
              return 0;
@@ -169,21 +221,23 @@
              newRow.setAttribute("class", weaponData.internalName); // This will make individual rows easier to find.
              newRow.style.display = "";
 
-             newRow.querySelector(".name").innerHTML = String.format("<span class='shortName'>{0}</span>&mdash;<span class='longName'>{1}</span>", weaponData.shortName, weaponData.longName);
-             newRow.querySelector(".class").textContent = weaponData.class[0].toUpperCase() + weaponData.class.substr(1).toLowerCase();
-             newRow.querySelector(".damageString").textContent = weaponData.damage;
+             newRow.querySelector(".name").innerHTML = String.format("<span class='longName'>{0}</span>{1}",
+                                                                     weaponData.weapon.longName,
+                                                                     (weaponData.count > 1 ? String.format(", {0}x", weaponData.count) : ""));
+             newRow.querySelector(".class").textContent = weaponData.weapon.class[0].toUpperCase() + weaponData.weapon.class.substr(1).toLowerCase();
+             newRow.querySelector(".damageString").textContent = weaponData.weapon.damage;
 
-             newRow.querySelector(".min").textContent = Number(Weapon.calculateDamage(weaponData.damage, Weapon.useMinimumValues).damage).toFixed(1);
-             newRow.querySelector(".max").textContent = Number(Weapon.calculateDamage(weaponData.damage, Weapon.useMaximumValues).damage).toFixed(1);
+             newRow.querySelector(".min").textContent = Number(Weapon.calculateDamage(weaponData.combinedDamageString, Weapon.useMinimumValues).damage).toFixed(1);
+             newRow.querySelector(".max").textContent = Number(Weapon.calculateDamage(weaponData.combinedDamageString, Weapon.useMaximumValues).damage).toFixed(1);
 
-             if (weaponData.ammoPerRound === 0) {
+             if (weaponData.weapon.ammoPerRound === 0) {
                  newRow.querySelector(".ammoPerRound").remove();
                  newRow.querySelector(".ammo").setAttribute("colspan", "2");
                  newRow.querySelector(".ammo").setAttribute("class", "ammo unlimited");
                  newRow.querySelector(".ammo").textContent = "Unlimited";
              } else {
-                 newRow.querySelector(".ammo").textContent = weaponData.ammo;
-                 newRow.querySelector(".ammoPerRound").textContent = weaponData.ammoPerRound;
+                 newRow.querySelector(".ammo").textContent = weaponData.weapon.ammo * weaponData.count;
+                 newRow.querySelector(".ammoPerRound").textContent = weaponData.weapon.ammoPerRound * weaponData.count;
              }
 
              // nth-of-type is 1-based.
@@ -191,8 +245,8 @@
              // The second row is the template.
              let anchor = newRow.querySelector(".dist a");
              anchor.setAttribute("href",
-                                 String.format("javascript:showCanvas('{0}', document.querySelector('.weapons tr:nth-of-type({1}) .dist a'), '{2}');",
-                                               weaponData.internalName, i + 3, canvasId));
+                                 String.format("javascript:showCanvas('{0}', '{1}', document.querySelector('.weapons tr:nth-of-type({2}) .dist a'), '{3}');",
+                                               weaponData.weapon.internalName, weaponData.combinedDamageString, i + 3, canvasId));
 
              weaponRowTemplate.parentNode.appendChild(newRow);
          }
@@ -206,15 +260,16 @@
          }
 
          // Renders a bar chart on the given canvas and then a line graph on top of that.
-         function renderGraphOnCanvas(weaponInternalName, canvasId) {
+         function renderGraphOnCanvas(weaponInternalName, combinedDamageString, canvasId) {
 
              let weapon = new Weapon(weaponInternalName);
 
-             // Generate some data for a weapon.  I dunno, the MRM.
+             // Generate some data for the given weapon by shooting it
+             // thousands of times.
              let originalData = [];
-             let trials = 2000;
+             const trials = 2000;
              for (let i = 0; i < trials; ++i) {
-                 let d = Weapon.calculateDamage(weapon.damage, Weapon.useRandomValues).damage;
+                 let d = Weapon.calculateDamage(combinedDamageString, Weapon.useRandomValues).damage;
                  d = Math.round(d);
                  if (originalData[d] === null || originalData[d] === undefined) {
                      originalData[d] = 0;
@@ -309,7 +364,7 @@
              // bar.draw();
          }
 
-         let showCanvas = function(weaponInternalName, parentElement, canvasId) {
+         let showCanvas = function(weaponInternalName, combinedDamageString, parentElement, canvasId) {
 
              hideCanvas(canvasId);
 
@@ -330,7 +385,7 @@
              wrapper.appendChild(canvas);
 
              // Create content.
-             renderGraphOnCanvas(weaponInternalName, canvasId);
+             renderGraphOnCanvas(weaponInternalName, combinedDamageString, canvasId);
 
              // Make it appear on screen.
              wrapper.style.left = String.format("{0}px", mouse.x - canvas.width);
