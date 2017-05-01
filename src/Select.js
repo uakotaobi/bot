@@ -65,8 +65,8 @@ function Select(controller, view, maxPlayers) {
     // -> ANOTHER hashtable mapping score/multiplier pairs to:
     // ---> Arrays of robots.
     //
-    // We have 5 possible score counts and 5 possible difficulties, leading to
-    // up to 25 robot arrays *per* *faction*.  To make this a little less
+    // We have 6 possible score counts and 5 possible difficulties, leading to
+    // up to 30 robot arrays *per* *faction*.  To make this a little less
     // ridiculous, the arrays are populated on-demand as needed.  But they are
     // only populated once!
     //
@@ -93,8 +93,8 @@ function Select(controller, view, maxPlayers) {
     // Are there enough factions to actually play a game?
     if (controller.getAllFactions().length < 2) {
         console.error("Select(): Currently, only %d factions have been" +
-                      "registered with GameController.addFaction(). but at" +
-                      "least two are needed to play the game.",
+                      " registered with GameController.addFaction(). but at" +
+                      " least two are needed to play the game.",
                      controller.getAllFactions().length);
 
         container.querySelector(".panel.left").textContent = "Not enough factions to play.";

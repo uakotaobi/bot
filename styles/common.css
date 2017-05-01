@@ -503,6 +503,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     background-image: url('../assets/images/backgrounds/[CC0] Rawdanitsu - Space Backgrounds 8 (Scene-2) [OpenGameArt]-85%25.jpg');
     background-size: cover;
     background-repeat: no-repeat;
+    background-position: center center;
 }
 
 .select-a-mech .content .panel {
@@ -596,9 +597,10 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     height: 100%;
     padding-right: 5%;
 }
-.select-a-mech label {
+.select-a-mech .panel.left label {
     font-size: 1em;
     font-family: sans-serif;
+    color: #ffff80;
 }
 
 .select-a-mech .row {
@@ -759,6 +761,10 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
 
 .select-a-mech .panel.right .danger h2 > span {
     background: linear-gradient(to left, rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.1));
+}
+
+.select-a-mech .panel.right dt {
+    color: #ff8080;
 }
 
 .select-a-mech .panel.right ul {

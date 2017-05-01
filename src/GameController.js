@@ -273,9 +273,8 @@ function GameController() {
                 let facesPerDie = Number(element.die.substr(2));
                 domObjects[i] = this.getDiceDOM(facesPerDie, element.value, fontSize, cssHeightUnits);
             } else {
-                // The DOM object is fine as it is' we just need to set the
-                // final size (and use the line-height for vertical
-                // centering.)
+                // The DOM object is fine as it is; we just need to set the
+                // final size.
                 element.setAttribute("style", "font-size: " + fontSize + cssHeightUnits);
             }
         }
@@ -288,20 +287,12 @@ function GameController() {
     //
     // Outline:
     //
-    //   "The [attacker.longName] fires [a|2+] [longName|longName plural] at the [defender]."
-    //
     //     Attacker
-    //       Attacker weapon 1    12 - [4][3]              =    5
-    //       Attacker weapon 2    12 - [6][6]              =  + 0
-    //                                                        ---
-    //       Total attack damage                                5
+    //       Attacker weapon      12 - [4][3]                   5
     //     Defender
     //       Jump                 <5>         PARTIAL SUCCESS  -2
     //       Armor                [4]                          -4
-    //       Total damage prevented                            ALL
     //     Total damage taken                                 NONE
-    //
-    //   "The attack fails."
     //
     // The defender section is only present if the defender has either jump or armor.
 
@@ -338,7 +329,7 @@ function GameController() {
         let attackerWeaponObjects = attackingRobot.findWeapons(attackerWeaponName);
         if (attackerWeaponObjects.length === 0) {
             // You don't _have_ that weapon!  Shame on you!
-            console.warn("GameController.getDamageObjectDOM(): Cannot create a " +
+            console.warn("GameController.getDamageReportDOM(): Cannot create a " +
                          "damage report for attackerWeaponName === \"" +
                          attackerWeaponName + "\" because the " +
                          attackingRobot.longName + " does not have that " +
