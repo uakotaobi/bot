@@ -786,6 +786,8 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
 }
 
 .select-a-mech .panel.right .button-bar button {
+    height: auto;
+
     /* Guarantees an ellipse. */
     border-radius: 3em;
 
