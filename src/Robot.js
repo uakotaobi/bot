@@ -228,11 +228,11 @@ function Robot(robotType) {
                 speed        : 10,
                 score        : 40,
                 image        : "./assets/images/bots/700px-Justin Nichol - Charon.png",
-                description  : "<p>A note from the manufacturer: <quote>“The Charon is" +
+                description  : "<p>A note from the manufacturer: <q>“The Charon is" +
                     " named for the legendary psychopomp of Greek mythology." +
                     " Like its namesake, it is <strong>expert</strong> at" +
                     " delivering souls to the <strong>land of the" +
-                    " dead</strong>.”</quote></p>"
+                    " dead</strong>.”</q></p>"
             },
             "executioner"    : {
                 modelNumber  : "Genesis Robotics GM2900",
