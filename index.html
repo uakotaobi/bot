@@ -170,21 +170,37 @@
          let c = new GameController();
          let v = new PlainView(c, null, null);
 
-         let content = document.getElementsByClassName("content")[0];
-         let effectiveHeight = window.getComputedStyle(content).height;
-         effectiveHeight = effectiveHeight.substr(0, effectiveHeight.length - 2); // Cut off the "px" suffix.
+         // Check to see if the explosions, fire, and wreckage are loaded, and
+         // only initiate the animation once they all are.
+         let startAnimation = function() {
+             let wreckageDiv = document.querySelector(".wreckage");
+             let wreckageImageUrl = window.getComputedStyle(wreckageDiv).backgroundImage;
+             let wreckageImagePath = wreckageImageUrl.substr(5, wreckageImageUrl.length - 7);
+             let wreckageImage = new Image();
+             wreckageImage.src = wreckageImagePath;
 
-         let wreckage = document.getElementsByClassName("wreckage")[0];
-         // fire1 = v.createEffect(wreckage, "f2", 820, effectiveHeight - 123, 0);
-         // fire1.layer = 50;
-         let delayMilliseconds = 4500;
-         let explosionDuration = 1500;
-         fire2      = v.createEffect(wreckage, "f2", 820, 180, 0,    explosionDuration - 2000 + delayMilliseconds);
-         explosion1 = v.createEffect(wreckage, "e1", 820-128/2+81/2, 180-128/2+123*.75, explosionDuration, delayMilliseconds);
-         explosion2 = v.createEffect(wreckage, "e2", 820-128/2+81/2, 180-128/2+123*.75, explosionDuration*1.5, delayMilliseconds-500);
-         fire2.preload();
-         explosion1.preload();
-         explosion2.preload();
+             if (wreckageImage.complete) {
+                 // Wreckage image is cached and loaded.  We can start.
+                 let content = document.querySelector("body > .content");
+                 let effectiveHeight = window.getComputedStyle(content).height;
+                 effectiveHeight = effectiveHeight.substr(0, effectiveHeight.length - 2); // Cut off the "px" suffix.
+
+                 let delayMilliseconds = 4500;
+                 let explosionDuration = 1500;
+                 let fire2      = v.createEffect(wreckageDiv, "f2", 820, 180, 0,    explosionDuration - 2000 + delayMilliseconds);
+                 let explosion1 = v.createEffect(wreckageDiv, "e1", 820-128/2+81/2, 180-128/2+123*.75, explosionDuration, delayMilliseconds);
+                 let explosion2 = v.createEffect(wreckageDiv, "e2", 820-128/2+81/2, 180-128/2+123*.75, explosionDuration*1.5, delayMilliseconds-500);
+
+                 fire2.preload();
+                 explosion1.preload();
+                 explosion2.preload();
+             } else {
+                 // Check again soon.
+                 window.setTimeout(startAnimation, 500);
+             }
+         };
+
+         window.setTimeout(startAnimation, 500);
         </script>
     </body>
 </html>
