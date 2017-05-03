@@ -103,8 +103,8 @@ function SpriteBase(width, height) {
     this.id = function() { return id; };
 
 
-    // Utility function: loads the frames of the sprite into an invisible div
-    // so that they can be cached by the web browser.
+    // Utility function: loads the frames of the sprite into an in-memory
+    // Image object so that they can be cached by the web browser.
     //
     // Returns a floating-point value indicating what percentage of our images
     // are loaded.
