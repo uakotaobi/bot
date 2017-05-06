@@ -16,9 +16,14 @@
 // You should have received a copy of the GNU General Public License along
 // with BOT.  If not, see <http://www.gnu.org/licenses/>.
 
-// Defines the UI-independent controller object which utilizes underlying
-// classes to play the game.
+////////////////////////////////////////////////////////////////////////////
+// Defines the UI-independent controller object which utilizes underlying //
+// classes to actually run the game.                                      //
+////////////////////////////////////////////////////////////////////////////
 
+// Technically speaking, you can play a complete game using only the
+// GameController (along with an AiPlayer once you get tired of choosing the
+// weapons to fire by hand), but it won't be very fun.
 
 function GameController() {
     "use strict";
@@ -551,7 +556,10 @@ function GameController() {
     // the only allowed types (both in lowercase.)
     //
     // Note that this function has no effect on the factions for the game that
-    // is currently in progress; only future games are affected.
+    // is currently in progress; only future games are affected.  If you
+    // really want a computer player to play on behalf of a human, generate an
+    // AiPlayer for that human player's faction and tell it to
+    // playOneRound(true).
     this.setFactionType = function(factionName, factionType) {
         if (!(factionName in factions)) {
             console.error("GameController.setFactionType(): Unrecognized" +
