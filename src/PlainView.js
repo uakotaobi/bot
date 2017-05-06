@@ -679,6 +679,15 @@ function PlainView(controller) {
         if (clickToClose) {
 
             dialogDiv.onclick = getDialogRemovalFunction(this);
+            dialogDiv.onkeypress = function(keyboardEvent) {
+                console.debug("You pressed %s in a modal dialog.", keyboardEvent.key);
+                switch (keyboardEvent.key) {
+                    case " ":
+                    case "Enter":
+                        this.click();
+                        break;
+                }
+            };
 
             // I'm going to interpret having a timeout *and*
             // clickToClose===true as indicating that the dialog is not trying
@@ -690,14 +699,16 @@ function PlainView(controller) {
             // ultimately, is not that important.
             if (timeoutMilliseconds <= 0) {
                 overlay.style.display = "block";
-                overlay.onclick = getDialogRemovalFunction(this);
+                overlay.onclick = dialogDiv.onclick;
+                overlay.onkeypress = dialogDiv.onkeypress;
                 dialogDiv.onclick = null;
+                dialogDiv.onkeypress = null;
             }
         } else {
             overlay.style.display = "none";
         }
 
-        // Let the position and dimensions.
+        // Set the position and dimensions.
         dialogDiv.style.left = cssLeft;
         dialogDiv.style.top = cssTop;
         dialogDiv.style.width = cssWidth;
@@ -708,10 +719,74 @@ function PlainView(controller) {
         let body = document.querySelector("body");
         body.appendChild(dialogDiv);
         PlainView.dialogIdStack.push(dialogId);
+        installDialogKeyboardHandler();
 
         // console.debug(String.format("DialogId {0}: type={1}, timeout={2} ms, click to close={3}",dialogId,dialogType,timeoutMilliseconds,clickToClose));
 
         return dialogDiv;
+    };
+
+
+    // As long as the dialog on the top of the stack can be dismissed with a
+    // mouse click, it should also be possible to dismiss the dialog with the
+    // space bar or enter keys.
+    let installDialogKeyboardHandler = function() {
+        if (PlainView.dialogIdStack.length === 0) {
+            return;
+        }
+
+        // Someone already seems to have installed us.
+        if (PlainView.oldDocumentOnKeyPress) {
+            return;
+        }
+
+        // Back up the old keyboard handler, if any.
+        if (document.onkeypress) {
+            PlainView.oldDocumentOnKeyPress = document.onkeypress;
+        }
+
+        document.onkeypress = function(keyboardEvent) {
+
+            let topmostDialogId          = PlainView.dialogIdStack[PlainView.dialogIdStack.length - 1];
+            let topmostDialog            = document.getElementById(topmostDialogId);
+            let topmostDialogIsClickable = (topmostDialog.onclick !== null);
+            let topmostDialogIsModal     = (topmostDialog.querySelector(".overlay").onclick !== null);
+
+            if (!topmostDialogIsClickable && !topmostDialogIsModal) {
+                return;
+            }
+
+            // console.debug("installDialogKeyboardHandler(): You pressed \"%s\"" +
+            //               " while a clickable dialog was active.",
+            //               keyboardEvent.key);
+            switch (keyboardEvent.key) {
+                case " ":
+                case "Enter":
+                case "Escape":
+                    if (topmostDialogIsClickable) {
+                        topmostDialog.click();
+                    } else {
+                        topmostDialog.querySelector(".overlay").click();
+                    }
+                    // console.debug("installDialogKeyboardHandler(): Dismissing dialog %s.",
+                    //               topmostDialogId);
+                    break;
+            }
+        };
+    };
+
+
+    // Undoes the effects of installDialogKeyboardHandler().
+    let uninstallDialogKeyboardHandler = function() {
+        if (!PlainView.oldDocumentOnKeyPress) {
+            console.warn("uninstallDialogKeyboardHandler():" +
+                         " installDialogKeyboardHandler() has not been" +
+                         " invoked recently.");
+            return;
+        }
+
+        document.onkeypress = PlainView.oldDocumentOnKeyPress;
+        delete PlainView.oldDocumentOnKeyPress;
     };
 
 
@@ -748,6 +823,24 @@ function PlainView(controller) {
                           "no div with that ID on the page.");
         } else {
             dialogDiv.remove();
+
+            // Should we remove the keyboard handler, too?  Only if the
+            // topmost dialog doesn't need it.
+            if (PlainView.dialogIdStack.length > 0) {
+                let topmostDialogId          = PlainView.dialogIdStack[PlainView.dialogIdStack.length - 1];
+                let topmostDialog            = document.getElementById(topmostDialogId);
+                let topmostDialogIsClickable = (topmostDialog.onclick !== null);
+                let topmostDialogIsModal     = (topmostDialog.querySelector(".overlay").onclick !== null);
+
+                if (topmostDialogIsClickable || topmostDialogIsModal) {
+                    return;
+                }
+            }
+
+            // Control only makes it here if there is no dialog on the stack
+            // or the dialog on the top of the stack right now needs no
+            // keyboard handler.
+            uninstallDialogKeyboardHandler();
         }
     };
 
