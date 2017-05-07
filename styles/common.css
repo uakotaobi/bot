@@ -179,7 +179,12 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     vertical-align: middle;
 }
 
-.dice {
+.formula.left-paren, .formula.right-paren, .formula.operator {
+    /* Make the formula expressions a little else dense. */
+    font-weight: normal;
+}
+
+.formula.dice {
     /* Make sure the die image is fully visible. */
     background-repeat: no-repeat;
     background-size: contain;
@@ -193,30 +198,30 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     text-shadow: 0px 0px 2px black;
 }
 
-.dice.dn-1  { background-image: url('../assets/images/dice/dn-1.png');  }
-.dice.dn-2  { background-image: url('../assets/images/dice/dn-2.png');  }
-.dice.dn-3  { background-image: url('../assets/images/dice/dn-3.png');  }
-.dice.d20-1 { background-image: url('../assets/images/dice/d20-1.png'); }
-.dice.d20-2 { background-image: url('../assets/images/dice/d20-2.png'); }
-.dice.d20-3 { background-image: url('../assets/images/dice/d20-3.png'); }
-.dice.d12-1 { background-image: url('../assets/images/dice/d12-1.png'); }
-.dice.d12-2 { background-image: url('../assets/images/dice/d12-2.png'); }
-.dice.d12-3 { background-image: url('../assets/images/dice/d12-3.png'); }
-.dice.d10-1 { background-image: url('../assets/images/dice/d10-1.png'); }
-.dice.d10-2 { background-image: url('../assets/images/dice/d10-2.png'); }
-.dice.d10-3 { background-image: url('../assets/images/dice/d10-3.png'); }
-.dice.d8-1  { background-image: url('../assets/images/dice/d8-1.png');  }
-.dice.d8-2  { background-image: url('../assets/images/dice/d8-2.png');  }
-.dice.d8-3  { background-image: url('../assets/images/dice/d8-3.png');  }
-.dice.d6-1  { background-image: url('../assets/images/dice/d6-1.png');  }
-.dice.d6-2  { background-image: url('../assets/images/dice/d6-2.png');  }
-.dice.d6-3  { background-image: url('../assets/images/dice/d6-3.png');  }
-.dice.d4-1  { background-image: url('../assets/images/dice/d4-1.png');  }
-.dice.d4-2  { background-image: url('../assets/images/dice/d4-2.png');  }
-.dice.d4-3  { background-image: url('../assets/images/dice/d4-3.png');  }
-.dice.d2-1  { background-image: url('../assets/images/dice/d2-1.png');  }
-.dice.d2-2  { background-image: url('../assets/images/dice/d2-2.png');  }
-.dice.d2-3  { background-image: url('../assets/images/dice/d2-3.png');  }
+.formula.dice.dn-1  { background-image: url('../assets/images/dice/dn-1.png');  }
+.formula.dice.dn-2  { background-image: url('../assets/images/dice/dn-2.png');  }
+.formula.dice.dn-3  { background-image: url('../assets/images/dice/dn-3.png');  }
+.formula.dice.d20-1 { background-image: url('../assets/images/dice/d20-1.png'); }
+.formula.dice.d20-2 { background-image: url('../assets/images/dice/d20-2.png'); }
+.formula.dice.d20-3 { background-image: url('../assets/images/dice/d20-3.png'); }
+.formula.dice.d12-1 { background-image: url('../assets/images/dice/d12-1.png'); }
+.formula.dice.d12-2 { background-image: url('../assets/images/dice/d12-2.png'); }
+.formula.dice.d12-3 { background-image: url('../assets/images/dice/d12-3.png'); }
+.formula.dice.d10-1 { background-image: url('../assets/images/dice/d10-1.png'); }
+.formula.dice.d10-2 { background-image: url('../assets/images/dice/d10-2.png'); }
+.formula.dice.d10-3 { background-image: url('../assets/images/dice/d10-3.png'); }
+.formula.dice.d8-1  { background-image: url('../assets/images/dice/d8-1.png');  }
+.formula.dice.d8-2  { background-image: url('../assets/images/dice/d8-2.png');  }
+.formula.dice.d8-3  { background-image: url('../assets/images/dice/d8-3.png');  }
+.formula.dice.d6-1  { background-image: url('../assets/images/dice/d6-1.png');  }
+.formula.dice.d6-2  { background-image: url('../assets/images/dice/d6-2.png');  }
+.formula.dice.d6-3  { background-image: url('../assets/images/dice/d6-3.png');  }
+.formula.dice.d4-1  { background-image: url('../assets/images/dice/d4-1.png');  }
+.formula.dice.d4-2  { background-image: url('../assets/images/dice/d4-2.png');  }
+.formula.dice.d4-3  { background-image: url('../assets/images/dice/d4-3.png');  }
+.formula.dice.d2-1  { background-image: url('../assets/images/dice/d2-1.png');  }
+.formula.dice.d2-2  { background-image: url('../assets/images/dice/d2-2.png');  }
+.formula.dice.d2-3  { background-image: url('../assets/images/dice/d2-3.png');  }
 
 /* Markup to style the damage report dialog. */
 .dialog .text .narrative strong       { color: rgb(30, 220, 30); text-shadow: 1px 1px 1px black; }

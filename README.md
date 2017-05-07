@@ -15,7 +15,8 @@ This is a known problem.  Click on a bad guy or click on a weapon to resize
 the sprite images.
 
 ## Fun with the JavaScript Debugger
-After you start a game, his F12 or whichever key combination enables the
+
+After you start a game, hit F12 or whichever key combination enables the
 JavaScript console on your web browser.
 
 1. Make the computer play for you:
