@@ -216,6 +216,9 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
 .formula.dice.d6-1  { background-image: url('../assets/images/dice/d6-1.png');  }
 .formula.dice.d6-2  { background-image: url('../assets/images/dice/d6-2.png');  }
 .formula.dice.d6-3  { background-image: url('../assets/images/dice/d6-3.png');  }
+.formula.dice.d5-1  { background-image: url('../assets/images/dice/d5-1.png');  }
+.formula.dice.d5-2  { background-image: url('../assets/images/dice/d5-2.png');  }
+.formula.dice.d5-3  { background-image: url('../assets/images/dice/d5-3.png');  }
 .formula.dice.d4-1  { background-image: url('../assets/images/dice/d4-1.png');  }
 .formula.dice.d4-2  { background-image: url('../assets/images/dice/d4-2.png');  }
 .formula.dice.d4-3  { background-image: url('../assets/images/dice/d4-3.png');  }
@@ -623,6 +626,12 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     transition: background 0.33s ease-in,
                 box-shadow 0.33s ease-in,
                 border-color 0.33s ease-in;
+}
+.select-a-mech button:focus,
+.select-a-mech select:focus {
+    /* Help to indicate the current control when tabbing through them. */
+    border-color: yellow;
+    box-shadow: 0px 0px 2px 0px yellow;
 }
 .select-a-mech select { border-radius: 2em; }
 .select-a-mech select option { color: black; }

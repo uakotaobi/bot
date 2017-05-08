@@ -44,9 +44,9 @@ function Weapon(weaponType) {
             longName       : "Machine Gun",
             shortName      : "MACH. GUN",
             class          : "heavy",
-            damage         : "1d6", // EV=3.5, but used in sets of 3 for 10.5
+            damage         : "1d5", // EV=3, but used in sets of 3 for 9
             ammoPerRound   : 10,
-            ammo           : 120
+            ammo           : 150
         },
         "lightlaser"       : {
             longName       : "Light Laser",
@@ -92,7 +92,7 @@ function Weapon(weaponType) {
             longName       : "Mid-Range Missile",
             shortName      : "MRM",
             class          : "medium",
-            damage         : "((1d4 + 1) * 1d4) - 1", // EV=7.75 -- toned down from its original 8.75 because that made it unusually strong for a medium weapon.
+            damage         : "((2d4 - 2) * 1d4) + 1", // EV=8.5 -- toned down from its original 8.75 because that made it unusually strong for a medium weapon.
             ammoPerRound   : 1,
             ammo           : 20
         },
@@ -164,7 +164,7 @@ function Weapon(weaponType) {
             longName       : "Plasma-Arc Emitter",
             shortName      : "P. ARC",
             class          : "heavy",
-            damage         : "17 - 2d6", // EV=10
+            damage         : "17 - 2d6", // EV=10, better than PPC
             ammoPerRound   : 0,
             ammo           : 1
         },

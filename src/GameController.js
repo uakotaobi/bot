@@ -54,11 +54,13 @@ function GameController() {
     this.getDiceDOM = function(numberOfFaces, rollValue, height, cssHeightUnits) {
         let span = document.createElement("div");
 
-        let prefix = "d" + numberOfFaces;
-        if (numberOfFaces != 2 && numberOfFaces != 4 && numberOfFaces != 6 &&
-            numberOfFaces != 8 && numberOfFaces != 10 && numberOfFaces != 12 &&
-            numberOfFaces != 20) {
-            prefix = "dn";
+        let prefix = "dn";
+        switch (numberOfFaces) {
+            case 2: case 4: case 5:
+            case 6: case 8: case 10:
+            case 12: case 20:
+                prefix = "d" + numberOfFaces;
+                break;
         }
 
         const min = 1, max = 3;
@@ -308,7 +310,7 @@ function GameController() {
         //
         // I see no need to provide knobs to tweak this; as long as it's
         // dependent on font size, I figure it'll work well on mobile phones.
-        const height = 18;
+        const height = 19;
         const heightIncrement = 1.2;
         const cssHeightUnits = "pt";
 

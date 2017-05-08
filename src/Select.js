@@ -31,10 +31,14 @@
 // allowed to play.  The minimum is always two (these are in fact
 // automatically added by the constructor); I think screen sizes become
 // unreasonable after four or so.
+//
+// The "allowAiOnly" argument, if false (the default), forces the first player
+// added to the UI to be a human and enforces this constraint.
 
-function Select(controller, view, maxPlayers) {
+function Select(controller, view, maxPlayers, allowAiOnly) {
     "use strict";
 
+    allowAiOnly = allowAiOnly || false;
     maxPlayers = Number(maxPlayers) || 5; // 2 for _this_ release.
 
 
@@ -70,8 +74,8 @@ function Select(controller, view, maxPlayers) {
     // ridiculous, the arrays are populated on-demand as needed.  But they are
     // only populated once!
     //
-    // "Why," you might ask.  It's simple: choosing the enemy forces well in
-    // advance prevents users from gaming the system by switching the
+    // "Why only once," you might ask.  It's simple: choosing the enemy forces
+    // well in advance prevents users from gaming the system by switching the
     // difficulty or total score over and over again, hoping for an easier
     // roll!
     let factionComputerForces = { };
@@ -93,7 +97,7 @@ function Select(controller, view, maxPlayers) {
     // Are there enough factions to actually play a game?
     if (controller.getAllFactions().length < 2) {
         console.error("Select(): Currently, only %d factions have been" +
-                      " registered with GameController.addFaction(). but at" +
+                      " registered with GameController.addFaction(), but at" +
                       " least two are needed to play the game.",
                      controller.getAllFactions().length);
 
@@ -334,7 +338,14 @@ function Select(controller, view, maxPlayers) {
                     addButton.setAttribute("class", "add");
                     addButton.removeAttribute("disabled");
                     addButton.onclick = that.addPlayerRowAtEnd;
-                    addButton.onkeydown = that.addPlayerRowAtEnd;
+                    addButton.onkeydown = function(keyboardEvent) {
+                        switch (keyboardEvent.key) {
+                            case " ":
+                            case "Enter":
+                                that.addPlayerRowAtEnd();
+                                break;
+                        }
+                    };
                 }
 
                 if (i >= 2) {
@@ -342,7 +353,14 @@ function Select(controller, view, maxPlayers) {
                     removeButton.setAttribute("class", "remove");
                     removeButton.removeAttribute("disabled");
                     removeButton.onclick = that.removePlayerRowFromEnd;
-                    removeButton.onkeydown = that.removePlayerRowFromEnd;
+                    removeButton.onkeydown = function(keyboardEvent) {
+                        switch (keyboardEvent.key) {
+                            case " ":
+                            case "Enter":
+                                that.removePlayerRowFromEnd();
+                                break;
+                        }
+                    };
                 }
             }
         }
@@ -1182,7 +1200,14 @@ function Select(controller, view, maxPlayers) {
 
     // Clicking on the BIG BUTTON launches the game proper.
     container.querySelector(".go").onclick = this.launchGame;
-    container.querySelector(".go").onkeydown = this.launchGame;
+    container.querySelector(".go").onkeydown = function(keyboardEvent) {
+        switch (keyboardEvent.key) {
+            case " ":
+            case "Enter":
+                this.launchGame();
+                break;
+        }
+    };
 
     // Since we have two factions, add one row for each faction.  Make the
     // first one human and the second one a computer.

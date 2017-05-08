@@ -568,6 +568,170 @@ function PlainView(controller) {
 
 
     //////////////////////////////////////////////////////////////////////////
+    // Keyboard handling code.                                              //
+    //////////////////////////////////////////////////////////////////////////
+
+
+    // Handles all rogue keypresses while the PlainView is active.
+    this.keyboardHandler = (function(view) {
+        return function(keyboardEvent) {
+
+            // Pressing Escape, Enter, or Space will dismiss any active dialog.
+            if (PlainView.dialogIdStack.length > 0) {
+
+                // At least one dialog is active.
+                let topmostDialogId = PlainView.dialogIdStack[PlainView.dialogIdStack.length - 1];
+                let topmostDialog = document.getElementById(topmostDialogId);
+
+                if (topmostDialog) {
+
+                    let topmostDialogIsClickable = (topmostDialog.onclick !== null);
+                    let topmostDialogIsModal = (topmostDialog.querySelector(".overlay").onclick !== null);
+
+                    if (topmostDialogIsClickable || topmostDialogIsModal) {
+                        switch (keyboardEvent.key) {
+                            case " ":
+                            case "Enter":
+                            case "Escape":
+                                if (topmostDialogIsClickable) {
+                                    topmostDialog.click();
+                                } else {
+                                    topmostDialog.querySelector(".overlay").click();
+                                }
+                                return;
+                        }
+                    }
+
+                } else {
+
+                    // How is this possible?
+                    console.error("installKeyboardHandler/document.onkeypress():" +
+                                  " Internal error: the top ID of the dialogIdStack, \"%s\"," +
+                                  " represents a dialog that, for some reason, no" +
+                                  " longer exists.", topmostDialogId);
+                }
+            } // end (if there are active dialogs on the stack)
+
+            // If control made it here, there was no active dialog to dismiss, or
+            // the user pressed something other than ESC, RET, or SPC.
+            //
+            // The actions that follow only make sense if a human controls the
+            // current robot (rather than merely being at the keyboard.)
+            if (controller.isGameInProgress() &&
+                controller.getFactionType(controller.getCurrentRobot().faction) === "human") {
+
+                // Converts a robot to an index in the controller.getGameRobots()
+                // array.
+                let getRobotIndex = function(robot) {
+                    if (robot !== null) {
+                        let robots = controller.getGameRobots();
+                        for (let i = 0; i < robots.length; ++i) {
+                            if (robots[i].id === robot.id) {
+                                return i;
+                            }
+                        }
+                    }
+                    return -1;
+                };
+
+                // Perform a linear search through the game robots to find the
+                // next (or previous) enemy that isn't the current one.
+                let getNextEnemy = function(currentRobot, currentEnemyRobotIndex, increment) {
+
+                    if (increment === 0) {
+                        console.error("PlainView.keyboardHandler/getNextEnemy():" +
+                                      " Internal error: can't obtain next or" +
+                                      " previous enemy when the increment is zero.");
+                        return;
+                    }
+                    let robots = controller.getGameRobots();
+                    let currentEnemyRobot = robots[currentEnemyRobotIndex];
+                    let index = currentEnemyRobotIndex;
+                    while (true) {
+                        index += increment;
+                        if (index < 0) {
+                            index += robots.length;
+                        } else if (index > robots.length - 1) {
+                            index -= robots.length;
+                        }
+
+                        if (index === currentEnemyRobotIndex) {
+                            // We've wrapped all the way around to the beginning
+                            // without seeing an enemy robot to select.  That's
+                            // not possible while a game is in progress.
+                            console.error("PlainView.keyboardHandler/getNextEnemy(): " +
+                                          "Can't find an enemy for the current" +
+                                          "robot (%s %s).  That implies that the" +
+                                          "game has already ended.",
+                                          currentRobot,
+                                          currentRobot.id);
+                            return;
+                        }
+
+                        if (robots[index].faction === currentRobot.faction) {
+                            // Skip allies (and ourselves) -- we can't select
+                            // them.
+                            continue;
+                        }
+
+                        // If control made it here, we have found the
+                        // next/previous enemy.  Do the same thing that the
+                        // user clicking on it would have done.
+                        let robotContainer = document.getElementById(id(robots[index].id));
+                        robotContainer.click();
+                        return;
+
+                    } // end (while looking for an enemy robot to select)
+                };
+
+
+                let currentEnemyRobotIndex = Math.max(getRobotIndex(controller.getCurrentRobotEnemy()), 0);
+                switch(keyboardEvent.key) {
+                    case "ArrowLeft":
+                        getNextEnemy(controller.getCurrentRobot(), currentEnemyRobotIndex, -1);
+                        break;
+                    case "ArrowRight":
+                        getNextEnemy(controller.getCurrentRobot(), currentEnemyRobotIndex, 1);
+                        break;
+                }
+            } // end (if the current robot is controlled by a human being)
+        };
+    })(this);
+
+    // As long as the dialog on the top of the stack can be dismissed with a
+    // mouse click, it should also be possible to dismiss the dialog with the
+    // space bar or enter keys.
+    let installKeyboardHandler = function(view) {
+
+        // Someone already seems to have installed us.
+        if (PlainView.oldDocumentOnKeyPress) {
+            return;
+        }
+
+        // Back up the old keyboard handler, if any.
+        if (document.onkeypress) {
+            PlainView.oldDocumentOnKeyPress = document.onkeypress;
+        }
+
+        document.onkeypress = view.keyboardHandler;
+    };
+
+
+    // Undoes the effects of installKeyboardHandler().
+    let uninstallKeyboardHandler = function() {
+        if (!PlainView.oldDocumentOnKeyPress) {
+            console.warn("uninstallKeyboardHandler():" +
+                         " installKeyboardHandler() has not been" +
+                         " invoked recently.");
+            return;
+        }
+
+        document.onkeypress = PlainView.oldDocumentOnKeyPress;
+        delete PlainView.oldDocumentOnKeyPress;
+    };
+
+
+    //////////////////////////////////////////////////////////////////////////
     // Dialog code.                                                         //
     //////////////////////////////////////////////////////////////////////////
 
@@ -708,172 +872,11 @@ function PlainView(controller) {
         let body = document.querySelector("body");
         body.appendChild(dialogDiv);
         PlainView.dialogIdStack.push(dialogId);
-        installDialogKeyboardHandler(this);
 
         // console.debug(String.format("DialogId {0}: type={1}, timeout={2} ms, click to close={3}",dialogId,dialogType,timeoutMilliseconds,clickToClose));
 
         return dialogDiv;
     };
-
-
-    // Handles all rogue keypresses while the PlainView is active.
-    this.keyboardHandler = (function(view) {
-        return function(keyboardEvent) {
-
-            // Pressing Escape, Enter, or Space will dismiss any active dialog.
-            if (PlainView.dialogIdStack.length > 0) {
-
-                // At least one dialog is active.
-                let topmostDialogId = PlainView.dialogIdStack[PlainView.dialogIdStack.length - 1];
-                let topmostDialog = document.getElementById(topmostDialogId);
-
-                if (topmostDialog) {
-
-                    let topmostDialogIsClickable = (topmostDialog.onclick !== null);
-                    let topmostDialogIsModal = (topmostDialog.querySelector(".overlay").onclick !== null);
-
-                    if (topmostDialogIsClickable || topmostDialogIsModal) {
-                        switch (keyboardEvent.key) {
-                            case " ":
-                            case "Enter":
-                            case "Escape":
-                                if (topmostDialogIsClickable) {
-                                    topmostDialog.click();
-                                } else {
-                                    topmostDialog.querySelector(".overlay").click();
-                                }
-                                return;
-                        }
-                    }
-
-                } else {
-
-                    // How is this possible?
-                    console.error("installDialogKeyboardHandler/document.onkeypress():" +
-                                  " Internal error: the top ID of the dialogIdStack, \"%s\"," +
-                                  " represents a dialog that, for some reason, no" +
-                                  " longer exists.", topmostDialogId);
-                }
-            } // end (if there are active dialogs on the stack)
-
-            // If control made it here, there was no active dialog to dismiss, or
-            // the user pressed something other than ESC, RET, or SPC.
-            //
-            // The actions that follow only make sense if a human controls the
-            // current robot (rather than merely being at the keyboard.)
-            if (controller.isGameInProgress() &&
-                controller.getFactionType(controller.getCurrentRobot().faction) === "human") {
-
-                // Converts a robot to an index in the controller.getGameRobots()
-                // array.
-                let getRobotIndex = function(robot) {
-                    if (robot !== null) {
-                        let robots = controller.getGameRobots();
-                        for (let i = 0; i < robots.length; ++i) {
-                            if (robots[i].id === robot.id) {
-                                return i;
-                            }
-                        }
-                    }
-                    return -1;
-                };
-
-                // Perform a linear search through the game robots to find the
-                // next (or previous) enemy that isn't the current one.
-                let getNextEnemy = function(currentRobot, currentEnemyRobotIndex, increment) {
-
-                    if (increment === 0) {
-                        console.error("PlainView.keyboardHandler/getNextEnemy():" +
-                                      " Internal error: can't obtain next or" +
-                                      " previous enemy when the increment is zero.");
-                        return;
-                    }
-                    let robots = controller.getGameRobots();
-                    let currentEnemyRobot = robots[currentEnemyRobotIndex];
-                    let index = currentEnemyRobotIndex;
-                    while (true) {
-                        index += increment;
-                        if (index < 0) {
-                            index += robots.length;
-                        } else if (index > robots.length - 1) {
-                            index -= robots.length;
-                        }
-
-                        if (index === currentEnemyRobotIndex) {
-                            // We've wrapped all the way around to the beginning
-                            // without seeing an enemy robot to select.  That's
-                            // not possible while a game is in progress.
-                            console.error("PlainView.keyboardHandler/getNextEnemy(): " +
-                                          "Can't find an enemy for the current" +
-                                          "robot (%s %s).  That implies that the" +
-                                          "game has already ended.",
-                                          currentRobot,
-                                          currentRobot.id);
-                            return;
-                        }
-
-                        if (robots[index].faction === currentRobot.faction) {
-                            // Skip allies (and ourselves) -- we can't select
-                            // them.
-                            continue;
-                        }
-
-                        // If control made it here, we have found the
-                        // next/previous enemy.  Do the same thing that the
-                        // user clicking on it would have done.
-                        let robotContainer = document.getElementById(id(robots[index].id));
-                        robotContainer.click();
-                        return;
-
-                    } // end (while looking for an enemy robot to select)
-                };
-
-
-                let currentEnemyRobotIndex = Math.max(getRobotIndex(controller.getCurrentRobotEnemy()), 0);
-                switch(keyboardEvent.key) {
-                    case "ArrowLeft":
-                        getNextEnemy(controller.getCurrentRobot(), currentEnemyRobotIndex, -1);
-                        break;
-                    case "ArrowRight":
-                        getNextEnemy(controller.getCurrentRobot(), currentEnemyRobotIndex, 1);
-                        break;
-                }
-            } // end (if the current robot is controlled by a human being)
-        };
-    })(this);
-
-    // As long as the dialog on the top of the stack can be dismissed with a
-    // mouse click, it should also be possible to dismiss the dialog with the
-    // space bar or enter keys.
-    let installDialogKeyboardHandler = function(view) {
-
-        // Someone already seems to have installed us.
-        if (PlainView.oldDocumentOnKeyPress) {
-            return;
-        }
-
-        // Back up the old keyboard handler, if any.
-        if (document.onkeypress) {
-            PlainView.oldDocumentOnKeyPress = document.onkeypress;
-        }
-
-        document.onkeypress = view.keyboardHandler;
-    };
-
-
-    // Undoes the effects of installDialogKeyboardHandler().
-    let uninstallDialogKeyboardHandler = function() {
-        if (!PlainView.oldDocumentOnKeyPress) {
-            console.warn("uninstallDialogKeyboardHandler():" +
-                         " installDialogKeyboardHandler() has not been" +
-                         " invoked recently.");
-            return;
-        }
-
-        document.onkeypress = PlainView.oldDocumentOnKeyPress;
-        delete PlainView.oldDocumentOnKeyPress;
-    };
-
 
     // Removes the dialog with the given ID from the page.  If the ID is not
     // supplied, the dialog on the top of the dialog stack is removed.
@@ -908,24 +911,6 @@ function PlainView(controller) {
                           "no div with that ID on the page.");
         } else {
             dialogDiv.remove();
-
-            // Should we remove the keyboard handler, too?  Only if the
-            // topmost dialog doesn't need it.
-            if (PlainView.dialogIdStack.length > 0) {
-                let topmostDialogId          = PlainView.dialogIdStack[PlainView.dialogIdStack.length - 1];
-                let topmostDialog            = document.getElementById(topmostDialogId);
-                let topmostDialogIsClickable = (topmostDialog.onclick !== null);
-                let topmostDialogIsModal     = (topmostDialog.querySelector(".overlay").onclick !== null);
-
-                if (topmostDialogIsClickable || topmostDialogIsModal) {
-                    return;
-                }
-            }
-
-            // Control only makes it here if there is no dialog on the stack
-            // or the dialog on the top of the stack right now needs no
-            // keyboard handler.
-            uninstallDialogKeyboardHandler();
         }
     };
 
@@ -936,7 +921,7 @@ function PlainView(controller) {
 
     // Hides the game view.
     this.hide = function() {
-        uninstallDialogKeyboardHandler();
+        uninstallKeyboardHandler();
         let contentDiv = document.querySelector("body > .content");
 
         // It will take us 1 second to fade out.
@@ -949,6 +934,7 @@ function PlainView(controller) {
 
     // Shows the game view.
     this.show = function() {
+        installKeyboardHandler(this);
         let contentDiv = document.querySelector("body > .content");
         contentDiv.style.display = "block";
 
@@ -2386,7 +2372,6 @@ function PlainView(controller) {
 
         dialog.style.display = "block";
     };
-
 
     return this;
 }
