@@ -808,17 +808,19 @@ function PlainView(controller) {
                         // finding a match.  Looks like the weapon you
                         // currently have is the only one that's not out of
                         // ammo.
+                        //
+                        // Give up the search and just select that sole
+                        // weapon, regardless of its ammo.
                         console.debug("PlainView.keyboardHandler/selectNextWeapon():" +
                                       " %s %s's other weapons are out of" +
                                       " ammo.  Selection unchanged.",
                                       currentRobot.longName,
                                       currentRobot.id);
-                        return;
-                    }
 
-                    if (currentRobot.arsenal[index].ammo < currentRobot.arsenal[index].ammoPerRound) {
+                    } else if (currentRobot.arsenal[index].ammo < currentRobot.arsenal[index].ammoPerRound) {
                         // We don't want to select weapons that are out of
-                        // ammo.
+                        // ammo (unless we have no choice, as in the case
+                        // above.)
                         continue;
                     }
 
@@ -1361,7 +1363,7 @@ function PlainView(controller) {
     this.removeDeadRobot = function(robot) {
 
         let currentRobot = controller.getCurrentRobot();
-        if (robot.faction !== currentRobot.faction) {
+        if (currentRobot && robot.faction !== currentRobot.faction) {
             console.warn(String.format("PlainView.removeDeadRobot(): Cannot remove the container for robots that are not allied to the current robot's faction ({0}).",
                                        currentRobot.faction));
             return false;
@@ -2510,6 +2512,7 @@ function PlainView(controller) {
                               controller.getFactionIcon(controller.winningFaction()),
                               "./assets/images/backgrounds/[CC0] Rawdanitsu - Another Space Backgrounds (space-background-10) [OpenGameArt]-85%25.jpg");
             content.style.display = "block";
+
         } else {
 
             // If only AI players are running, then show the success

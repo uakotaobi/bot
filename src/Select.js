@@ -850,10 +850,10 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
         //
         // I also say, so says I, that no bot has less than three inches of armor
         // plating.
-        const minArmor = 25.4 * 3;
-        let armor_to_mm = 1300/2.9;
+        const minArmorMillimeters = 25.4 * 3;
+        const armor_to_mm = 1300/2.9;
         let damageObject = Weapon.calculateDamage(robotData.armor, Weapon.useExpectedValues);
-        let armorRatingMillimeters = Math.max(minArmor, damageObject.damage * armor_to_mm);
+        let armorRatingMillimeters = Math.max(minArmorMillimeters, damageObject.damage * armor_to_mm);
         let armorString = String.format("{0} mm (approx.)",
                                        armorRatingMillimeters.toFixed(0));
 
