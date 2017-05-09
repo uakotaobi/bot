@@ -612,89 +612,259 @@ function PlainView(controller) {
                 }
             } // end (if there are active dialogs on the stack)
 
-            // If control made it here, there was no active dialog to dismiss, or
-            // the user pressed something other than ESC, RET, or SPC.
+
+            //////////////////////////////////////////////////////////////////
+            // If control made it here, there was no active dialog to dismiss,
+            // or the user pressed something other than ESC, RET, or SPC.
             //
             // The actions that follow only make sense if a human controls the
             // current robot (rather than merely being at the keyboard.)
-            if (controller.isGameInProgress() &&
-                controller.getFactionType(controller.getCurrentRobot().faction) === "human") {
+            //////////////////////////////////////////////////////////////////
 
-                // Converts a robot to an index in the controller.getGameRobots()
-                // array.
-                let getRobotIndex = function(robot) {
-                    if (robot !== null) {
-                        let robots = controller.getGameRobots();
-                        for (let i = 0; i < robots.length; ++i) {
-                            if (robots[i].id === robot.id) {
-                                return i;
-                            }
-                        }
-                    }
-                    return -1;
-                };
+            if (!controller.isGameInProgress() ||
+                controller.getFactionType(controller.getCurrentRobot().faction) !== "human") {
+                return;
+            }
 
-                // Perform a linear search through the game robots to find the
-                // next (or previous) enemy that isn't the current one.
-                let getNextEnemy = function(currentRobot, currentEnemyRobotIndex, increment) {
-
-                    if (increment === 0) {
-                        console.error("PlainView.keyboardHandler/getNextEnemy():" +
-                                      " Internal error: can't obtain next or" +
-                                      " previous enemy when the increment is zero.");
-                        return;
-                    }
+            //////////////////////////////////////////////////////////////////
+            // This helper function converts a robot to an index in the
+            // controller.getGameRobots() array.
+            let getRobotIndex = function(robot) {
+                if (robot !== null) {
                     let robots = controller.getGameRobots();
-                    let currentEnemyRobot = robots[currentEnemyRobotIndex];
-                    let index = currentEnemyRobotIndex;
-                    while (true) {
-                        index += increment;
-                        if (index < 0) {
-                            index += robots.length;
-                        } else if (index > robots.length - 1) {
-                            index -= robots.length;
+                    for (let i = 0; i < robots.length; ++i) {
+                        if (robots[i].id === robot.id) {
+                            return i;
                         }
+                    }
+                }
+                return -1;
+            };
 
-                        if (index === currentEnemyRobotIndex) {
-                            // We've wrapped all the way around to the beginning
-                            // without seeing an enemy robot to select.  That's
-                            // not possible while a game is in progress.
-                            console.error("PlainView.keyboardHandler/getNextEnemy(): " +
-                                          "Can't find an enemy for the current" +
-                                          "robot (%s %s).  That implies that the" +
-                                          "game has already ended.",
-                                          currentRobot,
-                                          currentRobot.id);
-                            return;
-                        }
+            //////////////////////////////////////////////////////////////////
+            // Performs a linear search through the game robots to find
+            // the next (or previous) enemy that isn't the current one.
+            // Once it's found, we simulate the same sequence of actions
+            // that clicking on that robot would simulate (except that we
+            // don't display the same dialog.)
+            let selectNextEnemy = function(currentRobot, currentEnemyRobotIndex, increment) {
 
-                        if (robots[index].faction === currentRobot.faction) {
-                            // Skip allies (and ourselves) -- we can't select
-                            // them.
-                            continue;
-                        }
+                if (increment === 0) {
+                    console.error("PlainView.keyboardHandler/selectNextEnemy():" +
+                                  " Internal error: can't obtain next or" +
+                                  " previous enemy when the increment is zero.");
+                    return;
+                }
+                let robots = controller.getGameRobots();
+                let currentEnemyRobot = robots[currentEnemyRobotIndex];
+                let index = currentEnemyRobotIndex;
+                while (true) {
+                    index += increment;
+                    if (index < 0) {
+                        index += robots.length;
+                    } else if (index > robots.length - 1) {
+                        index -= robots.length;
+                    }
 
-                        // If control made it here, we have found the
-                        // next/previous enemy.  Do the same thing that the
-                        // user clicking on it would have done.
-                        let robotContainer = document.getElementById(id(robots[index].id));
-                        robotContainer.click();
+                    if (index === currentEnemyRobotIndex) {
+                        // We've wrapped all the way around to the beginning
+                        // without seeing an enemy robot to select.  That's
+                        // not possible while a game is in progress.
+                        console.error("PlainView.keyboardHandler/selectNextEnemy(): " +
+                                      "Can't find an enemy for the current" +
+                                      "robot (%s %s).  That implies that the" +
+                                      "game has already ended.",
+                                      currentRobot,
+                                      currentRobot.id);
                         return;
+                    }
 
-                    } // end (while looking for an enemy robot to select)
+                    if (robots[index].faction === currentRobot.faction) {
+                        // Skip allies (and ourselves) -- we can't select
+                        // them.
+                        continue;
+                    }
+
+                    // If control made it here, we have found the
+                    // next/previous enemy.  Do the same thing that the
+                    // user clicking on it would have done.
+                    let robotContainer = document.getElementById(id(robots[index].id));
+                    let robotSelectRadioButton = robotContainer.querySelector(".top-bar input");
+                    controller.setCurrentEnemy(robots[index].id);
+                    robotSelectRadioButton.checked = true;
+                    view.updateRobots();
+                    return;
+
+                } // end (while looking for an enemy robot to select)
+            };
+
+            //////////////////////////////////////////////////////////////////
+            // Selects the next weapon type among the weapons that the
+            // given robot has.
+            let selectNextWeapon = function(currentRobot, currentWeapon, increment) {
+
+                if (increment === 0) {
+                    console.error("PlainView.keyboardHandler/selectNextWeapon():" +
+                                  " Internal error: can't obtain next or" +
+                                  " previous weapon when the increment is zero.");
+                    return;
+                }
+
+                // Returns an integer that, when the increment is added to it,
+                // will yield the index of the first weapon (index 0.)
+                //
+                // In either words, returns -1*increment modulo the arsenal length.
+                let priorIndex = function() {
+                    if (increment > 0) {
+                        return currentRobot.arsenal.length - increment;
+                    } else {
+                        return (-increment) % currentRobot.arsenal.length;
+                    }
                 };
 
+                let robotContainer = document.getElementById(id(currentRobot.id));
+                let arsenal = currentRobot.arsenal;
+                let weaponIndex = -1;
 
-                let currentEnemyRobotIndex = Math.max(getRobotIndex(controller.getCurrentRobotEnemy()), 0);
-                switch(keyboardEvent.key) {
-                    case "ArrowLeft":
-                        getNextEnemy(controller.getCurrentRobot(), currentEnemyRobotIndex, -1);
-                        break;
-                    case "ArrowRight":
-                        getNextEnemy(controller.getCurrentRobot(), currentEnemyRobotIndex, 1);
-                        break;
+                if (currentWeapon === null) {
+
+                    // No weapon was selected yet.  Select the first weapon
+                    // (when it's incremented.)
+                    weaponIndex = priorIndex();
+
+                } else {
+                    // What is the actual index of the weapon that the current
+                    // robot has selected?
+                    // Well, there's a problem: the GameController doesn't
+                    // keep track of that.  It only cares about the current
+                    // weapon's _type_.
+                    //
+                    // Consider a Scarab with two machine guns and a laser (in
+                    // that order.)  Arsenal[1], the second machine gun, is
+                    // currently selected.  The GameController only knows that
+                    // the Scarab has _a_ machine gun selected, so when we try
+                    // to do a search to find the machine gun, we'll happily
+                    // find it at arsenal[0], not arsenal[1] which the user
+                    // actually chose.
+                    //
+                    // In fact, there is only one way to keep track of this,
+                    // and that is by committing the cardinal sin of
+                    // inspecting the UI state to see which radio button is
+                    // currently checked.
+
+                    let radioButtons = robotContainer.querySelectorAll(String.format(".weapons table tr input"));
+                    for (let i = 0; i < radioButtons.length; ++i) {
+                        if (radioButtons[i].checked) {
+                            // Quick sanity check.
+                            if (currentRobot.arsenal[i].internalName !== currentWeapon.internalName) {
+                                console.warn("PlainView.keyboardHandler/selectNextWeapon():" +
+                                             " Internal error: the current" +
+                                             " robot, %s %s, has an actual" +
+                                             " current weapon of '%s' (at" +
+                                             " index %d), but the caller" +
+                                             " said it was '%s'.  Erring on" +
+                                             " the side of reality.",
+                                             currentRobot.longName,
+                                             currentRobot.id,
+                                             currentRobot.arsenal[i].internalName,
+                                             i,
+                                             currentWeapon.internalName);
+
+                            }
+                            weaponIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (weaponIndex === -1) {
+                        // The robot doesn't have any weapon radio buttons
+                        // checked, so it shouldn't have had a currentWeapon
+                        // in the first place.
+                        console.warn("PlainView.keyboardHandler/selectNextWeapon():" +
+                                     " Internal error: the current robot," +
+                                     " %s %s, has no selected weapons, yet" +
+                                     " the caller claimed the current" +
+                                     " weapon was '%s'.  Selecting the" +
+                                     " first weapon.",
+                                     currentRobot.longName,
+                                     currentRobot.id,
+                                     currentWeapon.internalName);
+                        weaponIndex = priorIndex();
+                    }
                 }
-            } // end (if the current robot is controlled by a human being)
+
+                // Find the next weapon in the arsenal that still has ammo.
+                let index = weaponIndex;
+                while (true) {
+                    index += increment;
+                    if (index < 0) {
+                        index += currentRobot.arsenal.length;
+                    } else if (index > currentRobot.arsenal.length - 1) {
+                        index -= currentRobot.arsenal.length;
+                    }
+
+                    if (index === weaponIndex) {
+                        // We wrapped all the way around the arsenal without
+                        // finding a match.  Looks like the weapon you
+                        // currently have is the only one that's not out of
+                        // ammo.
+                        console.debug("PlainView.keyboardHandler/selectNextWeapon():" +
+                                      " %s %s's other weapons are out of" +
+                                      " ammo.  Selection unchanged.",
+                                      currentRobot.longName,
+                                      currentRobot.id);
+                        return;
+                    }
+
+                    if (currentRobot.arsenal[index].ammo < currentRobot.arsenal[index].ammoPerRound) {
+                        // We don't want to select weapons that are out of
+                        // ammo.
+                        continue;
+                    }
+
+                    // If control made it here, we have found the next weapon
+                    // to select.
+                    let radioButton = robotContainer.querySelector(String.format(".weapons table tr:nth-child({0}) input",
+                                                                                 index + 1));
+                    controller.setCurrentRobotWeapon(currentRobot.arsenal[index].internalName);
+                    radioButton.checked = true;
+                    view.updateRobots();
+                    return;
+
+                } // end (while looking for the next weapon to select)
+            };
+
+
+            let currentEnemyRobotIndex = Math.max(getRobotIndex(controller.getCurrentRobotEnemy()), 0);
+            switch(keyboardEvent.key) {
+                case "ArrowLeft":
+                    selectNextEnemy(controller.getCurrentRobot(), currentEnemyRobotIndex, -1);
+                    break;
+                case "ArrowRight":
+                    selectNextEnemy(controller.getCurrentRobot(), currentEnemyRobotIndex, 1);
+                    break;
+                case "ArrowUp":
+                    selectNextWeapon(controller.getCurrentRobot(), controller.getCurrentRobotWeapon(), -1);
+                    break;
+                case "ArrowDown":
+                    selectNextWeapon(controller.getCurrentRobot(), controller.getCurrentRobotWeapon(), 1);
+                    break;
+                case "Escape":
+                {
+                    let robotsCleanedUp = view.removeDeadRobots(controller.getCurrentRobot().faction);
+                    if (robotsCleanedUp == 0) {
+                        // I suppose we could use this to pop up a dialog to
+                        // end the game.  I don't see why, but we could.
+                    }
+                    break;
+                }
+                case " ":
+                case "Enter":
+                    // Attack if we have the information we need; remind the
+                    // user if we don't.
+                    view.showNextDialogOrAdvanceTurn();
+                    break;
+            }
         };
     })(this);
 
@@ -1157,12 +1327,13 @@ function PlainView(controller) {
             let closeButton = document.querySelector("#" + id(robot.id) + " .top-bar .close");
             let getCloseOnclickHandler = function(view) {
                 return function() {
+                    view.removeDeadRobot(robot);
                     // Kill our robot div; it's useless now.
-                    robotContainer.remove();
-
-                    if (robot.hitpoints <= 0) {
-                        controller.removeRobot(robot);
-                    }
+                    // robotContainer.remove();
+                    //
+                    // if (robot.hitpoints <= 0) {
+                    //     controller.removeRobot(robot);
+                    // }
 
                     // Reposition the other robot divs on our side.
                     view.updateRobots();
@@ -1178,6 +1349,61 @@ function PlainView(controller) {
         }
 
         return document.getElementById(id(robot.id));
+    };
+
+
+    // Removes a robot's container div from the view if and only if it is dead
+    // and allied to the game's current robot.  Returns true if the removal
+    // was successful and false otherwise.
+    //
+    // Note that this function does not update the view afterward--that's your
+    // job, caller.
+    this.removeDeadRobot = function(robot) {
+
+        let currentRobot = controller.getCurrentRobot();
+        if (robot.faction !== currentRobot.faction) {
+            console.warn(String.format("PlainView.removeDeadRobot(): Cannot remove the container for robots that are not allied to the current robot's faction ({0}).",
+                                       currentRobot.faction));
+            return false;
+        }
+
+        if (robot.hitpoints > 0) {
+            console.warn(String.format("PlainView.removeDeadRobot(): Cannot remove robots that aren't dead.  Your {0} {1} still has {2} hitpoints.",
+                                       robot.longName,
+                                       robot.id,
+                                       robot.hitpoints));
+            return false;
+        }
+
+        let robotDiv = document.getElementById(id(robot.id));
+        if (!robotDiv) {
+            // I guess a human closed this div already.
+            return false;
+        }
+
+        // TODO: We could set the dimensions to 0 to animate the removal
+        // (and then of course remove the actual container after aa short
+        // delay.)
+        robotDiv.remove();
+        controller.removeRobot(robot);
+        return true;
+    };
+
+
+    // Removes all the dead robots for a given faction.  Returns the number of
+    // robots removed.
+    //
+    // This function *does* update the view, unlike PlainView.removeDeadRobot().
+    this.removeDeadRobots = function(faction) {
+        let robots = controller.getGameRobots(faction);
+        let deadRobotsRemoved = 0;
+        for (let i = 0; i < robots.length; ++i) {
+            if (robots[i].hitpoints <= 0 && this.removeDeadRobot(robots[i])) {
+                deadRobotsRemoved += 1;
+            }
+        }
+        this.updateRobots();
+        return deadRobotsRemoved;
     };
 
 
@@ -1680,40 +1906,6 @@ function PlainView(controller) {
         }
 
         robotDiv.querySelector(String.format(".weapons tr:nth-child({0}) input", index + 1)).checked = (checked === true ? "checked" : "");
-        return true;
-    };
-
-
-    // Removes a robot's container div from the view if and only if it is dead
-    // and allied to the game's current robot.  Returns true if the removal
-    // was successful and false otherwise.
-    this.removeDeadRobot = function(robot) {
-
-        let currentRobot = controller.getCurrentRobot();
-        if (robot.faction !== currentRobot.faction) {
-            console.warn(String.format("PlainView.removeDeadRobot(): Cannot remove the container for robots that are not allied to the current robot's faction ({0}).",
-                                       currentRobot.faction));
-            return false;
-        }
-
-        if (robot.hitpoints > 0) {
-            console.warn(String.format("PlainView.removeDeadRobot(): Cannot remove robots that aren't dead.  Your {0} {1} still has {2} hitpoints.",
-                                       robot.longName,
-                                       robot.id,
-                                       robot.hitpoints));
-            return false;
-        }
-
-        let robotDiv = document.getElementById(id(robot.id));
-        if (!robotDiv) {
-            console.warn("PlainView.removeDeadRobot(): Can't remove the div for %s with " +
-                         "ID %s because the div is missing.  (Did a human close it already?)",
-                         robot.longName,
-                         robot.id);
-            return false;
-        }
-
-        robotDiv.remove();
         return true;
     };
 

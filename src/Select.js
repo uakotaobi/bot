@@ -225,6 +225,62 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
     };
 
 
+    // A helper function called on-demand whenever there's a possibility that
+    // the user's changes could make the game impossible to start.
+    let validateAndUpdateGoButton = function() {
+
+        let reason = "";
+        if (factionConflict) {
+            reason += "one or more players are assigned to the same faction";
+        }
+
+        for (let i = 0; i < players.length; ++i) {
+            if (players[i].exceededQuota) {
+                reason += (reason === "" ? "" : ", and because ");
+                reason += "one or more players have exceeded their quotas for this difficulty level";
+                break;
+            }
+        }
+
+        let goButton = container.querySelector(".go");
+        if (reason !== "") {
+            reason = "Cannot start the game because " + reason + ".";
+            goButton.setAttribute("class", "go disabled");
+            goButton.setAttribute("disabled", "disabled");
+            goButton.setAttribute("title", reason);
+        } else {
+            // Everything looks good.
+            goButton.setAttribute("class", "go");
+            goButton.removeAttribute("disabled");
+            goButton.setAttribute("title", "Play the game");
+        }
+    };
+
+
+    // Updates the pointQuota for each player, and displays the warning colors
+    // if a player has exceeded the quota.
+    let updatePlayerPointQuotas = function() {
+        let pointQuota = Number(container.querySelector(".points").value);
+
+        for (let i = 0; i < players.length; ++i) {
+            let currentPoints = calculatePlayerPoints(i);
+
+            let factionClass = String.format("player-{0}", players[i].factionIndex);
+            let quotaDiv = container.querySelector(String.format(".quota.{0}", factionClass));
+            quotaDiv.textContent = String.format("{0}/{1}", currentPoints, pointQuota);
+
+            if (currentPoints > pointQuota) {
+                players[i].exceededQuota = true;
+                quotaDiv.setAttribute("class", String.format("quota {0} exceeded", factionClass));
+            } else {
+                players[i].exceededQuota = false;
+                quotaDiv.setAttribute("class", String.format("quota {0}", factionClass));
+            }
+        }
+        validateAndUpdateGoButton();
+    };
+
+
     // Clones the #player-row-template element the given number of times, then
     // deletes it permanently.  The cloned rows start out unrendered (display:
     // none.)  Call addPlayerRow() to make them visible.
@@ -689,30 +745,6 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
     };
 
 
-    // Updates the pointQuota for each player, and displays the warning colors
-    // if a player has exceeded the quota.
-    let updatePlayerPointQuotas = function() {
-        let pointQuota = Number(container.querySelector(".points").value);
-
-        for (let i = 0; i < players.length; ++i) {
-            let currentPoints = calculatePlayerPoints(i);
-
-            let factionClass = String.format("player-{0}", players[i].factionIndex);
-            let quotaDiv = container.querySelector(String.format(".quota.{0}", factionClass));
-            quotaDiv.textContent = String.format("{0}/{1}", currentPoints, pointQuota);
-
-            if (currentPoints > pointQuota) {
-                players[i].exceededQuota = true;
-                quotaDiv.setAttribute("class", String.format("quota {0} exceeded", factionClass));
-            } else {
-                players[i].exceededQuota = false;
-                quotaDiv.setAttribute("class", String.format("quota {0}", factionClass));
-            }
-        }
-        validateAndUpdateGoButton();
-    };
-
-
     // Sums the points for all of the Bots that a player has chosen.
     let calculatePlayerPoints = function(playerIndex) {
 
@@ -723,38 +755,6 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
             sum += Robot.dataTable[robotInternalName].score;
         }
         return sum;
-    };
-
-
-    // A helper function called on-demand whenever there's a possibility that
-    // the user's changes could make the game impossible to start.
-    let validateAndUpdateGoButton = function() {
-
-        let reason = "";
-        if (factionConflict) {
-            reason += "one or more players are assigned to the same faction";
-        }
-
-        for (let i = 0; i < players.length; ++i) {
-            if (players[i].exceededQuota) {
-                reason += (reason === "" ? "" : ", and because ");
-                reason += "one or more players have exceeded their quotas for this difficulty level";
-                break;
-            }
-        }
-
-        let goButton = container.querySelector(".go");
-        if (reason != "") {
-            reason = "Cannot start the game because " + reason + ".";
-            goButton.setAttribute("class", "go disabled");
-            goButton.setAttribute("disabled", "disabled");
-            goButton.setAttribute("title", reason);
-        } else {
-            // Everything looks good.
-            goButton.setAttribute("class", "go");
-            goButton.removeAttribute("disabled");
-            goButton.setAttribute("title", "Play the game");
-        }
     };
 
 
@@ -1138,6 +1138,13 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
         // returns to us when the current game is over, we'll come up with a
         // fresh challenge for our plucky human enemy.
         factionComputerForces = { };
+
+        // To prevent the player from inadvertently re-launching the game by
+        // pressing <SPC> or <ENTER> over and over after losing a regular
+        // game, intentionally remove focus from the launch button that the
+        // user has just activated.
+        let goButton = container.querySelector(".go");
+        goButton.blur();
 
         // We're ready to launch!
         //
