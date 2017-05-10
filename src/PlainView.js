@@ -2513,6 +2513,9 @@ function PlainView(controller) {
                               "./assets/images/backgrounds/[CC0] Rawdanitsu - Another Space Backgrounds (space-background-10) [OpenGameArt]-85%25.jpg");
             content.style.display = "block";
 
+            // The dead do not receive the glory.
+            this.removeDeadRobots(controller.winningFaction());
+
         } else {
 
             // If only AI players are running, then show the success

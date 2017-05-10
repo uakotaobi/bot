@@ -68,7 +68,7 @@ function Weapon(weaponType) {
             longName       : "Heavy Laser",
             shortName      : "HV. LASER",
             class          : "medium",
-            damage         : "1d10 + 1d4", // EV=8
+            damage         : "2d8", // EV=9
             ammoPerRound   : 1,
             ammo           : 20
         },
@@ -86,7 +86,7 @@ function Weapon(weaponType) {
             class          : "heavy",
             damage         : "3d6", // EV=10.5
             ammoPerRound   : 1,
-            ammo           : 15
+            ammo           : 12
         },
         "midrangemissile"  : {
             longName       : "Mid-Range Missile",
@@ -94,7 +94,7 @@ function Weapon(weaponType) {
             class          : "medium",
             damage         : "((2d4 - 2) * 1d4) + 1", // EV=8.5 -- toned down from its original 8.75 because that made it unusually strong for a medium weapon.
             ammoPerRound   : 1,
-            ammo           : 20
+            ammo           : 15
         },
         "longrangemissile" : {
             longName       : "Long-Range Missile",
@@ -102,13 +102,13 @@ function Weapon(weaponType) {
             class          : "light",
             damage         : "1d6 + 2", // EV=5.5
             ammoPerRound   : 1,
-            ammo           : 25
+            ammo           : 30
         },
         "ac-stormcrow"     : {
             longName       : "Autocannon 5-pack",
             shortName      : "AC/5",
             class          : "medium",
-            damage         : "2d4", // EV=5 (but used in pairs for 10)
+            damage         : "1d8", // EV=4.5 (but used in pairs for 9)
             ammoPerRound   : 1,
             ammo           : 5
         },
@@ -120,11 +120,19 @@ function Weapon(weaponType) {
             ammoPerRound   : 1,
             ammo           : 10
         },
-        "ll-bullfrog"      : {
-            longName       : "Light Laser (Auxiliary)",
-            shortName      : "LT. LASER",
+        "lightpulse"       : {
+            longName       : "Light Impulse",
+            shortName      : "LT. PULSE",
             class          : "light",
             damage         : "1 + 2d2", // EV=4, slightly better than a lightlaser
+            ammoPerRound   : 0,
+            ammo           : 1
+        },
+        "mediumpulse"      : {
+            longName       : "Medium Impulse",
+            shortName      : "MD. PULSE",
+            class          : "medium",
+            damage         : "1 + 1d12", // EV=7.5, better than the mortar on average (but with lower max damage)
             ammoPerRound   : 1,
             ammo           : 20
         },

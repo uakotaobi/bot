@@ -603,35 +603,34 @@ function GameController() {
     this.removeRobot = function(robot) {
         let currentRobot = this.getCurrentRobot();
 
-        if (currentRobot === null) {
-            // There should _be_ a current robot.
-            console.error(String.format("GameController.removeRobot(): There is no current robot.  Is the game no longer in progress?"));
-            return;
-        }
+        // Perform additional tests if a game is currently in progress.
+        if (currentRobot !== null) {
 
-        if (currentRobot.hitpoints <= 0) {
-            // The current robot is dead.  That shouldn't have happened.
-            console.warn(String.format("GameController.removeRobot(): The current robot ({0} {1}) should always have positive hitpoints.  It has {2}.",
-                                       currentRobot.longName,
-                                       currentRobot.id,
-                                       currentRobot.hitpoints));
-        }
+            if (currentRobot.hitpoints <= 0) {
+                // The current robot is dead.  That shouldn't have happened.
+                console.warn("GameController.removeRobot(): Internal error: The current robot (%s %s) should always have positive hitpoints.  It has %d.",
+                             currentRobot.longName,
+                             currentRobot.id,
+                             currentRobot.hitpoints);
+            }
 
-        if (robot.id === currentRobot.id) {
-            // Removing the current robot is probably a bad idea.  It forces
-            // us to advance to the next robot, even if the code that's
-            // calling us is not prepared for that.
-            console.warn(String.format("GameController.removeRobot(): I am being asked to remove the current robot ({0} {1}).  That doesn't seem like a good idea, but proceeding anyway.  (This will call GameController.nextRobot().)",
-                                       robot.longName,
-                                       robot.id));
-            this.nextRobot();
-        }
+            if (robot.id === currentRobot.id) {
+                // Removing the current robot is probably a bad idea.  It forces
+                // us to advance to the next robot, even if the code that's
+                // calling us is not prepared for that.
+                console.warn("GameController.removeRobot(): Warning: I am being asked to remove the current robot (%s %s).  That doesn't seem like a good idea, but proceeding anyway.  (This will call GameController.nextRobot().)",
+                             robot.longName,
+                             robot.id);
+                this.nextRobot();
+            }
+        } // end (if there is a current robot due to a game being in progress)
+
 
         if (robot.hitpoints > 0) {
-            console.warn(String.format("GameController.removeRobot(): I am being asked to remove {0} {1}, but it is still in the game (hitpoints = {2}.)",
-                                       robot.longName,
-                                       robot.id,
-                                       robot.hitpoints));
+            console.warn("GameController.removeRobot(): Warning: I am being asked to remove %s %s, but it is still alive (hitpoints = %d.)",
+                         robot.longName,
+                         robot.id,
+                         robot.hitpoints);
         }
 
         // Remove the robot from whatever faction it belongs to (if we can
@@ -671,10 +670,10 @@ function GameController() {
 
                 } else {
                     // Control should never make it here.
-                    console.warn(String.format("GameController.removeRobot(): Internal error: Can't find index of the robot we want to remove ({0} {1}) in {2}'s robots array.  That should not be possible.",
-                                              robot.longName,
-                                              robot.id,
-                                              faction.name));
+                    console.warn("GameController.removeRobot(): Internal error: Can't find index of the robot we want to remove (%s %s) in %s\'s robots array.  That should not be possible.",
+                                 robot.longName,
+                                 robot.id,
+                                 faction.name);
 
                 } // end (if we can't find the robot we want to remove within its faction's robots array [which is impossible])
             } // end (if we've found the faction of the robot we want to remove)
