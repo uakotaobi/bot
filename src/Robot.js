@@ -290,7 +290,7 @@ function Robot(robotType) {
     let isEntirelyDigits    = function(s) { return (s.search(/[0-9]+/)  === 0); };
 
     // Generates a random ID string that conforms to whatever ID pattern is
-    // passed in as am argument.
+    // passed in as an argument.
     //
     // For the most p[art, characters within an ID pattern are copied verbatim
     // into the output string.  However, certain special constructions are

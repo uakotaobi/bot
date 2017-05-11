@@ -262,7 +262,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     text-align: center;
 
     font-family: Ikarus;
-    font-size: 36pt;
+    font-size: 3.2vw;
     height: 20%;
 }
 .dialog.endgame .content .text {
@@ -319,10 +319,12 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     color: white;
     text-shadow: 0px 0px 1px black, 0px 0px 1px black, 0px 0px 1px black, 0px 0px 1px black,
                  2px 2px 1px rgb(0, 0, 0);
-    font-size: 1.7em;
+    /* Scales the font as the screen height scales.  Tested with a width of 55%
+       for ".text p" elements. */
+    font-size: 5vh;
 }
 .dialog.endgame .content.success .text p {
-    width: 50%;
+    width: 55%; /* See above. */
     margin-left: auto;
     margin-right: auto;
 }
@@ -603,7 +605,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
      */
     width: 100%;
     height: 100%;
-    padding-right: 5%;
+    padding-right: 10%;
 }
 .select-a-mech .panel.left label {
     font-size: 1em;

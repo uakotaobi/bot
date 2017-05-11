@@ -36,7 +36,7 @@ function Weapon(weaponType) {
             longName       : "Machine Gun",
             shortName      : "MACH. GUN",
             class          : "medium",
-            damage         : "1d6", // EV=3.5, but used in sets of 2 for 7
+            damage         : "1d7", // EV=4, but used in sets of 2 for 8
             ammoPerRound   : 10,
             ammo           : 200
         },

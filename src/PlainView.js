@@ -1163,11 +1163,6 @@ function PlainView(controller) {
                 allFactionDivs[i].remove();
             }
         }
-
-        // let allRobotDivs = document.querySelectorAll(".content .robot");
-        // for (let i = 0; i < allRobotDivs.length; ++i) {
-        //     allRobotDivs[i].remove();
-        // }
     };
 
 
@@ -1383,9 +1378,6 @@ function PlainView(controller) {
             return false;
         }
 
-        // TODO: We could set the dimensions to 0 to animate the removal
-        // (and then of course remove the actual container after aa short
-        // delay.)
         robotDiv.remove();
         controller.removeRobot(robot);
         return true;
@@ -2188,10 +2180,8 @@ function PlainView(controller) {
     // This function is called by the radio button onclick handlers for the
     // weapon arsenal rows and the enemy robot divs.
     //
-    // TODO: I think this should also be called at the end of AI turns; if the
-    // current weapon and current enemy are null, _all_ we need to print out is
-    // "$FOO_ALLIANCE, it's your turn."
-    //
+    // Via createAdvanceTurnOnClickHandler(), this function is also called at
+    // the end of AI players' turns.
     //
     this.showNextDialogOrAdvanceTurn = function() {
 
@@ -2227,9 +2217,9 @@ function PlainView(controller) {
             // they skip their turn before making it here.  Here is the human
             // player equivalent.
 
-            console.log("The human-controlled %s %s is out of ammunition.  Displaying out-of-ammo dialog.",
-                        controller.getCurrentRobot().longName,
-                        controller.getCurrentRobot().id);
+            console.debug("The human-controlled %s %s is out of ammunition.  Displaying out-of-ammo dialog.",
+                          controller.getCurrentRobot().longName,
+                          controller.getCurrentRobot().id);
             let dialog = this.addDialog("generic", "30%", "15%", "40%", "",
                                         0, true);
             dialog.querySelector(".title").textContent = "Damage Report";
@@ -2451,19 +2441,14 @@ function PlainView(controller) {
     };
 
 
+    // Shows the endgame success or failure dialog if a player won the game
+    // (regardless of whether that player is human or AI.)
     this.checkForEndgame = function() {
         if (controller.isGameInProgress()) {
             return;
         }
 
         // The game's over!
-
-        // TODO: How to we make the game wait for the human to click
-        // on the damage report dialog and dismiss it BEFORE showing
-        // the endgame?  Perhaps I can have a checkForEndgame()
-        // function that calls the code below, but only is
-        // !gameInProgress(), and then call *that* from the ordinary
-        // onclick code!
 
         // If the dialog mentions the losing factions, we want to be
         // ready.
@@ -2543,6 +2528,7 @@ function PlainView(controller) {
                                   controller.getFactionIcon(controller.winningFaction()),
                                   "./assets/images/backgrounds/[CC0] Cuzco - Space background (bg5) [OpengameArt]-85%25.jpg");
                 content.style.display = "block";
+
             } else {
 
                 // A computer won a computer-only match.  Show the victory dialog.
