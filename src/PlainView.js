@@ -2346,25 +2346,23 @@ function PlainView(controller) {
 
                 this.explodeRobot(theBadGuy);
 
-            } else {
+            } else if (o.damageReport.jumped === true) {
+                // Jumping normally means taking no damage, meaning we jump to
+                // the full height.
+                let jumpDurationMilliseconds = 2000;
 
-                if (o.damageReport.jumped === true) {
-                    // Jumping normally means taking no damage, meaning we jump to
-                    // the full height.
-                    let jumpDurationMilliseconds = 2000;
-
-                    // But if the jump failed (i.e., we jumped, but it did not
-                    // prevent all the damage) then we cut off the jump early to
-                    // represent a misfire or something.
-                    if (o.damageReport.jumped === true &&
-                        o.damageReport.jumpDamage.damage < o.damageReport.originalDamage.damage) {
-                        jumpDurationMilliseconds /= 10;
-                    }
-
-                    const smokeDurationMilliseconds = 1000;
-                    this.explode(theBadGuy, "jump", smokeDurationMilliseconds, jumpDurationMilliseconds);
+                // But if the jump failed (i.e., we jumped, but it did not
+                // prevent all the damage) then we cut off the jump early to
+                // represent a misfire or something.
+                if (o.damageReport.jumped === true &&
+                    o.damageReport.jumpDamage.damage < o.damageReport.originalDamage.damage) {
+                    jumpDurationMilliseconds /= 10;
                 }
+
+                const smokeDurationMilliseconds = 1000;
+                this.explode(theBadGuy, "jump", smokeDurationMilliseconds, jumpDurationMilliseconds);
             }
+
 
             // Clicking on the dialog (or the overlay) activates the next turn.
             dialog.onclick = null;
