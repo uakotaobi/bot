@@ -659,6 +659,13 @@ function PlainView(controller) {
                 let currentEnemyRobot = robots[currentEnemyRobotIndex];
                 let index = currentEnemyRobotIndex;
                 while (true) {
+                    let robotContainer = document.getElementById(id(robots[index].id));
+                    if (robotContainer) {
+                        // Uncheck the robot we're moving away from.
+                        let robotSelectRadioButton = robotContainer.querySelector(".top-bar input");
+                        robotSelectRadioButton.checked = false;
+                    }
+
                     index += increment;
                     if (index < 0) {
                         index += robots.length;
@@ -672,9 +679,9 @@ function PlainView(controller) {
                         // not possible while a game is in progress.
                         console.error("PlainView.keyboardHandler/selectNextEnemy(): " +
                                       "Can't find an enemy for the current" +
-                                      "robot (%s %s).  That implies that the" +
-                                      "game has already ended.",
-                                      currentRobot,
+                                      " robot (%s %s).  That implies that the" +
+                                      " game has already ended.",
+                                      currentRobot.longName,
                                       currentRobot.id);
                         return;
                     }
@@ -685,10 +692,15 @@ function PlainView(controller) {
                         continue;
                     }
 
+                    if (robots[index].hitpoints <= 0) {
+                        // Skip any dead robots that haven't been removed from the game yet.
+                        continue;
+                    }
+
                     // If control made it here, we have found the
                     // next/previous enemy.  Do the same thing that the
                     // user clicking on it would have done.
-                    let robotContainer = document.getElementById(id(robots[index].id));
+                    robotContainer = document.getElementById(id(robots[index].id));
                     let robotSelectRadioButton = robotContainer.querySelector(".top-bar input");
                     controller.setCurrentEnemy(robots[index].id);
                     robotSelectRadioButton.checked = true;
@@ -1166,87 +1178,6 @@ function PlainView(controller) {
     };
 
 
-    // Ensures that the faction divs for all of the active game's factions are
-    // created if they do not already exist.  If a faction is dead, their div
-    // is resized to nothing, triggering an animation that makes the bot divs
-    // in the faction disappear.
-    this.updateFactions = function() {
-
-        let content = document.querySelector("body .content");
-
-        const factions = controller.getGameFactions();
-        let livingFactionTable = [];
-        for (let i = 0; i < factions.length; ++i) {
-            let robotsInFaction = controller.getGameRobots(factions[i]);
-            let numberOfLivingRobots = 0;
-            for (let j = 0; j < robotsInFaction.length; ++j) {
-                if (robotsInFaction[j].hitpoints > 0) {
-                    numberOfLivingRobots += 1;
-                }
-            }
-            if (numberOfLivingRobots > 0) {
-                livingFactionTable.push({
-                    originalIndex: i,
-                    name: factions[i]
-                });
-                // Create the faction div if it does not exist.
-                if (document.getElementById(id(factions[i])) === null) {
-                    let factionDiv = document.createElement("form");
-                    factionDiv.setAttribute("id", id(factions[i]));
-                    content.appendChild(factionDiv);
-                }
-            } else {
-                // Instead of unceremoniously disappearing the div,
-                // we do an animation: set the div's dimensions to 0
-                // programmatically, then ensure that the CSS properties for
-                // the faction divs have overflow: hidden and a timed CSS
-                // transition on the width and height properties.
-
-                let factionDiv = document.getElementById(id(factions[i]));
-                if (factionDiv !== null) {
-                    factionDiv.style.width = "0";
-                    factionDiv.style.height = "0";
-                    // factionDiv.style.opacity = "0";
-                    // factionDiv.remove();
-                }
-            }
-        }
-
-
-        let factionWidth = 0.2;
-        let factionHeight = 0.2;
-        const numberOfFactions = livingFactionTable.length;
-        if (numberOfFactions in areaTable) {
-            factionWidth  = areaTable[numberOfFactions][0];
-            factionHeight = areaTable[numberOfFactions][1];
-        }
-
-        // Readjusts the div sizes for factions that are currently on the
-        // board ("currently on the board" being defined as id(factionName)
-        // existing as an HTML element on the page.)
-        //
-        // This is called in two contexts: when a faction div is removed due
-        // to the faction being eliminated through combat, and when addRobot()
-        // is adding faction divs to place its robots in.
-
-
-        for (let factionIndex = 0, rowPercentage = 0; rowPercentage < 1; rowPercentage += factionHeight) {
-            for (let columnPercentage = 0; columnPercentage < 1; columnPercentage += factionWidth, factionIndex++) {
-
-                let factionName = livingFactionTable[factionIndex].name;
-                let originalIndex = livingFactionTable[factionIndex].originalIndex;
-
-                let existingContainer = document.getElementById(id(factionName));
-
-                existingContainer.setAttribute("class", "faction faction-" + originalIndex);
-                existingContainer.style.width = (100 * factionWidth) + "%";
-                existingContainer.style.height = (100 * factionHeight) + "vh"; // View Height.  This is vital; height% doesn't work at all.
-                existingContainer.style.left = (100 * columnPercentage) + "%";
-                existingContainer.style.top = (100 * rowPercentage) + "%";
-            }
-        }
-    };
-
     // Add a div to the webpage that allows the human player to control a
     // robot on her side (and by "control", I mean to select a weapon that the
     // robot has and then select an enemy to attack.)
@@ -1528,6 +1459,118 @@ function PlainView(controller) {
     //////////////////////////////////////////////////////////////////////////
     // Player-neutral UI-refreshing functions.                              //
     //////////////////////////////////////////////////////////////////////////
+
+
+    // Ensures that the faction divs for all of the active game's factions are
+    // created if they do not already exist.  If a faction is dead, their div
+    // is resized to nothing, triggering an animation that makes the bot divs
+    // in the faction disappear.
+    this.updateFactions = function() {
+
+        let content = document.querySelector("body .content");
+
+        const factions = controller.getGameFactions();
+        let livingFactionTable = [];
+        for (let i = 0; i < factions.length; ++i) {
+            let robotsInFaction = controller.getGameRobots(factions[i]);
+            let numberOfLivingRobots = 0;
+            for (let j = 0; j < robotsInFaction.length; ++j) {
+                if (robotsInFaction[j].hitpoints > 0) {
+                    numberOfLivingRobots += 1;
+                }
+            }
+            if (numberOfLivingRobots > 0) {
+                livingFactionTable.push({
+                    originalIndex: i,
+                    name: factions[i]
+                });
+                // Create the faction div if it does not exist.
+                if (document.getElementById(id(factions[i])) === null) {
+                    let factionDiv = document.createElement("form");
+                    factionDiv.setAttribute("id", id(factions[i]));
+                    content.appendChild(factionDiv);
+                }
+            } else {
+                // Instead of unceremoniously disappearing the div,
+                // we do an animation: set the div's dimensions to 0
+                // programmatically, then ensure that the CSS properties for
+                // the faction divs have overflow: hidden and a timed CSS
+                // transition on the width and height properties.
+
+                let factionDiv = document.getElementById(id(factions[i]));
+                if (factionDiv !== null) {
+                    factionDiv.style.width = "0";
+                    factionDiv.style.height = "0";
+                    // factionDiv.style.opacity = "0";
+                    // factionDiv.remove();
+                }
+            }
+        }
+
+
+        let factionWidth = 0.2;
+        let factionHeight = 0.2;
+        const numberOfFactions = livingFactionTable.length;
+        if (numberOfFactions in areaTable) {
+            factionWidth  = areaTable[numberOfFactions][0];
+            factionHeight = areaTable[numberOfFactions][1];
+        }
+
+        // Readjusts the div sizes for factions that are currently on the
+        // board ("currently on the board" being defined as id(factionName)
+        // existing as an HTML element on the page.)
+        //
+        // This is called in two contexts: when a faction div is removed due
+        // to the faction being eliminated through combat, and when addRobot()
+        // is adding faction divs to place its robots in.
+
+
+        for (let factionIndex = 0, rowPercentage = 0; rowPercentage < 1; rowPercentage += factionHeight) {
+            for (let columnPercentage = 0; columnPercentage < 1; columnPercentage += factionWidth, factionIndex++) {
+
+                let factionName = livingFactionTable[factionIndex].name;
+                let originalIndex = livingFactionTable[factionIndex].originalIndex;
+
+                let existingContainer = document.getElementById(id(factionName));
+
+                existingContainer.setAttribute("class", "faction faction-" + originalIndex);
+                existingContainer.style.width = (100 * factionWidth) + "%";
+                existingContainer.style.height = (100 * factionHeight) + "vh"; // View Height.  This is vital; height% doesn't work at all.
+                existingContainer.style.left = (100 * columnPercentage) + "%";
+                existingContainer.style.top = (100 * rowPercentage) + "%";
+
+                // console.debug("Set #%s's height to (100 * %s)vh (%s) = %s.",
+                //              id(factionName),
+                //              factionHeight.toFixed(2),
+                //              existingContainer.style.height,
+                //              window.getComputedStyle(existingContainer).height);
+            }
+        }
+
+        // let foo = [];
+        // function getLivingRobots(factionName) {
+        //     let robots = controller.getGameRobots(factionName);
+        //     return robots.filter(function(robot) {
+        //         return (robot.hitpoints > 0);
+        //     });
+        // }
+        // for (let i = 0; i < factions.length; ++i) {
+        //     foo.push({
+        //         name: factions[i],
+        //         robots: getLivingRobots(factions[i]).length,
+        //         height: window.getComputedStyle(document.getElementById(id(factions[i]))).height,
+        //         toString: function() {
+        //             return String.format("[{0}({1}): {2}/{3}]", this.name, i, this.robots, this.height);
+        //         }
+        //     });
+        // }
+        //
+        // console.debug("PlainView.updateFactions(): There are %d living factions (%s%%x%s%%).  Faction robot counts and container heights: %s",
+        //               numberOfFactions,
+        //               (factionWidth*100).toFixed(2),
+        //               (factionHeight*100).toFixed(2),
+        //               foo);
+    };
 
 
     // Make corrections to the visual appearance of all robot divs so that
@@ -2300,22 +2343,27 @@ function PlainView(controller) {
 
             // Sprite effects are best done after the robot divs have adjusted in size.
             if (theBadGuy.hitpoints <= 0) {
+
                 this.explodeRobot(theBadGuy);
-            } else if (o.damageReport.jumped === true) {
-                // Jumping normally means taking no damage, meaning we jump to
-                // the full height.
-                let jumpDurationMilliseconds = 2000;
 
-                // But if the jump failed (i.e., we jumped, but it did not
-                // prevent all the damage) then we cut off the jump early to
-                // represent a misfire or something.
-                if (o.damageReport.jumped === true &&
-                    o.damageReport.jumpDamage.damage < o.damageReport.originalDamage.damage) {
-                    jumpDurationMilliseconds /= 10;
+            } else {
+
+                if (o.damageReport.jumped === true) {
+                    // Jumping normally means taking no damage, meaning we jump to
+                    // the full height.
+                    let jumpDurationMilliseconds = 2000;
+
+                    // But if the jump failed (i.e., we jumped, but it did not
+                    // prevent all the damage) then we cut off the jump early to
+                    // represent a misfire or something.
+                    if (o.damageReport.jumped === true &&
+                        o.damageReport.jumpDamage.damage < o.damageReport.originalDamage.damage) {
+                        jumpDurationMilliseconds /= 10;
+                    }
+
+                    const smokeDurationMilliseconds = 1000;
+                    this.explode(theBadGuy, "jump", smokeDurationMilliseconds, jumpDurationMilliseconds);
                 }
-
-                const smokeDurationMilliseconds = 1000;
-                this.explode(theBadGuy, "jump", smokeDurationMilliseconds, jumpDurationMilliseconds);
             }
 
             // Clicking on the dialog (or the overlay) activates the next turn.
@@ -2417,6 +2465,22 @@ function PlainView(controller) {
                 this.explode(robot, robot.class, 0, 1000);
                 break;
         }
+
+        let that = this;
+        window.setTimeout(function() {
+            // Since a robot dying can cause the faction divs to resize, we
+            // need to schedule our robot update (which can resize the robot
+            // in response to faction div size changes) to occur after the
+            // computed style of the faction divs has actually changed.
+            //
+            // That's right: this setTimeout() call is compensating for the
+            // _purely decorative_ CSS transition animation for the ".faction"
+            // class by waiting for it to complete.
+            let robots = controller.getGameRobots();
+            for (let i = 0; i < robots.length; ++i) {
+                recalculateImageHeight(robots[i]);
+            }
+        }, 6000);
     };
 
 

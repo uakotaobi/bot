@@ -448,9 +448,9 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     overflow: hidden;
 }
 .robot .main-image img {
-    /*height: 300px;*/
     opacity: 1.0;
     transition: margin-left 1s ease-in,
+                height 0.2s ease-in,
                 opacity 1s ease-in;
 
     /* This is *only* needed for PlainView.explode(robot, "jump", 0, duration). */
