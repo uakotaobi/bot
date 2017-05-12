@@ -146,7 +146,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     background-repeat: no-repeat;
     background-size: contain;
 }
-.dialog.turn .title { font-size: 14pt; }
+.dialog.turn .title { font-size: 0.8vh; }
 .dialog.turn .title h2 { margin: 0; }
 .dialog.turn .text { text-align: center; }
 

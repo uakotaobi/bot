@@ -675,24 +675,29 @@ function PlainView(controller) {
 
                     if (index === currentEnemyRobotIndex) {
                         // We've wrapped all the way around to the beginning
-                        // without seeing an enemy robot to select.  That's
-                        // not possible while a game is in progress.
-                        console.error("PlainView.keyboardHandler/selectNextEnemy(): " +
-                                      "Can't find an enemy for the current" +
-                                      " robot (%s %s).  That implies that the" +
-                                      " game has already ended.",
-                                      currentRobot.longName,
-                                      currentRobot.id);
-                        return;
-                    }
+                        // without seeing a new enemy robot to select, so the
+                        // selection remains unchanged.
+                        //
+                        // That's perfectly normal and common, occurring in
+                        // every game where two surviving Bots duke it out --
+                        // what's not common is for the currently-selected
+                        // robot to already be dead.  In fact, that should not
+                        // be possible.
+                        if (currentEnemyRobot.hitpoints <= 0) {
+                            console.warn("PlainView.keyboardHandler/selectNextEnemy(): " +
+                                         "Internal error: The current robot (%s %s) doesn't have any other enemies, and the current enemy robot (%s %s) is dead.  That implies that the game has ended, so how are you reading this?",
+                                         currentRobot.longName,
+                                         currentRobot.id,
+                                         currentEnemyRobot.longName,
+                                         currentEnemyRobot.id);
+                            return;
+                        }
 
-                    if (robots[index].faction === currentRobot.faction) {
+                    } else if (robots[index].faction === currentRobot.faction) {
                         // Skip allies (and ourselves) -- we can't select
                         // them.
                         continue;
-                    }
-
-                    if (robots[index].hitpoints <= 0) {
+                    } else if (robots[index].hitpoints <= 0) {
                         // Skip any dead robots that haven't been removed from the game yet.
                         continue;
                     }
@@ -2464,6 +2469,7 @@ function PlainView(controller) {
                 break;
         }
 
+        // Resize the robots...but later.
         let that = this;
         window.setTimeout(function() {
             // Since a robot dying can cause the faction divs to resize, we
