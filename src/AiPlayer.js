@@ -89,8 +89,8 @@ function AiPlayer(factionName, controller, view) {
                 // take it out with a weapon having limitless ammo.)
                 w1 = 1.0;
                 w2 = 1.0;
-                w3 = 0.75;
-                w4 = 1.0;
+                w3 = 0.5;
+                w4 = 0.75;
                 break;
             case "heavy":
                 // Heavy Bots have powerful weapons.  It is their
@@ -112,10 +112,10 @@ function AiPlayer(factionName, controller, view) {
                 // will prefer limitless weapons if they can get the job done.
                 w1 = 0.75;
                 w2 = 1.0;
-                w3 = 0.15;
+                w3 = 0.20;
                 w4 = 0.25;
                 break;
-        };
+        }
 
 
 
@@ -369,12 +369,9 @@ function AiPlayer(factionName, controller, view) {
     // (Of course, perhaps that is what you want.)
     //
     // If updateView is true (the default), a dialog box will be created to
-    // report on the attack.  Making it false results in a simulated attack,
+    // report on the attack.  Making it false results in a silent attack,
     // although the lines of code needed to do that are small enough that you
     // could do that yourself.
-    //
-    // Returns true if the game ended this turn (that is, if we won) and false
-    // if the game is still in progress by the end of the turn.
     this.playOneRound = function(updateView) {
 
         updateView = updateView || true;
@@ -387,7 +384,7 @@ function AiPlayer(factionName, controller, view) {
             turnDialog = view.addDialog("turn", "30%", "10%", "40%", "12em", 0/*8000*/, false);
             turnDialog.querySelector(".logo").style.backgroundImage = "url(\"" +
                 controller.getFactionIcon(ourBot.faction) + "\")";
-            turnDialog.setAttribute("class", "dialog turn red");
+            turnDialog.setAttribute("class", "dialog turn enemy red");
             turnDialog.querySelector(".title").style.display = "block";
             turnDialog.querySelector(".title h2").textContent = this.faction;
 
@@ -427,9 +424,9 @@ function AiPlayer(factionName, controller, view) {
         } else {
 
             // Let the AI tell us what it's thinking.
-            for (let i = 0; i < attackInfo.reasons.length; ++i) {
-                console.debug(String.format("{0} {1}: {2}", ourBot.longName, ourBot.id, attackInfo.reasons[i]));
-            }
+            // for (let i = 0; i < attackInfo.reasons.length; ++i) {
+            //     console.debug(String.format("{0} {1}: {2}", ourBot.longName, ourBot.id, attackInfo.reasons[i]));
+            // }
 
             // If a human player is the target of our wrath, say that "we" are
             // under attack (a phrase that is only meaningful to humans.)
@@ -581,7 +578,7 @@ function AiPlayer(factionName, controller, view) {
                 robotClass = "medium";
             } else if (p <= weights[0] + weights[1] + weights[2]) {
                 robotClass = "heavy";
-            } else /* p <= 1 */ {
+            } else /* p <= weights[0] + weights[1] + weights[2] + weights[3] */ {
                 robotClass = "assault";
             }
 

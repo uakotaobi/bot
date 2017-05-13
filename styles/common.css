@@ -146,7 +146,8 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     background-repeat: no-repeat;
     background-size: contain;
 }
-.dialog.turn .title { font-size: 0.8vh; }
+.dialog.turn .title { font-size: 0.8vw; }
+.dialog.turn.enemy .title { font-size: 1.2vw; }
 .dialog.turn .title h2 { margin: 0; }
 .dialog.turn .text { text-align: center; }
 
@@ -321,7 +322,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
                  2px 2px 1px rgb(0, 0, 0);
     /* Scales the font as the screen height scales.  Tested with a width of 55%
        for ".text p" elements. */
-    font-size: 5vh;
+    font-size: 4vh;
 }
 .dialog.endgame .content.success .text p {
     width: 55%; /* See above. */
@@ -652,6 +653,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     background: none;
     box-shadow: none;
 }
+.select-a-mech .player.row .wrapper { display: inline-block; }
 .select-a-mech .player.row .team.invalid { color: white; background-color: red; }
 .select-a-mech .player.row .flag {
     display: inline-block;
@@ -696,7 +698,11 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     margin-left: 0;
     color: gray;
 }
+/* Media query to make the player rows more compact when dimensions are less
+   than 1080p. */
+@media screen and (max-width: 1800px) {
 
+}
 .select-a-mech .stats, .select-a-mech .panel.center .description {
     display: none;
 }
