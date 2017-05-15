@@ -1065,6 +1065,31 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
     };
 
 
+    // The preloading of sprites and robots should not delay the loading of the page itself.
+    let waitUntilBackgroundIsLoaded = function() {
+
+        let startTimeMilliseconds    = Date.now();
+        let pageBackgroundUrlString  = window.getComputedStyle(document.querySelector("body > .content")).backgroundImage; // url("http://example.com")
+        let pageBackgroundUrl        = pageBackgroundUrlString.substr(5, pageBackgroundUrlString.length - 7);              // http://example.com
+        let pageBackgroundImage      = new Image(pageBackgroundUrl);
+        let panelBackgroundUrlString = window.getComputedStyle(document.querySelector(".select-a-mech .panel.left")).backgroundImage;
+        let panelBackgroundUrl       = panelBackgroundUrlString.substr(5, panelBackgroundUrlString.length - 7);
+        let panelBackgroundImage     = new Image(panelBackgroundUrl);
+
+        if (pageBackgroundImage.complete && panelBackgroundImage.complete) {
+            console.debug("Select/waitUntilBackgroundIsLoaded(): Backgrounds loaded in %.2f seconds.",
+                          (Date.now() - startTimeMilliseconds)/1000.0);
+
+            Robot.preloadImages();
+            SpriteBase.preloadImages();
+            // TODO: Preload success and failure background images.
+
+        } else {
+            window.setTimeout(waitUntilBackgroundIsLoaded, 100);
+        }
+    };
+
+
     // Show the Select-a-Mech™ screen.
     //
     // See the comments for PlainView.show() if you're wondering where this
@@ -1075,12 +1100,9 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
             container.style.opacity = "1";
         }, 1);
 
-        // Now's as good a time as any to preload the images and sprites that
-        // the actual game will use.
-        Robot.preloadImages();
-        SpriteBase.preloadImages();
-        // TODO: Preload success and failure background images.
-
+        // Now's as good a time as any to preload the images and
+        // sprites that the actual game will use.
+        window.setTimeout(waitUntilBackgroundIsLoaded, 100);
 
         // BECAUSE this function is often (okay, usually) called after a game
         // has concluded, AND because we want the computer Bot choices to be

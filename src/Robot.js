@@ -478,38 +478,21 @@ function Robot(robotType) {
     // The div is removed once all the images are loaded.
     if (!Robot.hasOwnProperty("preloadImages")) {
         Robot.preloadImages = function() {
-            // let offscreenDiv = document.createElement("div");
+
             let startTimeMilliseconds = Date.now();
             let robotImages = [];
 
-            for (let internalName in Robot.robotTable) {
-                let imagePath = Robot.robotTable[internalName].image;
-                // let img = document.createElement("img");
+            for (let internalName in Robot.dataTable) {
+                let imagePath = Robot.dataTable[internalName].image;
                 let img = new Image();
                 img.src = imagePath;
-                // offscreenDiv.appendChild(img);
                 robotImages.push(img);
             }
-
-            // Add the div in a way that the users will not notice it.
-            // offscreenDiv.style.left = "-9999px";
-            // offscreenDiv.style.top = "-9999px";
-            // offscreenDiv.style.width = "1px";
-            // offscreenDiv.style.height = "1px";
-            // offscreenDiv.style.display = "block";
-            // document.querySelector("body").appendChild(offscreenDiv);
 
             // This function's only purpose is to let me know how long the
             // robots took to load on your client (to within 500 milliseconds
             // of accuracy.)
             let checkRobotImagePreloadingProgress = function() {
-                // let robotImageElements = offscreenDiv.querySelectorAll("img");
-                // for (let imageElement in robotImageElements) {
-                //     if (!imageElement.complete) {
-                //         window.setTimeout(checkRobotImagePreloadingProgress, 500);
-                //         return;
-                //     }
-                // }
                 let loadedImages = 0;
                 for (let i = 0; i < robotImages.length; ++i) {
                     if (robotImages[i].complete) {
@@ -518,19 +501,13 @@ function Robot(robotType) {
                 }
 
                 if (loadedImages < robotImages.length) {
-                    // console.debug("Robot.preloadImages/checkRobotImagePreloadingProgress(): %d/%d robot image(s) loaded, %.2f seconds elapsed.",
-                    //               loadedImages,
-                    //               robotImages.length,
-                    //               (Date.now() - startTimeMilliseconds)/1000.0);
                     window.setTimeout(checkRobotImagePreloadingProgress, 100);
                 } else {
 
                     // If control makes it here, all the images are loaded.
                     console.debug("Robot.preloadImages/checkRobotImagePreloadingProgress(): All %d robot image(s) loaded in %.2f seconds.",
-                                  // robotImageElements.length,
-                                  robotImages.length,
+                                  loadedImages,
                                   (Date.now() - startTimeMilliseconds)/1000.0);
-                    // offscreenDiv.remove();
                 }
             };
 

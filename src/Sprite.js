@@ -74,14 +74,10 @@ function SpriteBase(width, height) {
                 }
 
                 if (fullyLoadedSprites < sprites.length) {
-                    // console.debug("SpriteBase.preloadImages/checkSpriteImagePreloadingProgress(): %d/%d effects sprite(s) loaded, %.2f seconds elapsed.",
-                    //               fullyLoadedSprites,
-                    //               sprites.length,
-                    //               (Date.now() - startTimeMilliseconds)/1000.0);
                     window.setTimeout(checkSpriteImagePreloadingProgress, 100);
                 } else {
                     console.debug("SpriteBase.preloadImages/checkSpriteImagePreloadingProgress(): All %d effects sprite(s) loaded in %.2f seconds.",
-                                  sprites.length,
+                                  fullyLoadedSprites,
                                   (Date.now() - startTimeMilliseconds)/1000.0);
                 }
             };
