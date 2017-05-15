@@ -65,8 +65,8 @@ function SpriteBase(width, height) {
                 }
             }
 
-            let fullyLoadedSprites = 0;
             let checkSpriteImagePreloadingProgress = function() {
+                let fullyLoadedSprites = 0;
                 for (let i = 0; i < sprites.length; ++i) {
                     if (sprites[i].preload() >= 1) {
                         fullyLoadedSprites += 1;

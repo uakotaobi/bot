@@ -1069,15 +1069,20 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
     let waitUntilBackgroundIsLoaded = function() {
 
         let startTimeMilliseconds    = Date.now();
-        let pageBackgroundUrlString  = window.getComputedStyle(document.querySelector("body > .content")).backgroundImage; // url("http://example.com")
-        let pageBackgroundUrl        = pageBackgroundUrlString.substr(5, pageBackgroundUrlString.length - 7);              // http://example.com
-        let pageBackgroundImage      = new Image(pageBackgroundUrl);
+        let pageBackgroundUrlString  = window.getComputedStyle(document.querySelector("body > .select-a-mech")).backgroundImage; // url("http://example.com")
+        let pageBackgroundUrl        = pageBackgroundUrlString.substr(5, pageBackgroundUrlString.length - 7);                    // http://example.com
+        let pageBackgroundImage      = new Image();
+        pageBackgroundImage.src      = pageBackgroundUrl;
         let panelBackgroundUrlString = window.getComputedStyle(document.querySelector(".select-a-mech .panel.left")).backgroundImage;
         let panelBackgroundUrl       = panelBackgroundUrlString.substr(5, panelBackgroundUrlString.length - 7);
-        let panelBackgroundImage     = new Image(panelBackgroundUrl);
+        let panelBackgroundImage     = new Image();
+        panelBackgroundImage.src     = panelBackgroundUrl;
 
-        if (pageBackgroundImage.complete && panelBackgroundImage.complete) {
-            console.debug("Select/waitUntilBackgroundIsLoaded(): Backgrounds loaded in %.2f seconds.",
+        if (pageBackgroundUrlString  !== "none" && pageBackgroundImage.complete &&
+            panelBackgroundUrlString !== "none" && panelBackgroundImage.complete) {
+            console.debug("Select/waitUntilBackgroundIsLoaded(): Backgrounds (\"%s\", \"%s\") loaded in %.2f seconds.",
+                          pageBackgroundUrl,
+                          panelBackgroundUrl,
                           (Date.now() - startTimeMilliseconds)/1000.0);
 
             Robot.preloadImages();
