@@ -54,13 +54,14 @@
          .weapons tr {
              background: #eee;
              color: black;
-             transition: background-color .4s ease-in,
-                         color .4s ease-in;
+             transition: background 0.5s ease-in;
          }
          .weapons tr:hover {
-             background: #224;
+             background: linear-gradient(to bottom, #224, #448) #eee;
              color: white;
          }
+         .weapons tr:hover td { border: 1px inset white; }
+         .weapons tr:hover a { color: lime; }
          .weapons .shortName, .weapons .damageString {
              font-family: monospace;
          }
@@ -174,15 +175,7 @@
                  let weapon = new Weapon(weaponInternalName);
                  let count = buckets[weaponInternalName];
                  let key = weapon.longName;
-                 let combinedDamageString = weapon.damage;
-
-                 if (count > 1) {
-                     key = String.format("{0}, {1}x", weapon.longName, count);
-                     for (let i = 0; i < count - 1; ++i) {
-                         combinedDamageString = String.format("{0}) + ({1}", combinedDamageString, weapon.damage);
-                     }
-                     combinedDamageString = String.format("({0})", combinedDamageString);
-                 }
+                 let combinedDamageString = Weapon.getCombinedDamageString(weapon.damage, count);
 
                  allRobotWeapons[key] = {
                      key: key,
@@ -218,12 +211,16 @@
 
              let newRow = weaponRowTemplate.cloneNode(true);
              newRow.removeAttribute("id");
-             newRow.setAttribute("class", weaponData.internalName); // This will make individual rows easier to find.
+             newRow.setAttribute("class", weaponData.weapon.internalName); // This will make individual rows easier to find.
              newRow.style.display = "";
 
-             newRow.querySelector(".name").innerHTML = String.format("<span class='longName'>{0}</span>{1}",
+             let optionalComma = (weaponData.count > 1 ? ", " : "");
+             let weaponCountString = (weaponData.count > 1 ? String.format("{0}x ", weaponData.count) : "");
+
+             newRow.querySelector(".name").innerHTML = String.format("<span class='longName'>{0}</span>{1}{2}",
                                                                      weaponData.weapon.longName,
-                                                                     (weaponData.count > 1 ? String.format(", {0}x", weaponData.count) : ""));
+                                                                     optionalComma,
+                                                                     weaponCountString);
              newRow.querySelector(".class").textContent = weaponData.weapon.class[0].toUpperCase() + weaponData.weapon.class.substr(1).toLowerCase();
              newRow.querySelector(".damageString").textContent = weaponData.weapon.damage;
 
@@ -241,12 +238,15 @@
              }
 
              // nth-of-type is 1-based.
-             // The first row is the header (no .dist.)
+             // The first row is the header (no ".dist".)
              // The second row is the template.
              let anchor = newRow.querySelector(".dist a");
              anchor.setAttribute("href",
                                  String.format("javascript:showCanvas('{0}', '{1}', document.querySelector('.weapons tr:nth-of-type({2}) .dist a'), '{3}');",
-                                               weaponData.weapon.internalName, weaponData.combinedDamageString, i + 3, canvasId));
+                                               weaponCountString + weaponData.weapon.longName,
+                                               Weapon.getCombinedDamageString(weaponData.weapon.damage, weaponData.count),
+                                               i + 3,
+                                               canvasId));
 
              weaponRowTemplate.parentNode.appendChild(newRow);
          }
@@ -260,16 +260,13 @@
          }
 
          // Renders a bar chart on the given canvas and then a line graph on top of that.
-         function renderGraphOnCanvas(weaponInternalName, combinedDamageString, canvasId) {
+         function renderGraphOnCanvas(title, damageString, canvasId) {
 
-             let weapon = new Weapon(weaponInternalName);
-
-             // Generate some data for the given weapon by shooting it
-             // thousands of times.
+             // Generate some data by evaluating this damageString.
              let originalData = [];
              const trials = 2000;
              for (let i = 0; i < trials; ++i) {
-                 let d = Weapon.calculateDamage(combinedDamageString, Weapon.useRandomValues).damage;
+                 let d = Weapon.calculateDamage(damageString, Weapon.useRandomValues).damage;
                  d = Math.round(d);
                  if (originalData[d] === null || originalData[d] === undefined) {
                      originalData[d] = 0;
@@ -309,14 +306,15 @@
                  options: {
                      // colors: ['#7CB5EC','#434348','#90ED7D'],
                      colors: ['Gradient(white:red)'],
-
+                     crosshairs: true,
                      textAccessible: false, // I am seriously sick and tired of .rgraph_domtext_wrapper.
                      textSize: 14,
                      // variant: '3d', gutterBottom: 150,
-                     gutterLeft: 60,
-                     gutterTop: 40,
-                     // labels: ['January','Febuary','March','April','May','June'],
+                     gutterLeft: 100,
+                     gutterTop: 50,
+                     gutterBottom: 60,
                      labels: labels,
+                     labelsAboveUnitsPost: "%",
                      shadow: true,
                      unitsPost: '%',
                      backgroundGridVlines: true,
@@ -325,7 +323,12 @@
                      //hmarginGrouped: 5,
                      noxaxis: false,
                      noyaxis: false,
-                     title: String.format("Frequency Distribution for {0}", weapon.longName),
+                     title: String.format("Frequency Distribution for the {0}", title),
+                     titleY: 20,
+                     titleXaxis: "Damage",
+                     titleXaxisPos: 0.3,
+                     titleYaxis: "Frequency",
+                     titleYaxisPos: 0.4,
                      // key: ['Fructon Road','Lewisham Avenue','Carnival Mar-de-Gras'],
                      // key: ['Distribution'],
                      // keyPosition: 'gutter',
@@ -354,8 +357,9 @@
              });
 
              // https://www.rgraph.net/canvas/docs/api.html
-             // https://www.rgraph.net/demos/index.html#canvas
-             // https://www.rgraph.net/demos/bar-line-combo.html
+             // Samples for all canvas chart types: https://www.rgraph.net/demos/index.html#canvas
+             // Sample for the chart we're using:   https://www.rgraph.net/demos/bar-line-combo.html
+             // Chart options:                      https://www.rgraph.net/canvas/docs/charts-index.html
              // http://www.cmsws.com/examples/applications/rgraph/RGraph_20091010/docs/api.html
              var combo = new RGraph.CombinedChart(bar, line);
              combo.draw();
@@ -364,7 +368,11 @@
              // bar.draw();
          }
 
-         let showCanvas = function(weaponInternalName, combinedDamageString, parentElement, canvasId) {
+         // Creates the canvas and displays a damage curve on it.
+         //
+         // Debugging?  Move the mouse to the right side of the viewport, then
+         // try showCanvas("Foo", "1d3^(1d4-1)", document.querySelector("body"), "cvs").
+         let showCanvas = function(title, damageString, parentElement, canvasId) {
 
              hideCanvas(canvasId);
 
@@ -385,7 +393,7 @@
              wrapper.appendChild(canvas);
 
              // Create content.
-             renderGraphOnCanvas(weaponInternalName, combinedDamageString, canvasId);
+             renderGraphOnCanvas(title, damageString, canvasId);
 
              // Make it appear on screen.
              wrapper.style.left = String.format("{0}px", mouse.x - canvas.width);

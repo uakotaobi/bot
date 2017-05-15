@@ -43,7 +43,7 @@ function Robot(robotType) {
             "invalid"        : {
                 modelNumber  : "Ukulele UM1",          // Make and model number of bot.
                 longName     : "Munchkin",             // Model name of bot.
-                idPattern    : "No. [0-999999]",          // Template to use for unique IDs.  Leading zeroes matter.
+                idPattern    : "No. [0-999999]",       // Template to use for unique IDs.  Leading zeroes matter.
                 class        : "light",                // Bot class: light, medium, or heavy.
                 arsenal      : ["invalid"],            // Weapons on the bot.
                 hitpoints    : 1,
@@ -292,7 +292,7 @@ function Robot(robotType) {
     // Generates a random ID string that conforms to whatever ID pattern is
     // passed in as an argument.
     //
-    // For the most p[art, characters within an ID pattern are copied verbatim
+    // For the most part, characters within an ID pattern are copied verbatim
     // into the output string.  However, certain special constructions are
     // recognized within the ID pattern:
     //
@@ -326,7 +326,7 @@ function Robot(robotType) {
     //   0009.
     //
     // TODO: Support commas in order to select specific items rather than a
-    // range, like {alpha,beta [1-5][0-9]}.
+    // range, like {alpha,beta}[1-5][0-9].
     let createId = function(idPattern) {
         let result = "";
         for (let i = 0; i < idPattern.length; ++i) {
@@ -642,8 +642,8 @@ function Robot(robotType) {
             return damageReport;
         }
 
-        // Update the arsenal by firing all the weapons, but...!  We discard
-        // those rolls!
+        // Update the arsenal by firing all the matching weapons, but...!  We
+        // discard those rolls!
         if (updateRobots) {
             for (let i = 0; i < matchingWeapons.length; ++i) {
                 let unusedDamageReport = matchingWeapons[i].fire();
@@ -652,14 +652,7 @@ function Robot(robotType) {
 
         // Here's why: we create a new damageString that combines the strength
         // of all those weapons together, and then we fire THAT!
-        let combinedDamageString = matchingWeapons[0].damage;
-        if (matchingWeapons.length > 1) {
-            for (let i = 0; i < matchingWeapons.length - 1; ++i) {
-                combinedDamageString += ") + (";
-                combinedDamageString += matchingWeapons[0].damage;
-            }
-            combinedDamageString = "(" + combinedDamageString + ")";
-        }
+        let combinedDamageString = Weapon.getCombinedDamageString(matchingWeapons[0].damage, matchingWeapons.length);
         damageReport.originalDamage = Weapon.calculateDamage(combinedDamageString, damageType);
 
         // Can the defender dodge it?

@@ -390,14 +390,14 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
 }
 
 /* Markup for the PlainView's factions and robots. */
-.faction.faction-0 .robot .main-image { background-color: rgba(160, 255, 255, 0.2); }
-.faction.faction-1 .robot .main-image { background-color: rgba(255, 160, 255, 0.2); }
-.faction.faction-2 .robot .main-image { background-color: rgba(255, 255, 160, 0.2); }
-.faction.faction-3 .robot .main-image { background-color: rgba(160, 160, 255, 0.2); }
-.faction.faction-4 .robot .main-image { background-color: rgba(255, 160, 160, 0.2); }
-.faction.faction-5 .robot .main-image { background-color: rgba(160, 255, 160, 0.2); }
+.faction.faction-0 .robot .main-image { background-color: rgba(160, 0,   0,   0.2); }
+.faction.faction-1 .robot .main-image { background-color: rgba(0,   160, 0,   0.2); }
+.faction.faction-2 .robot .main-image { background-color: rgba(0,   0,   160, 0.2); }
+.faction.faction-3 .robot .main-image { background-color: rgba(160, 160, 0,   0.2); }
+.faction.faction-4 .robot .main-image { background-color: rgba(0,   160, 160, 0.2); }
+.faction.faction-5 .robot .main-image { background-color: rgba(160, 0,   160, 0.2); }
 .faction.faction-6 .robot .main-image { background-color: rgba(160, 160, 160, 0.2); }
-.faction.faction-7 .robot .main-image { background-color: rgba(255, 255, 255, 0.2); }
+.faction.faction-7 .robot .main-image { background-color: rgba(0,   0,   0,   0.2); }
 .faction {
     width: 0;
     height: 0;
@@ -441,6 +441,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
 .robot .top-bar > .name { float: left; }
 .robot .top-bar > .hp { float: right; width: 4em; text-align: right; }
 .robot .top-bar > .close { display: none; float: right; width: 1em; text-align: center; }
+.robot .top-bar > .close:hover { color: white; background-color: rgba(255, 0, 0, 0.5); text-shadow: 1px 1px 1px black; }
 
 .robot .main-image {
     width: 100%;

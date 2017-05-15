@@ -59,10 +59,11 @@ function AiPlayer(factionName, controller, view) {
         // Constants for tweaking the AI's behavior. //
         ///////////////////////////////////////////////
 
-        let w1 = 1.0;  // The weight to give to the threatToSelf score.
-        let w2 = 1.0;  // The weight to give to the threatToOthers score.
+        let w1 = 1.0; // The weight to give to the threatToSelf score.
+        let w2 = 1.0; // The weight to give to the threatToOthers score.
         let w3 = 1.0; // The weight to give to the vulnerabilityToWeaponWithAmmoScore.
         let w4 = 1.0; // The weight to give to the vulnerabilityToWeaponWithoutAmmoScore.
+        let w5 = 0.0; // The weight to give to the hatredOfHumanPlayersScore.
 
         // The AI is stateless--there is presently no place to store an
         // "individual pilot bias" for different robotIds.  What we _can_ do,
@@ -100,8 +101,8 @@ function AiPlayer(factionName, controller, view) {
                 // they don't care about that.
                 w1 = 1.0;
                 w2 = 0.75;
-                w3 = 0.25;
-                w4 = 0.25;
+                w3 = 0.20;
+                w4 = 0.20;
                 break;
             case "assault":
                 // Assault mechs: Heavy armor, heavier weapons.  They can pick
@@ -118,27 +119,55 @@ function AiPlayer(factionName, controller, view) {
         }
 
 
+        // So where do we store our "hatred of human beings bias" in a
+        // stateless AI?  The answer is that we don't -- we use the factions
+        // to guide us.
+        //
+        // TODO: The hatred could also respond to environmental cues, like how
+        // often the human player has shot us.  But then, why restrict that
+        // sort of thing to just human-controlled bots?
+        if (controller.getGameFactions().length > 2) {
+            switch(robot.faction) {
+                case "The Star Alliance":
+                    // The Star Alliance is an unbiased (though not friendly)
+                    // computer opponent--unless you're playing them one on
+                    // one, of course.
+                    w5 = 0;
+                    break;
+                case "The Prime Edict":
+                    // There's a fine line here.  w5=0.3 is more than enough to
+                    // make the Edict hate your guts regardless of other
+                    // dangers to it, while w5=0 allows a human to shoot
+                    // random computer players and sit back while they turn on
+                    // each other in a frenzy of opportunistic killing.
+                    w5 = 0.2;
+                    break;
+                default:
+                    // Have a slight disdain for human units.  This generally
+                    // turns up only when robots from different factions have
+                    // an equally good score.
+                    w5 = Math.random() / 10;
+                    break;
+            }
+        }
 
         // Let's do this heuristically.  We need the following pieces of
-        // information:
+        // information for each enemy robot:
         //
-        // - The most threatening robot
-        // - For each of our weapons:
-        //   * The robot that would take the most damage from this weapon
+        // - The damage we expect them to do to each of the Bots in our
+        //   faction, including us (presuming optimal play on their part)
+        //   * The weapons we expect them to shoot our allies with
+        // - The weapons of ours, with limited and with unlimited ammo, which
+        //   would deal the most damage to them
         //
-        // Then:
-        // - If the most threatening robot could kill *us* next turn, it
-        //   is awarded a very high score.
-        // - If the most threatening robot could kill a different robot on
-        //   our side next turn, it is awarded a high score.
-        // - If a robot could be destroyed by one of our weapons, it is
-        //   awarded a score.
-        // - If a robot could be destroyed by one of our weapons that does
-        //   not consume ammunition, it is awarded a score.
+        // We gather this information in two passes and then use linear
+        // interpolation to generate a score for each criterion, ranging from
+        // 0 to 1.  Multiplying these factors by their respective weights
+        // gives us our final score.
         //
         // The robot with the highest score wins the lottery by getting shot.
         //
-        // Later on, I'll factor in other scoring factors like "hatred"
+        // Later on, I'll factor in other scoring factors like "vengeance"
         // (how much a given AI player is tired of being attacked by a
         // given enemy robot or enemy player) and "finesse" (saving at
         // least one round of the most devastating weapon just to kill off
@@ -151,7 +180,12 @@ function AiPlayer(factionName, controller, view) {
         };
 
 
-        let robotScores = [];
+        /////////////////////////////////////////////////////////////////////
+        // First pass: How dangerous are the enemy robots?  What is their  //
+        // best weapon against us?  Which one is the biggest threat to us? //
+        /////////////////////////////////////////////////////////////////////
+
+        let enemyRobotScores = [];
         let robots = controller.getGameRobots();
         for (let i = 0; i < robots.length; ++i) {
 
@@ -160,8 +194,8 @@ function AiPlayer(factionName, controller, view) {
             }
             let enemyRobot = robots[i];
 
-            // Use the expected values of each of this robot's attacks to
-            // decide if we should treat it as the most dangerous enemy.
+            // Use the expected values of each of this enemy robot's attacks
+            // to decide if we should treat it as the most dangerous enemy.
             let bestWeaponsAgainstOurFaction = { };
             for (let j = 0; j < enemyRobot.arsenal.length; ++j) {
 
@@ -173,13 +207,17 @@ function AiPlayer(factionName, controller, view) {
                     // They're out of this one.
                     continue;
                 }
-                let damageReport = enemyRobot.fire(robot, currentEnemyWeapon.internalName, Weapon.useExpectedValues, false);
-                let expectedDamage = damageReport.finalDamage;
+
+                // Simulate an attack on our bots using average
+                // values for all of the enemy's weaponry.
                 let friendlyRobots = controller.getGameRobots(robot.faction);
 
                 for (let k = 0; k < friendlyRobots.length; ++k) {
 
                     let friendlyRobot = friendlyRobots[k];
+                    let damageReport = enemyRobot.fire(friendlyRobot, currentEnemyWeapon.internalName, Weapon.useExpectedValues, false);
+                    let expectedDamage = damageReport.finalDamage;
+
                     if (!(friendlyRobot.id in bestWeaponsAgainstOurFaction) ||
                         expectedDamage > bestWeaponsAgainstOurFaction[friendlyRobot.id].expectedDamage) {
 
@@ -207,42 +245,47 @@ function AiPlayer(factionName, controller, view) {
 
             // Robots start out with no score, but we do know what their
             // most threatening weapon is.
-            robotScores.push({
-                score: 0,
-                threatToSelfScore: 0,
-                threatToOthersScore: 0,
-                vulnerabilityToWeaponWithAmmoScore: 0,
-                vulnerabilityToWeaponWithoutAmmoScore: 0,
-                recommendedWeaponWithoutAmmo: null,
-                recommendedWeaponWithAmmo: null,
-                robotToTarget: enemyRobot,
-                bestWeaponsAgainstOurFaction: bestWeaponsAgainstOurFaction,
-                mostThreatenedAlly: null
+            enemyRobotScores.push({
+                robotToTarget                         : enemyRobot,
+                score                                 : 0,
+                threatToSelfScore                     : 0,
+                threatToOthersScore                   : 0,
+                vulnerabilityToWeaponWithAmmoScore    : 0,
+                vulnerabilityToWeaponWithoutAmmoScore : 0,
+                hatredOfHumanPlayersScore             : 0,
+                recommendedWeaponWithoutAmmo          : null,
+                recommendedWeaponWithAmmo             : null,
+                bestWeaponsAgainstOurFaction          : bestWeaponsAgainstOurFaction,
+                mostThreatenedAlly                    : null
             });
         } // end (for each enemy robot [first pass])
 
-        // return { mostDangerous: mostDangerousEnemy, mostVulnerable: mostVulnerableEnemiesPerWeapon };
-
         if (mostDangerousEnemy.robot === null) {
+            // All of the enemies are out of ammo.
             result.reasons.push("No remaining enemy is a threat to us.");
         }
 
-        /////////////////////////////////////////////////////////////////
-        // Start awarding scores based on practical heuristics.  Each  //
-        // score uses linear interpolation, with 1.0 being the highest //
-        // score for a given criterion and 0.0 being the lowest.       //
-        /////////////////////////////////////////////////////////////////
-        for (let i = 0; i < robotScores.length; ++i) {
 
-            let enemyRobot = robotScores[i].robotToTarget;
+        ////////////////////////////////////////////////////////////////////////
+        // Second pass.                                                       //
+        //                                                                    //
+        // Start awarding scores to each enemy based on practical heuristics. //
+        // Each score uses linear interpolation, with 1.0 being the highest   //
+        // score for a given criterion and 0.0 being the lowest.              //
+        ////////////////////////////////////////////////////////////////////////
 
-            // Award a score based on how likely you are to kill us or our allies.
+        for (let i = 0; i < enemyRobotScores.length; ++i) {
+
+            let enemyRobot = enemyRobotScores[i].robotToTarget;
+
+            // Award a score based on how likely you are to kill us (w1) or
+            // our allies (w2).
             let threatToSelfScore = -1;
             let threatToOthersScore = -1;
             let mostThreatenedAlly = null;
-            for (let robotId in robotScores[i].bestWeaponsAgainstOurFaction) {
+            for (let robotId in enemyRobotScores[i].bestWeaponsAgainstOurFaction) {
 
-                let expectedDamageFromBestAttack = robotScores[i].bestWeaponsAgainstOurFaction[robotId].expectedDamage;
+                let expectedDamageFromBestAttack = enemyRobotScores[i].bestWeaponsAgainstOurFaction[robotId].expectedDamage;
                 let currentAlliedRobot = Robot.list()[robotId];
                 let score = Math.max(0, Math.min(1, expectedDamageFromBestAttack/currentAlliedRobot.hitpoints));
 
@@ -253,12 +296,13 @@ function AiPlayer(factionName, controller, view) {
                     mostThreatenedAlly = currentAlliedRobot;
                 }
             }
-            robotScores[i].threatToSelfScore = Math.max(0, threatToSelfScore);
-            robotScores[i].threatToOthersScore = Math.max(0, threatToOthersScore);
-            robotScores[i].mostThreatenedAlly = mostThreatenedAlly;
+            enemyRobotScores[i].threatToSelfScore = Math.max(0, threatToSelfScore);
+            enemyRobotScores[i].threatToOthersScore = Math.max(0, threatToOthersScore);
+            enemyRobotScores[i].mostThreatenedAlly = mostThreatenedAlly;
 
 
-            // Award a score based on how likely our weapons are to kill you.
+            // Award a score based on how likely our weapons with ammo (w3)
+            // and without ammo (w4) are to kill you.
             let vulnerabilityToWeaponWithoutAmmoScore = -1;
             let vulnerabilityToWeaponWithAmmoScore = -1;
             let recommendedWeaponWithoutAmmo = null;
@@ -290,73 +334,84 @@ function AiPlayer(factionName, controller, view) {
                 return result;
             }
 
-            robotScores[i].vulnerabilityToWeaponWithoutAmmoScore = Math.max(0, vulnerabilityToWeaponWithoutAmmoScore);
-            robotScores[i].vulnerabilityToWeaponWithAmmoScore = Math.max(0, vulnerabilityToWeaponWithAmmoScore);
-            robotScores[i].recommendedWeaponWithoutAmmo = recommendedWeaponWithoutAmmo;
-            robotScores[i].recommendedWeaponWithAmmo = recommendedWeaponWithAmmo;
+            enemyRobotScores[i].vulnerabilityToWeaponWithoutAmmoScore = Math.max(0, vulnerabilityToWeaponWithoutAmmoScore);
+            enemyRobotScores[i].vulnerabilityToWeaponWithAmmoScore = Math.max(0, vulnerabilityToWeaponWithAmmoScore);
+            enemyRobotScores[i].recommendedWeaponWithoutAmmo = recommendedWeaponWithoutAmmo;
+            enemyRobotScores[i].recommendedWeaponWithAmmo = recommendedWeaponWithAmmo;
 
-            // The final score is the sum of all of these.
-            // These are all equally weighted right now, but perhaps they should not be.
-            robotScores[i].score += w1 * robotScores[i].threatToSelfScore;
-            robotScores[i].score += w2 * robotScores[i].threatToOthersScore;
-            robotScores[i].score += w3 * robotScores[i].vulnerabilityToWeaponWithAmmoScore;
-            robotScores[i].score += w4 * robotScores[i].vulnerabilityToWeaponWithoutAmmoScore;
+            // Award a score based on our sheer hatred of the human race and
+            // everyone in it (w5).
+            enemyRobotScores[i].hatredOfHumanPlayersScore = 0;
+            if (controller.getGameFactions().length > 2 &&
+                controller.getFactionType(enemyRobotScores[i].robotToTarget.faction) === "human") {
+                enemyRobotScores[i].hatredOfHumanPlayersScore = w5;
+            }
+
+            // The final score is the weighted sum of all of these.
+            enemyRobotScores[i].score += w1 * enemyRobotScores[i].threatToSelfScore;
+            enemyRobotScores[i].score += w2 * enemyRobotScores[i].threatToOthersScore;
+            enemyRobotScores[i].score += w3 * enemyRobotScores[i].vulnerabilityToWeaponWithAmmoScore;
+            enemyRobotScores[i].score += w4 * enemyRobotScores[i].vulnerabilityToWeaponWithoutAmmoScore;
+            enemyRobotScores[i].score +=      enemyRobotScores[i].hatredOfHumanPlayersScore;
 
         } // end (for each robot that can be scored)
 
 
         // Score by highest score, descending.
-        robotScores.sort(function(robotScoreA, robotScoreB) {
+        enemyRobotScores.sort(function(robotScoreA, robotScoreB) {
             return robotScoreB.score - robotScoreA.score;
         });
 
-        let winner = robotScores[0];
-        result.enemy = robotScores[0].robotToTarget;
-        result.weaponName = (w3 * robotScores[0].vulnerabilityToWeaponWithAmmoScore >
-                             w4 * robotScores[0].vulnerabilityToWeaponWithoutAmmoScore ?
-                             robotScores[0].recommendedWeaponWithAmmo.internalName :
-                             robotScores[0].recommendedWeaponWithoutAmmo.internalName);
+        let winner = enemyRobotScores[0];
+        result.enemy = enemyRobotScores[0].robotToTarget;
+        result.weaponName = (w3 * enemyRobotScores[0].vulnerabilityToWeaponWithAmmoScore >
+                             w4 * enemyRobotScores[0].vulnerabilityToWeaponWithoutAmmoScore ?
+                             enemyRobotScores[0].recommendedWeaponWithAmmo.internalName :
+                             enemyRobotScores[0].recommendedWeaponWithoutAmmo.internalName);
 
-        result.reasons.push(String.format("Recommendation: Attack {0} {1} (weighted score {2}) with '{3}' weapon.",
-                                          robotScores[0].robotToTarget.longName,
-                                          robotScores[0].robotToTarget.id,
-                                          robotScores[0].score.toFixed(4),
-                                          result.weaponName));
+        let hatredOfHumanPlayersMessage = "  We burn with hatred for all the human race.";
+        result.reasons.push(String.format("Recommendation: Attack {0} {1} (weighted score {2}) with '{3}' weapon.{4}",
+                                          enemyRobotScores[0].robotToTarget.longName,
+                                          enemyRobotScores[0].robotToTarget.id,
+                                          enemyRobotScores[0].score.toFixed(4),
+                                          result.weaponName,
+                                          enemyRobotScores[0].hatredOfHumanPlayersScore > 0 ? hatredOfHumanPlayersMessage : ""));
         let mostThreateningWeaponMessage = "It is unarmed!";
-        if (robot.id in robotScores[0].bestWeaponsAgainstOurFaction) {
+        if (robot.id in enemyRobotScores[0].bestWeaponsAgainstOurFaction) {
             mostThreateningWeaponMessage = String.format("Its most dangerous weapon to us is its {0}.",
-                                                         robotScores[0].bestWeaponsAgainstOurFaction[robot.id].weapon.longName);
+                                                         enemyRobotScores[0].bestWeaponsAgainstOurFaction[robot.id].weapon.longName);
         }
         result.reasons.push(String.format("Its threat level to us is {0}{1}.  {2}",
-                                          robotScores[0].threatToSelfScore.toFixed(4),
-                                          (robotScores[0].threatToSelfScore >= 1.0 ? " (it can kill us next turn)" : ""),
+                                          enemyRobotScores[0].threatToSelfScore.toFixed(4),
+                                          (enemyRobotScores[0].threatToSelfScore >= 1.0 ? " (it can kill us next turn)" : ""),
                                           mostThreateningWeaponMessage));
         result.reasons.push(String.format("Its threat level to our allies is {0}{1}.",
-                                          robotScores[0].threatToOthersScore.toFixed(4),
-                                          (robotScores[0].threatToOthersScore >= 1.0 ? " (it can kill an ally next turn)" : "")));
-        if (robotScores[0].mostThreatenedAlly !== null) {
+                                          enemyRobotScores[0].threatToOthersScore.toFixed(4),
+                                          (enemyRobotScores[0].threatToOthersScore >= 1.0 ? " (it can kill an ally next turn)" : "")));
+        if (enemyRobotScores[0].mostThreatenedAlly !== null) {
             result.reasons.push(String.format("Our most vulnerable ally is {0} {1} ({2} hp).",
-                                              robotScores[0].mostThreatenedAlly.longName,
-                                              robotScores[0].mostThreatenedAlly.id,
-                                              robotScores[0].mostThreatenedAlly.hitpoints));
+                                              enemyRobotScores[0].mostThreatenedAlly.longName,
+                                              enemyRobotScores[0].mostThreatenedAlly.id,
+                                              enemyRobotScores[0].mostThreatenedAlly.hitpoints));
         }
         result.reasons.push(String.format("Our threat level to it is {0} if we want to preserve ammunition and {1} if we don't.",
-                                          robotScores[0].vulnerabilityToWeaponWithoutAmmoScore.toFixed(4),
-                                          robotScores[0].vulnerabilityToWeaponWithAmmoScore.toFixed(4)));
-        if (robotScores.length > 1) {
-            let badRobot = robotScores[robotScores.length - 1].robotToTarget;
+                                          enemyRobotScores[0].vulnerabilityToWeaponWithoutAmmoScore.toFixed(4),
+                                          enemyRobotScores[0].vulnerabilityToWeaponWithAmmoScore.toFixed(4)));
+        if (enemyRobotScores.length > 1) {
+            let badRobot = enemyRobotScores[enemyRobotScores.length - 1].robotToTarget;
             result.reasons.push(String.format("The worst-scoring enemy was {0} {1} ({2} hp), with a score of {3}.  We are ignoring it.",
                                               badRobot.longName,
                                               badRobot.id,
                                               badRobot.hitpoints,
-                                              robotScores[robotScores.length - 1].score));
+                                              enemyRobotScores[enemyRobotScores.length - 1].score));
         }
         if (w1 != 1.0 || w2 != 1.0 || w3 != 1.0 || w4 != 1.0) {
-            result.reasons.push(String.format("Some weights influenced the final score.  Our weights are w1={0}, w2={1}, w3={2}, w4={3}.",
+            result.reasons.push(String.format("Some weights influenced the final score.  Our weights are w1={0}, w2={1}, w3={2}, w4={3}, w5={4}.",
                                               w1.toFixed(4),
                                               w2.toFixed(4),
                                               w3.toFixed(4),
-                                              w4.toFixed(4)));
+                                              w4.toFixed(4),
+                                              w5.toFixed(4)));
         }
         return result;
     };
@@ -424,9 +479,9 @@ function AiPlayer(factionName, controller, view) {
         } else {
 
             // Let the AI tell us what it's thinking.
-            // for (let i = 0; i < attackInfo.reasons.length; ++i) {
-            //     console.debug(String.format("{0} {1}: {2}", ourBot.longName, ourBot.id, attackInfo.reasons[i]));
-            // }
+            for (let i = 0; i < attackInfo.reasons.length; ++i) {
+                console.debug(String.format("{0} {1}: {2}", ourBot.longName, ourBot.id, attackInfo.reasons[i]));
+            }
 
             // If a human player is the target of our wrath, say that "we" are
             // under attack (a phrase that is only meaningful to humans.)

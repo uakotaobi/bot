@@ -169,10 +169,10 @@ function Weapon(weaponType) {
             ammo           : 20
         },
         "arc"              : {
-            longName       : "Plasma-Arc Emitter",
-            shortName      : "P. ARC",
-            class          : "heavy",
-            damage         : "17 - 2d6", // EV=10, better than PPC
+            longName       : "Disruption Wave",
+            shortName      : "D. WAVE",
+            class          : "medium",
+            damage         : "15 - 2d6", // EV=8
             ammoPerRound   : 0,
             ammo           : 1
         },
@@ -189,8 +189,8 @@ function Weapon(weaponType) {
             shortName      : "CLUSTER",
             class          : "heavy",
             damage         : "2d2", // Best used in packs of 4 or 6 (EV=12 or 15.)
-            ammoPerRound   : 5,
-            ammo           : 20
+            ammoPerRound   : 4,
+            ammo           : 16
         },
         "gauss"            : {
             longName       : "Gauss Gun",
@@ -672,6 +672,12 @@ function Weapon(weaponType) {
     // -----------------------------------------------------------------------
     // Public static data.
 
+    // The "List of Weapons" page needs to enumerate through the full list of
+    // weapons we have, and that means exposing the dataTable.
+    if (!("dataTable" in Weapon)) {
+        Weapon.dataTable = dataTable;
+    }
+
     //////////////////////////////////////////////////////////////
     // Constants to pass into calculateDamage() and evaluate(). //
     //////////////////////////////////////////////////////////////
@@ -731,7 +737,7 @@ function Weapon(weaponType) {
     // exponentiation.  We DON'T understand operator precedence; use
     // parentheses judiciously to make up for that.
     //
-    // damageType tells us how to deal with dice rolls.  It can be once of
+    // damageType tells us how to deal with dice rolls.  It can be one of
     // Weapon.useRandomValues (the default), Weapon.useMinimumValues,
     // Weapon.useExpectedValues, or Weapon.useMinimumValues.
     //
@@ -744,10 +750,14 @@ function Weapon(weaponType) {
     //          always be "1".
     //   * value: The value that was rolled for this die.
     //
-    // There will be one entry in the "rolls" array for each die in the
-    // weapon's damage expression (but keep in mind that a 2d6 will be split
-    // into two 1d6 rolls).  If the damageString had no die component, the
-    // rolls array will be empty.
+    // When the damageType is Weapon.useExpectedValues, there will be one
+    // entry in the "rolls" array for each die in the weapon's damage
+    // expression (but keep in mind that a 2d6 will be split into two 1d6
+    // rolls).
+    //
+    // If the dmaageType is not Weapon.useExpectedValues or if the
+    // damageString had no die token in the first place, the rolls array
+    // will be empty.
 
     if (Weapon.hasOwnProperty("calculateDamage") === false) {
         Weapon.calculateDamage = function(damageString, damageType) {
@@ -767,6 +777,31 @@ function Weapon(weaponType) {
         };
     }
 
+    // Returns a damage string expression representing the sum of `count'
+    // separate invocations of the given damage string.  So, for instance, for
+    // a 1d6, this function would return 1d6+ 1d6 + 1d6.  Parentheses are used
+    // to group the expressions.
+    //
+    // We need this because weapons of the same type in an arsenal are always
+    // fired together, and the combinedDamageString is the correct expression
+    // to evaluate to determine how much damage this deals.
+    //
+    // For an invalid count or a count less than 2, the original damage string
+    // is returned unaltered.
+
+    if (Weapon.hasOwnProperty("getCombinedDamageString") === false) {
+        Weapon.getCombinedDamageString = function(damageString, count) {
+            let combinedDamageString = damageString;
+            if (count > 1) {
+                for (let i = 0; i < count - 1; ++i) {
+                    combinedDamageString += ") + (";
+                    combinedDamageString += damageString;
+                }
+                combinedDamageString = "(" + combinedDamageString + ")";
+            }
+            return combinedDamageString;
+        };
+    }
 
     // -----------------------------------------------------------------------
     // Public member variables that the caller can manipulate.
@@ -796,13 +831,6 @@ function Weapon(weaponType) {
         }
         return { damage: 0, rolls: [] };
     };
-
-
-    // The "List of Weapons" page needs to enumerate through the full list of
-    // weapons we have, and that means exposing the dataTable.
-    if (!("dataTable" in Weapon)) {
-        Weapon.dataTable = dataTable;
-    }
 
     return this;
 }
