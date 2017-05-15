@@ -679,6 +679,12 @@ function GameController() {
             } // end (if we've found the faction of the robot we want to remove)
         } // end (for each faction)
 
+        if (!robot.unregister()) {
+            console.warn("GameController.removeRobot(): Internal error: Could not unregister the robot we want to remove (%s %s).",
+                         robot.longName,
+                         robot.id);
+        }
+
         // Just in case you deleted the last robot in a faction.
         updateVictoryStatus();
     };
@@ -719,6 +725,30 @@ function GameController() {
         currentEnemy = null;
         winningFaction = "";
         playingFactions = [];
+
+        // If you want to re-add the same robots to the same factions again so
+        // that you end up effectively replaying the same game--then hey,
+        // that's your problem.
+        for (let factionName in factions) {
+
+            // Clean up any existing "live" robots left over from a previous
+            // game.
+            for (let i = 0; i < factions[factionName].robots.length; ++i) {
+                factions[factionName].robots[i].unregister();
+            }
+            factions[factionName].robots = [];
+
+            // Clean up the "template robots" we cloned.
+            //
+            // TODO: Note that the original purpose of the template robots was
+            // to allow us to restart a game under the same initial conditions
+            // -- but since this code here explicitly removes that ability, it
+            // obviates the need for the templates in the first place.
+            for (let i = 0; i < factions[factionName].original_robots.length; ++i) {
+                factions[factionName].original_robots[i].unregister();
+            }
+            factions[factionName].original_robots = [];
+        }
     };
 
 
@@ -740,7 +770,8 @@ function GameController() {
         // conditions easily.
         for (let i = 0; i < playingFactions.length; ++i) {
             let faction = playingFactions[i];
-            faction.robots = [];
+
+            // Clone from our pristine original robots.
             for (let j = 0; j < faction.original_robots.length; ++j) {
 
                 // extend(), if not given a 'to' object (the second argument),
@@ -817,13 +848,6 @@ function GameController() {
         }
 
         resetGameState();
-
-        // If you want to re-add the same robots to the same factions again so
-        // that you end up effectively replaying the same game--then hey,
-        // that's your problem.
-        for (let factionName in factions) {
-            factions[factionName].original_robots = [];
-        }
     };
 
 

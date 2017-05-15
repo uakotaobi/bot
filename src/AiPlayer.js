@@ -479,9 +479,9 @@ function AiPlayer(factionName, controller, view) {
         } else {
 
             // Let the AI tell us what it's thinking.
-            for (let i = 0; i < attackInfo.reasons.length; ++i) {
-                console.debug(String.format("{0} {1}: {2}", ourBot.longName, ourBot.id, attackInfo.reasons[i]));
-            }
+            // for (let i = 0; i < attackInfo.reasons.length; ++i) {
+            //     console.debug(String.format("{0} {1}: {2}", ourBot.longName, ourBot.id, attackInfo.reasons[i]));
+            // }
 
             // If a human player is the target of our wrath, say that "we" are
             // under attack (a phrase that is only meaningful to humans.)
@@ -622,8 +622,10 @@ function AiPlayer(factionName, controller, view) {
         }
 
         // What follows is the CPU version of Select-a-Mech™.
-        let minBotScore = new Robot("scarab").score;
+        let cheapestBot = new Robot("scarab");
+        let minBotScore = cheapestBot.score;
         let currentScore = 0;
+        cheapestBot.unregister();
         while (targetScore - currentScore >= minBotScore) {
             let p = Math.random();
             let robotClass = "";

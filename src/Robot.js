@@ -870,5 +870,6 @@ function Robot(robotType) {
 }
 
 (function() {
-    new Robot(); // Force the dataTable to poof into existence.
+    let r = new Robot(); // Force the dataTable to poof into existence.
+    r.unregister();
 }());

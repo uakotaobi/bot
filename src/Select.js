@@ -1102,6 +1102,7 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
         controller.resetGame();
         view.resetGame();
         let playingFactions = []; // Not all factions may have been assigned to a player!
+        let usedRobots = { };
 
         for (let i = 0; i < players.length; ++i) {
 
@@ -1138,12 +1139,27 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
             // Register these robots with the GameController.
             for (let j = 0; j < robots.length; ++j) {
                 controller.addRobot(playingFaction, robots[j]);
+                usedRobots[robots[j].id] = true;
             }
         }
 
         // Clear the factionComputerForces.  That way, after the PlainView
         // returns to us when the current game is over, we'll come up with a
-        // fresh challenge for our plucky human enemy.
+        // fresh challenge for our intrepid human enemy.
+        console.debug("Used robots: %d (out of %d registered)",
+                      Object.keys(usedRobots).length,
+                      Object.keys(Robot.robotTable).length);
+        for (let factionName in factionComputerForces) {
+            for (let key in factionComputerForces[factionName]) {
+                for (let i = 0; i < factionComputerForces[factionName][key].length; ++i) {
+                    let robot = factionComputerForces[factionName][key][i];
+                    if (!(robot.id in usedRobots)) {
+                        robot.unregister();
+                    }
+                }
+            }
+        }
+        console.debug("Registered robots: %d", Object.keys(Robot.robotTable).length);
         factionComputerForces = { };
 
         // To prevent the player from inadvertently re-launching the game by
