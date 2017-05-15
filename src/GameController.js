@@ -547,7 +547,6 @@ function GameController() {
                 type: factionType,
                 currentRobotIndex: 0,
                 robots: [],
-                original_robots: []
             };
         }
         factions[factionName].icon = factionIconHref;
@@ -591,11 +590,10 @@ function GameController() {
         }
 
         robot.faction = factionName; // Just in case we need it later.
-        factions[factionName].original_robots.push(robot);
+        factions[factionName].robots.push(robot);
     };
 
-    // Removes the given robot from its faction.  The robot will still exist
-    // in the Robot.list and in factions[robot.faction].original_robots.
+    // Removes the given robot from its faction and unregisters it.
     //
     // This is meant to be used to eliminate dead bots from consideration by
     // the rest of the *current* game.  (The game will already ignore robots
@@ -737,17 +735,6 @@ function GameController() {
                 factions[factionName].robots[i].unregister();
             }
             factions[factionName].robots = [];
-
-            // Clean up the "template robots" we cloned.
-            //
-            // TODO: Note that the original purpose of the template robots was
-            // to allow us to restart a game under the same initial conditions
-            // -- but since this code here explicitly removes that ability, it
-            // obviates the need for the templates in the first place.
-            for (let i = 0; i < factions[factionName].original_robots.length; ++i) {
-                factions[factionName].original_robots[i].unregister();
-            }
-            factions[factionName].original_robots = [];
         }
     };
 
@@ -766,38 +753,10 @@ function GameController() {
             playingFactions.push(factions[arguments[i]]);
         }
 
-        // Clone the robots so we can restart the game with the same initial
-        // conditions easily.
+        // Sort the factions' robot arrays by robot speed.
         for (let i = 0; i < playingFactions.length; ++i) {
             let faction = playingFactions[i];
 
-            // Clone from our pristine original robots.
-            for (let j = 0; j < faction.original_robots.length; ++j) {
-
-                // extend(), if not given a 'to' object (the second argument),
-                // will call the 'from' object's constructor function with no
-                // arguments.  Unfortunately for us, Robot() with no args
-                // returns a Munchkin.
-                //
-                //   let clonedRobot = extend(faction.original_robots[j], null);
-                //
-                // Of course, that raises the obvious question of why we
-                // don't just say "clonedRobot = new Robot(faction.original_robots[j].internalName)"
-                // and be done with it.  The answer is that the original robot
-                // added to the faction may have been customized -- for
-                // instance, it may have had a different weapon or altered
-                // hitpoints compared to its ordinary brethren.  We use the
-                // constructed version as a template, but then copy these
-                // potentially customized properties on top of it.
-                //
-                let clonedRobot = extend(faction.original_robots[j],
-                                         new Robot(faction.original_robots[j].internalName));
-
-                faction.robots.push(clonedRobot);
-            }
-
-            // Sort the factions' robot arrays by robot speed.
-            //
             // The fastest robot should always go first, so it needs to be
             // first in the array.
             faction.robots.sort(function(robot1, robot2) {
