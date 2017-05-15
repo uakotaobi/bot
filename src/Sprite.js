@@ -37,6 +37,60 @@ function SpriteBase(width, height) {
     }
 
     // -----------------------------------------------------------------------
+    // Public static functions (class-level.)
+
+    if (!SpriteBase.hasOwnProperty("preloadImages")) {
+        SpriteBase.preloadImages = function() {
+
+            let startTimeMilliseconds = Date.now();
+
+            // At the time of writing, there are 3 fire sprites and 16
+            // explosion sprites.  But it helps to overplan.
+            const fireSprites = 20;
+            const explosionSprites = 40;
+            let sprites = [];
+
+            for (let i = 1; i <= fireSprites; ++i) {
+                let sprite = SpecialEffectSprite(String.format("f{0}", i));
+                if (sprite.totalFrames() > 0) {
+                    sprite.preload();
+                    sprites.push(sprite);
+                }
+            }
+            for (let i = 1; i <= explosionSprites; ++i) {
+                let sprite = SpecialEffectSprite(String.format("e{0}", i));
+                if (sprite.totalFrames() > 0) {
+                    sprite.preload();
+                    sprites.push(sprite);
+                }
+            }
+
+            let fullyLoadedSprites = 0;
+            let checkSpriteImagePreloadingProgress = function() {
+                for (let i = 0; i < sprites.length; ++i) {
+                    if (sprites[i].preload() >= 1) {
+                        fullyLoadedSprites += 1;
+                    }
+                }
+
+                if (fullyLoadedSprites < sprites.length) {
+                    // console.debug("SpriteBase.preloadImages/checkSpriteImagePreloadingProgress(): %d/%d effects sprite(s) loaded, %.2f seconds elapsed.",
+                    //               fullyLoadedSprites,
+                    //               sprites.length,
+                    //               (Date.now() - startTimeMilliseconds)/1000.0);
+                    window.setTimeout(checkSpriteImagePreloadingProgress, 100);
+                } else {
+                    console.debug("SpriteBase.preloadImages/checkSpriteImagePreloadingProgress(): All %d effects sprite(s) loaded in %.2f seconds.",
+                                  sprites.length,
+                                  (Date.now() - startTimeMilliseconds)/1000.0);
+                }
+            };
+
+            window.setTimeout(checkSpriteImagePreloadingProgress, 100);
+        };
+    }
+
+    // -----------------------------------------------------------------------
     // Private variables (closure-local.)
 
     let frames = [];
@@ -107,7 +161,7 @@ function SpriteBase(width, height) {
     // Image object so that they can be cached by the web browser.
     //
     // Returns a floating-point value indicating what percentage of our images
-    // are loaded.
+    // are loaded.  Calling this function repeatedly is safe.
     let preloadedImages = [];
     this.preload = function() {
         if (preloadedImages.length === 0) {
@@ -438,7 +492,7 @@ function SpecialEffectSprite(effectName) {
                 case "e12": filename = "exports_0-60-frames-100x100 (test4).png"; break;
                 case "e13": filename = "exports_0-60-frames-100x100 (test5).png"; break;
                 case "e14": filename = "exports_0-60-frames-100x100 (test6).png"; break;
-            };
+            }
             let sprite = new SpriteBase(100, 100);
             sprite.addFramesFromSpriteSheet(String.format("./assets/images/effects/{0}", filename), 6, 10);
             sprite.loop = false;
@@ -477,8 +531,12 @@ function SpecialEffectSprite(effectName) {
         default:
         {
             // Almost surely not what you want.
-            console.warn("SpecialEffectSprite(): Unrecognized effectName '{0}'.", effectName);
+            // console.warn("SpecialEffectSprite(): Unrecognized effectName '{0}'.", effectName);
             return new SpriteBase(1, 1);
         }
     }
 }
+
+(function() {
+    new SpriteBase(); // Force the preloadImages() function to poof into existence.
+}());

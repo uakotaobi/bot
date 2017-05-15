@@ -1075,6 +1075,13 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
             container.style.opacity = "1";
         }, 1);
 
+        // Now's as good a time as any to preload the images and sprites that
+        // the actual game will use.
+        Robot.preloadImages();
+        SpriteBase.preloadImages();
+        // TODO: Preload success and failure background images.
+
+
         // BECAUSE this function is often (okay, usually) called after a game
         // has concluded, AND because we want the computer Bot choices to be
         // mixed up at the end of every game, AND because said mixing up has

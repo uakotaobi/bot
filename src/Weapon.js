@@ -835,5 +835,7 @@ function Weapon(weaponType) {
     return this;
 }
 
-// Ensure that calculateDamage() is available.
-new Weapon();
+
+(function() {
+    new Weapon(); // Ensure that calculateDamage() is available.
+}());
