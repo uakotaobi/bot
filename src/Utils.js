@@ -68,3 +68,17 @@ if (!String.format) {
 
 // Just returns a random integer between a and b, inclusive.
 function random(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+
+// Assigns the given path to an in-memory Image object.  The Image will load
+// the resource asynchronously, and you can check on its progress by checking
+// myImage.complete.
+//
+// We understand HTTP and HTTPS URIs, relative paths, and url("http://example.net/foo/bar").
+function preload(imagePath) {
+
+    // This is @stephenhay's regex from
+    // https://mathiasbynens.be/demo/url-regex, with the forward slashes in
+    // the middle escaped appropriately.
+    const uriRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
+}

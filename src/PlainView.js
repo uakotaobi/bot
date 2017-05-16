@@ -1261,12 +1261,7 @@ function PlainView(controller) {
             let getCloseOnclickHandler = function(view) {
                 return function() {
                     view.removeDeadRobot(robot);
-                    // Kill our robot div; it's useless now.
-                    // robotContainer.remove();
-                    //
-                    // if (robot.hitpoints <= 0) {
-                    //     controller.removeRobot(robot);
-                    // }
+                    controller.removeRobot(robot);
 
                     // Reposition the other robot divs on our side.
                     view.updateRobots();
@@ -1315,13 +1310,13 @@ function PlainView(controller) {
         }
 
         robotDiv.remove();
-        controller.removeRobot(robot);
         return true;
     };
 
 
-    // Removes all the dead robots for a given faction.  Returns the number of
-    // robots removed.
+    // Removes the robot divs for all dead robots from a given faction, then
+    // removes the robots themselves from the GameController.  Returns the
+    // number of robots removed.
     //
     // This function *does* update the view, unlike PlainView.removeDeadRobot().
     this.removeDeadRobots = function(faction) {
@@ -1330,6 +1325,7 @@ function PlainView(controller) {
         for (let i = 0; i < robots.length; ++i) {
             if (robots[i].hitpoints <= 0 && this.removeDeadRobot(robots[i])) {
                 deadRobotsRemoved += 1;
+                controller.removeRobot(robots[i]);
             }
         }
         this.updateRobots();
@@ -1961,7 +1957,7 @@ function PlainView(controller) {
     // controller.getCurrentRobot() and controller.getCurrentRobotEnemy()
     // won't work.)
     //
-    // Returns the sentence.
+    // Returns the sentence string.
     this.weaveNarrative = function(damageReport, attackingRobot, attackingRobotWeapon, defendingRobot) {
         let enemyName = String.format("the <strong class='enemy name'>{0}</strong>", defendingRobot.longName);
         if (defendingRobot.longName === attackingRobot.longName) {
@@ -1984,11 +1980,13 @@ function PlainView(controller) {
         let damageAdjective = "";
         if (damageReport.originalDamage.damage > 30) { // EMF damage levels and above
             let n = Math.random();
-            if (n > 0.66) {
+            if (n > 0.75) {
                 damageAdjective = "an <strong>overwhelming</strong> ";
-            } else if (n > 0.34) {
+            } else if (n > 0.5) {
                 // damageAdjective = "an <strong>unbelievable</strong> ";
                 damageAdjective = "a <strong>jaw-dropping</strong> ";
+            } else if (n > 0.25) {
+                damageAdjective = "an <strong>incredible</strong> ";
             }
         } else if (damageReport.originalDamage.damage > 23) { // max(4d6) or greater
             let n = Math.random();
@@ -2007,6 +2005,7 @@ function PlainView(controller) {
                 // damageAdjective = "a quite pathetic ";
                 // damageAdjective = "a disappointing ";
                 // damageAdjective = "a mere ";
+                // damageAdjective = "a meager ";
                 // damageAdjective = "an underwhelming ";
                 damageAdjective = "only ";
             }
@@ -2065,6 +2064,7 @@ function PlainView(controller) {
             if (damageReport.jumped) {
 
                 if (damageReport.jumpDamage.damage >= damageReport.originalDamage.damage) {
+
                     let attackerName = String.format("the <strong class='name'>{0}</strong>", attackingRobot.longName);
                     if (attackingRobot.longName === defendingRobot.longName) {
                         attackerName = "<strong class='name'>its counterpart</strong>";
@@ -2097,7 +2097,7 @@ function PlainView(controller) {
                         String.format(". The <span class='enemy" +
                                       "name'>{0}</span> " +
                                       "<strong>partially</strong> dodges " +
-                                      "the attack by jumping, and the " +
+                                      "the attack by jumping, but the " +
                                       "remaining {1} damage is <strong " +
                                       "class='enemy'>deflected</strong> by " +
                                       "its armor plating.  It takes no " +
@@ -2146,11 +2146,18 @@ function PlainView(controller) {
 
                     // Bots that can jump and have armor are rare, but
                     // they do exist.
-                    if (damageReport.armorDamage.damage > 0) {
-                        narrative += String.format(", {0} of which {1} <strong class='enemy'>deflected</strong> by its {2}armor plating.",
-                                                   damageReport.armorDamage.damage,
-                                                   (damageReport.armorDamage.damage > 1 ? "are" : "is"),
-                                                   armorAdjective);
+                    if (defendingRobot.armor !== "") {
+
+                        if (damageReport.armorDamage.damage > 0) {
+                            narrative += String.format(", {0} of which {1} <strong class='enemy'>deflected</strong> by its {2}armor plating.",
+                                                       damageReport.armorDamage.damage,
+                                                       (damageReport.armorDamage.damage > 1 ? "are" : "is"),
+                                                       armorAdjective);
+                        } else {
+                            // The jump did the trick, but the armor failed to play its part.
+                            narrative += String.format(". Curiously, its armor plating affords it <strong>no protection</strong>.");
+                        }
+
                     } else {
                         narrative += ".";
                     }
@@ -2162,23 +2169,38 @@ function PlainView(controller) {
 
                     // Bots that can jump and have armor are rare, but
                     // they do exist.
-                    if (damageReport.armorDamage.damage > 0) {
-                        narrative += String.format("; its {0}armor still prevents {1} point{2} of damage.",
-                                                   armorAdjective,
-                                                   damageReport.armorDamage.damage,
-                                                   (damageReport.armorDamage.damage > 1 ? "s" : ""));
+                    if (defendingRobot.armor !== "") {
+                        if (damageReport.armorDamage.damage > 0) {
+                            narrative += String.format("; its {0}armor still prevents {1} point{2} of damage.",
+                                                       armorAdjective,
+                                                       damageReport.armorDamage.damage,
+                                                       (damageReport.armorDamage.damage > 1 ? "s" : ""));
+                        } else {
+                            // The jump misfired *and* the armor misfired.
+                            // Whatever you paid for this Bot, you should ask
+                            // for your money back.
+                            narrative += String.format(" and takes <strong>full damage</strong>, thanks in no small part to its laughable excuse for armor.");
+                        }
                     } else {
                         narrative += ".";
                     }
                 }
 
-            } else if (damageReport.armorDamage.damage > 0) {
-                //  Okay, so the enemy can't jump.  But if they have
-                // armor that worked, we should show that.
-                narrative += String.format(".  The <span class='enemy name'>{0}'s</span> {1}armor plating <strong class='enemy'>prevents</strong> {2} damage.",
-                                           defendingRobot.longName,
-                                           armorAdjective,
-                                           damageReport.armorDamage.damage);
+            } else if (defendingRobot.armor !== "") {
+                // Okay, so the enemy can't jump.  But if they have armor that
+                // worked, we should show that.
+
+                if (damageReport.armorDamage.damage > 0) {
+                    narrative += String.format(".  The <span class='enemy name'>{0}'s</span> {1}armor plating <strong class='enemy'>prevents</strong> {2} damage.",
+                                               defendingRobot.longName,
+                                               armorAdjective,
+                                               damageReport.armorDamage.damage);
+                } else {
+                    // The armor didn't work.  The whole point of armor is to
+                    // *protect* you!
+                    narrative += String.format(", <strong>not hampered in the slightest</strong> by the <span class='enemy name'>{0}'s</span> so-called armor.",
+                                               defendingRobot.longName);
+                }
 
             } else {
                 // No jump, no armor.  That's actually pretty rare

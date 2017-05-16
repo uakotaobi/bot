@@ -435,8 +435,13 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
 .robot.targeted { border: 2px inset red; }
 
 .robot { position: absolute; background-color: rgba(240, 240, 240, 0.4); }
-.robot .top-bar { height: 1em; text-shadow: 1px 1px 1px gray; }
-.robot .top-bar { border: 1px outset black; padding: 3px; }
+.robot .top-bar {
+    height: 1em;
+    text-shadow: 1px 1px 1px gray;
+    border: 1px outset black;
+    padding: 3px;
+    overflow: hidden;
+}
 .robot .top-bar > input { float: left; display: block; margin-top: 0; }
 .robot .top-bar > .name { float: left; }
 .robot .top-bar > .hp { float: right; width: 4em; text-align: right; }

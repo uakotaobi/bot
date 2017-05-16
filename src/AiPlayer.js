@@ -427,9 +427,14 @@ function AiPlayer(factionName, controller, view) {
     // report on the attack.  Making it false results in a silent attack,
     // although the lines of code needed to do that are small enough that you
     // could do that yourself.
-    this.playOneRound = function(updateView) {
+    //
+    // If turnsToAutomate is greater than 0 (0 is the default), dismissing
+    // the turn dialog this function generates will cause an AI player to take
+    // over the next turn with turnsToAutomate diminished by 1.
+    this.playOneRound = function(updateView, turnsToAutomate) {
 
         updateView = updateView || true;
+        turnsToAutomate = turnsToAutomate || 0;
         let ourBot = controller.getCurrentRobot();
         let turnDialog = null;
 
@@ -443,13 +448,18 @@ function AiPlayer(factionName, controller, view) {
             turnDialog.querySelector(".title").style.display = "block";
             turnDialog.querySelector(".title h2").textContent = this.faction;
 
-            // Clicking will close our dialog and start the next turn.
-            turnDialog.onclick = view.createAdvanceTurnOnClickHandler(view, turnDialog.id);
+            if (turnsToAutomate <= 0) {
+                // Clicking will close our dialog and start the next turn.
+                turnDialog.onclick = view.createAdvanceTurnOnClickHandler(view, turnDialog.id);
+            } else {
+                // Clicking will fire up an AI player to handle the next turn.
+                turnDialog.onclick = this.getAdvanceNextTurnHandler(turnsToAutomate - 1);
+            }
 
             // Did any of our robots get killed in the last few rounds?  If
             // so, remove their divs, but only if we're not a human.  (The
             // humans can remove their own divs.)
-            if (controller.getFactionType(ourBot.faction) === "ai") {
+            if (controller.getFactionType(ourBot.faction) === "ai" || turnsToAutomate > 0) {
                 for (let i = 0, robots = controller.getGameRobots(ourBot.faction); i < robots.length; ++i) {
                     if (robots[i].hitpoints <= 0) {
                         view.removeDeadRobot(robots[i]);
@@ -486,12 +496,18 @@ function AiPlayer(factionName, controller, view) {
             // If a human player is the target of our wrath, say that "we" are
             // under attack (a phrase that is only meaningful to humans.)
             if (updateView) {
-                if (controller.getFactionType(attackInfo.enemy.faction) === "human") {
-                    let p = document.createElement("p");
+                let p = document.createElement("p");
+
+                if (turnsToAutomate > 0) {
+                    p.innerHTML = String.format("The computer will control of the game for <strong>{0}</strong> more round{1}.",
+                                                turnsToAutomate,
+                                                (turnsToAutomate === 1 ? "" : "s"));
+                } else if (controller.getFactionType(attackInfo.enemy.faction) === "human") {
                     p.innerHTML = "<strong>We are under attack!</strong>";
-                    turnDialog.querySelector(".text").textContent = "";
-                    turnDialog.querySelector(".text").appendChild(p);
                 }
+
+                turnDialog.querySelector(".text").textContent = "";
+                turnDialog.querySelector(".text").appendChild(p);
             }
 
             // There have been situations in the past where the current robot
@@ -562,8 +578,10 @@ function AiPlayer(factionName, controller, view) {
                 textDiv.appendChild(p);
                 // textDiv.appendChild(o.damageReportDOM); // It takes up too much room.
 
+                // NB: We never needed this.  It was handled above.
+                //
                 // Clicking will close our dialog and start the next turn.
-                turnDialog.onclick = view.createAdvanceTurnOnClickHandler(view, turnDialog.id);
+                // turnDialog.onclick = view.createAdvanceTurnOnClickHandler(view, turnDialog.id);
 
                 // Show the dialog.
                 //
@@ -673,10 +691,168 @@ function AiPlayer(factionName, controller, view) {
     };
 
 
+    // This function, when called, returns a function that is suitable to
+    // serve as dialog's onclick handler.  Clicking on the dialog will cause
+    // it to run the next turn as an AI unconditionally -- at least until
+    // turnsToAutomate decrements to 0.
+    this.getAdvanceNextTurnHandler = function(turnsToAutomate) {
+
+        // This was taken from
+        // PlainView.createAdvanceTurnOnClickHandler().  The main difference
+        // is that the AI player runs unconditionally rather than only running
+        // if the faction is not controlled by a human.
+        //
+        // In fact, this is so similar that it would probably be better to
+        // just have a flag in createAdvanceTurnOnClickHandler() that doesn't
+        // let humans play.
+        return function() {
+            // Dismiss the topmost dialog (we presume it's a turn dialog,
+            // though it might not be.)
+            if (PlainView.dialogIdStack.length > 0) {
+                let dialogId = PlainView.dialogIdStack[PlainView.dialogIdStack.length - 1];
+                view.removeDialog(dialogId);
+            }
+
+            if (!controller.isGameInProgress()) {
+
+                view.checkForEndgame();
+
+            } else {
+                let currentEnemy = controller.getCurrentRobotEnemy();
+                let currentWeapon = controller.getCurrentRobotWeapon();
+
+                if (controller.getCurrentRobot().hasAmmo() && currentWeapon &&  currentEnemy) {
+                    // Deselect the current weapon and current enemy in the view.
+                    view.selectCurrentRobotWeapon(controller.getCurrentRobot(), currentWeapon.internalName, false);
+                    view.selectEnemyRobot(currentEnemy, false);
+                }
+
+                controller.nextRobot();
+                view.updateRobots();
+
+                let aiPlayer = new AiPlayer(controller.getCurrentRobot().faction, controller, view);
+                aiPlayer.playOneRound(true, turnsToAutomate);
+            }
+        };
+    };
+
+
+    // Using the current game as a starting condition, plays for the given
+    // number of turns using the turn-playing AI and returns a combat
+    // summary.
+    //
+    // This function is especially useful for simulating one-on-one matches.
+    //
+    // The arguments to this function are:
+    //
+    // - turns: The number of turns to play.  The default is 0, meaning "play
+    //   until the game ends."  Note that setting this to a value greater than
+    //   0 _may_ eliminate some portions of the final report (namely, those
+    //   portions that depend on a winner, since the number of turns you pass
+    //   in might not be enough to end the game.)
+    //
+    //   The turns argument works just fine in conjunction with the
+    //   MonteCarloSimulation play style.
+    //
+    // - playStyle: One of four values:
+    //   * AiPlayer.PlayStyleNormal: The AiPlayer will play all sides of
+    //     the current game, including user dialog updates.  Essentially, any
+    //     humans playing will lose control of the game other than being able
+    //     to dismiss the dialogs.
+    //
+    this.play = function(playStyle, turns) {
+        turns = turns || 0;
+
+        let result = {
+            winningFaction: "",
+            survivingRobots: [],
+            statistics: {
+                victoryProbability: { },
+                averageDamageDealt: { },
+                averageDAmageTaken: { },
+                averageTurnsToWin:  { }
+            }
+        };
+
+
+        if (!controller.isGameInProgress()) {
+            console.error("AiPlayer.play(): A game must be in progress for me to play it.");
+            return result;
+        }
+
+        if (playStyle === AiPlayer.PlayStyleNormal) {
+
+            // Take over the game until victory or until we've played the
+            // required number of turns, whichever comes first.'
+            if (turns < 0) {
+                console.warn("AiPlayer.play(): Having the AI take over the game for %d turns makes no sense.  Use a non-negative number of turns (0 to play until end of game.)", turns);
+            } else {
+                if (turns === 0) {
+                    turns = 1e6; // That should be good enough.
+                }
+
+                // Play this round, and arrange things so the next N rounds
+                // (where N is the number of turns to play) will also be
+                // forcibly played by the AI.  All the human will be able to
+                // do is click to dismiss the intermediate dialogs.
+
+                let aiPlayer = new AiPlayer(controller.getCurrentRobot().faction, controller, view);
+                aiPlayer.playOneRound(true, turns);
+            }
+        }
+
+
+        // // This is not a while loop.  It is a state machine that will be
+        // // called several times in the course of a normal mode game.
+        // // That should probably be its own method.
+        //
+        // let done = false;
+        // let turnCounter = 0;
+        // while (!done) {
+        //     turnCounter += 1;
+        //
+        //     if (playStyle === AiPlayer.PlayStyleNormal) {
+        //
+        //         // Set all of the players to AI so that playing a round does
+        //         // not accidentally return control to the human.
+        //
+        //         let currentFaction = controller.getCurrentRobot().faction;
+        //         let oldFactionType = controller.getFactionType(currentFaction);
+        //         controller.setFactionType(currentFaction, "ai");
+        //
+        //         // Play the current player.
+        //         let player = new AiPlayer(controller.getCurrentRobot().faction, controller, view);
+        //         player.playOneRound(true);
+        //         if (!controller.isGameInProgress()) {
+        //
+        //         }
+        //     }
+        //
+        //
+        //
+        //
+        //     if (turnCounter > turns) {
+        //         // Done for now.
+        //         break;
+        //     }
+        // }
+        return result;
+    };
+
+
     // -----------------------------------------------------------------------
     // Public member variables (per-instance variables.)
 
     this.faction = factionName;
+
+    // -----------------------------------------------------------------------
+    // Public static variables (class-level variables.)
+
+    // Possible values for the playStyle argument in AiPlayer.play().
+    if (!AiPlayer.hasOwnProperty("PlayStyleNormal")) {
+        AiPlayer.PlayStyleNormal = "PlayStyleNormal";
+    }
+
 
     return this;
 }

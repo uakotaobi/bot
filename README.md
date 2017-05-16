@@ -49,21 +49,49 @@ JavaScript console on your web browser.
 3. Test an explosion sequence:
    First, choose a robot.
    ```javascript
-     robot = g.controller().getCurrentRobot()                     // The robot whose turn it currently is
-     robot = g.controller().getGameRobots()[0]                    // The current game's first still-living robot
-     robot = g.controller().getGameRobots()[1]                    // ...second (and so forth)
-     robot = g.controller().getGameRobots("The Star Alliance")[0] // That faction's fastest still-living robot
+   robot = g.controller().getCurrentRobot()                     // The robot whose turn it currently is
+   robot = g.controller().getGameRobots()[0]                    // The current game's first still-living robot
+   robot = g.controller().getGameRobots()[1]                    // ...second (and so forth)
+   robot = g.controller().getGameRobots("The Star Alliance")[0] // That faction's fastest still-living robot
    ```
 
    Then choose a Bot class and the timing parameters:
    ```javascript
-   let fireDurationMilliseconds = 10 * 1000;
-   let explosionDurationMilliseconds = 3 * 1000;
+   fireDurationMilliseconds = 10 * 1000;
+   explosionDurationMilliseconds = 3 * 1000;
    g.view().explode(robot, "medium", fireDurationMilliseconds, explosionDurationMilliseconds);
    ```
 
    You can also pass the special string "jump" as the second argument to make
    the robot jump rather than explode.
+
+4. Give yourself unfair reinforcements:
+
+   ```javascript
+   robot = new Robot("scarab")
+   g.controller().addRobot("The Star Alliance", robot)
+   g.view().addRobot(r)
+   g.view().updateRobots()
+   ```
+
+   You might want to give yourself something more useful than a Scarab.
+   * Unless, of course, you give the Scarab itself an unfair weapon:
+
+     ```javascript
+     robot.arsenal.push(new Weapon("emf"))
+     g.view().updateRobots()
+     ```
+   * Or just make up a damage string for an existing weapon:
+
+     ```javascript
+     robot.arsenal[0].shortName = "BB GUN"
+     robot.arsenal[0].dmaage = "5d20"
+     g.view().updateRobots()
+     ```
+
+     You may find that giving a robot a powerful weapon makes that robot
+     seem _a lot more interesting_ to computer opponents than it was
+     previously.
 
 ## License
 

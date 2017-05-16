@@ -47,7 +47,7 @@ function Robot(robotType) {
                 class        : "light",                // Bot class: light, medium, or heavy.
                 arsenal      : ["invalid"],            // Weapons on the bot.
                 hitpoints    : 1,
-                armor        : "0d6",                  // Armor expression (evaluated like weapon damage expressions.)
+                armor        : "0d6",                  // Armor expression (evaluated like weapon damage expressions.)  Empty strings mean no armor.
                 jump         : false,                  // Chance to jump for reduced damage when true.
                 speed        : 1,                      // Determines turn order: higher = sooner.
                 score        : 1,                      // Determines how many of these you can add to your forces

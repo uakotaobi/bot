@@ -1080,7 +1080,7 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
 
         if (pageBackgroundUrlString  !== "none" && pageBackgroundImage.complete &&
             panelBackgroundUrlString !== "none" && panelBackgroundImage.complete) {
-            console.debug("Select/waitUntilBackgroundIsLoaded(): Backgrounds (\"%s\", \"%s\") loaded in %.2f seconds.",
+            console.debug("Select/waitUntilBackgroundIsLoaded(): Backgrounds loaded in %.2f seconds.  Initiating remaining preloads.",
                           pageBackgroundUrl,
                           panelBackgroundUrl,
                           (Date.now() - startTimeMilliseconds)/1000.0);
