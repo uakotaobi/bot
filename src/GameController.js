@@ -962,6 +962,19 @@ function GameController() {
     };
 
 
+    // Query function: what were the most recent robots to play in each
+    // faction?  This is only of use to AiPlayer.play(), and even then only
+    // under the simulation and Monte Carlo playStyles, where the computer
+    // player runs a simulation of the actual game.
+    this._getCurrentRobotIndices = function() {
+        let result = { };
+        for (let i = 0; i < playingFactions.length; ++i) {
+            result[playingFactions[i].name] = playingFactions[i].currentRobotIndex;
+        }
+        return result;
+    };
+
+
     // Query function: Which robot's turn is it?  If there is no game in
     // progress, returns null.  Otherwise, this function will always return a
     // functioning robot.

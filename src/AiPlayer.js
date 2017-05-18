@@ -31,13 +31,34 @@ function AiPlayer(factionName, controller, view) {
     // Find the most effective attack (that is, a weapon name/enemy pair) for
     // an arbitrary robot at this point in time.
     //
+    // The allRobots argument exists only for the benefit of AiPlayer.play(),
+    // and only for the PlayStyleSimulation and PlayStyleMonteCarlo simulated
+    // play styles at that.  It causes us to derive our list of allies and
+    // adversaries from the then list instead of using the GameController's
+    // list.
+    //
     // Returns an object with the following fields:
     // - weaponName: The name of the weapon that this robot should attack
     //               with.
     // - enemy:      The enemy robot that should be attacked.
     // - reasons:    The AI's reasons for selecting this pair.  An
     //               array of human-readable strings.
-    this.chooseBestAttack = function(robot) {
+    this.chooseBestAttack = function(robot, allRobots) {
+
+        // Special handling for the case where the (simulated) robots are
+        // supplied to us.  We can't rely on the controller to give us the
+        // list of robots and factions in that case!
+        allRobots = allRobots || controller.getGameRobots();
+        let factionRobots = { };
+        let factions = [];
+        for (let i = 0; i < allRobots.length; ++i) {
+            let factionName = allRobots[i].faction;
+            if (!(factionName in factionRobots)) {
+                factions.push(factionName);
+                factionRobots[factionName] = [];
+            }
+            factionRobots[factionName].push(allRobots[i]);
+        }
 
         let result = {
             weaponName: "",
@@ -45,7 +66,7 @@ function AiPlayer(factionName, controller, view) {
             reasons: []
         };
 
-        if (!controller.isGameInProgress()) {
+        if (!controller.isGameInProgress() && !allRobots) {
             result.reasons.push("Cannot attack.  There is no game in progress.");
             return result;
         }
@@ -100,9 +121,9 @@ function AiPlayer(factionName, controller, view) {
                 // Lots of tinier enemies are vulnerable to their firepower;
                 // they don't care about that.
                 w1 = 1.0;
-                w2 = 0.75;
-                w3 = 0.20;
-                w4 = 0.20;
+                w2 = 0.1; // Who _cares_ if your Hermes can blow up one of ours!
+                w3 = 0.05;
+                w4 = 0.05;
                 break;
             case "assault":
                 // Assault mechs: Heavy armor, heavier weapons.  They can pick
@@ -126,7 +147,7 @@ function AiPlayer(factionName, controller, view) {
         // TODO: The hatred could also respond to environmental cues, like how
         // often the human player has shot us.  But then, why restrict that
         // sort of thing to just human-controlled bots?
-        if (controller.getGameFactions().length > 2) {
+        if (factions.length > 2) {
             switch(robot.faction) {
                 case "The Star Alliance":
                     // The Star Alliance is an unbiased (though not friendly)
@@ -186,7 +207,7 @@ function AiPlayer(factionName, controller, view) {
         /////////////////////////////////////////////////////////////////////
 
         let enemyRobotScores = [];
-        let robots = controller.getGameRobots();
+        let robots = allRobots;
         for (let i = 0; i < robots.length; ++i) {
 
             if (robots[i].faction === robot.faction || robots[i].hitpoints <= 0) {
@@ -210,7 +231,7 @@ function AiPlayer(factionName, controller, view) {
 
                 // Simulate an attack on our bots using average
                 // values for all of the enemy's weaponry.
-                let friendlyRobots = controller.getGameRobots(robot.faction);
+                let friendlyRobots = factionRobots[robot.faction];
 
                 for (let k = 0; k < friendlyRobots.length; ++k) {
 
@@ -342,7 +363,7 @@ function AiPlayer(factionName, controller, view) {
             // Award a score based on our sheer hatred of the human race and
             // everyone in it (w5).
             enemyRobotScores[i].hatredOfHumanPlayersScore = 0;
-            if (controller.getGameFactions().length > 2 &&
+            if (factions.length > 2 &&
                 controller.getFactionType(enemyRobotScores[i].robotToTarget.faction) === "human") {
                 enemyRobotScores[i].hatredOfHumanPlayersScore = w5;
             }
@@ -394,7 +415,7 @@ function AiPlayer(factionName, controller, view) {
                                               enemyRobotScores[0].mostThreatenedAlly.id,
                                               enemyRobotScores[0].mostThreatenedAlly.hitpoints));
         }
-        result.reasons.push(String.format("Our threat level to it is {0} if we want to preserve ammunition and {1} if we don't.",
+        result.reasons.push(String.format("Our threat level to the target is {0} if we want to preserve ammunition and {1} if we don't.",
                                           enemyRobotScores[0].vulnerabilityToWeaponWithoutAmmoScore.toFixed(4),
                                           enemyRobotScores[0].vulnerabilityToWeaponWithAmmoScore.toFixed(4)));
         if (enemyRobotScores.length > 1) {
@@ -403,7 +424,7 @@ function AiPlayer(factionName, controller, view) {
                                               badRobot.longName,
                                               badRobot.id,
                                               badRobot.hitpoints,
-                                              enemyRobotScores[enemyRobotScores.length - 1].score));
+                                              enemyRobotScores[enemyRobotScores.length - 1].score.toFixed(4)));
         }
         if (w1 != 1.0 || w2 != 1.0 || w3 != 1.0 || w4 != 1.0) {
             result.reasons.push(String.format("Some weights influenced the final score.  Our weights are w1={0}, w2={1}, w3={2}, w4={3}, w5={4}.",
@@ -453,7 +474,7 @@ function AiPlayer(factionName, controller, view) {
                 turnDialog.onclick = view.createAdvanceTurnOnClickHandler(view, turnDialog.id);
             } else {
                 // Clicking will fire up an AI player to handle the next turn.
-                turnDialog.onclick = this.getAdvanceNextTurnHandler(turnsToAutomate - 1);
+                turnDialog.onclick = view.createAdvanceTurnOnClickHandler(view, turnDialog.id, turnsToAutomate - 1);
             }
 
             // Did any of our robots get killed in the last few rounds?  If
@@ -463,7 +484,7 @@ function AiPlayer(factionName, controller, view) {
                 for (let i = 0, robots = controller.getGameRobots(ourBot.faction); i < robots.length; ++i) {
                     if (robots[i].hitpoints <= 0) {
                         view.removeDeadRobot(robots[i]);
-                        console.debug(String.format("AiPlayer.playOneRound(): Removing dead {0} {1} from view and controller.", robots[i].longName, robots[i].id));
+                        // console.debug(String.format("AiPlayer.playOneRound(): Removing dead {0} {1} from view and controller.", robots[i].longName, robots[i].id));
                         controller.removeRobot(robots[i]);
                     }
                 }
@@ -498,11 +519,18 @@ function AiPlayer(factionName, controller, view) {
             if (updateView) {
                 let p = document.createElement("p");
 
-                if (turnsToAutomate > 0) {
-                    p.innerHTML = String.format("The computer will control of the game for <strong>{0}</strong> more round{1}.",
-                                                turnsToAutomate,
-                                                (turnsToAutomate === 1 ? "" : "s"));
+                if (turnsToAutomate > 1) {
+
+                    p.innerHTML = String.format("The computer will control this game for <strong>{0}</strong> more round{1}.",
+                                                turnsToAutomate - 1,
+                                                (turnsToAutomate - 1 === 1 ? "" : "s"));
+
+                } else if (turnsToAutomate === 1) {
+
+                    p.innerHTML = "The regular game will resume next round.";
+
                 } else if (controller.getFactionType(attackInfo.enemy.faction) === "human") {
+
                     p.innerHTML = "<strong>We are under attack!</strong>";
                 }
 
@@ -571,7 +599,11 @@ function AiPlayer(factionName, controller, view) {
 
                 // Add some narrative to the dialog.
                 let p = document.createElement("p");
-                p.setAttribute("class", "enemy narrative");
+                if (controller.getFactionType(ourBot.faction) === "ai") {
+                    p.setAttribute("class", "enemy narrative");
+                } else {
+                    p.setAttribute("class", "narrative");
+                }
                 p.innerHTML = view.weaveNarrative(o.damageReport, ourBot, ourBotWeapon, theirBot);
 
                 let textDiv = turnDialog.querySelector(".text");
@@ -691,52 +723,6 @@ function AiPlayer(factionName, controller, view) {
     };
 
 
-    // This function, when called, returns a function that is suitable to
-    // serve as dialog's onclick handler.  Clicking on the dialog will cause
-    // it to run the next turn as an AI unconditionally -- at least until
-    // turnsToAutomate decrements to 0.
-    this.getAdvanceNextTurnHandler = function(turnsToAutomate) {
-
-        // This was taken from
-        // PlainView.createAdvanceTurnOnClickHandler().  The main difference
-        // is that the AI player runs unconditionally rather than only running
-        // if the faction is not controlled by a human.
-        //
-        // In fact, this is so similar that it would probably be better to
-        // just have a flag in createAdvanceTurnOnClickHandler() that doesn't
-        // let humans play.
-        return function() {
-            // Dismiss the topmost dialog (we presume it's a turn dialog,
-            // though it might not be.)
-            if (PlainView.dialogIdStack.length > 0) {
-                let dialogId = PlainView.dialogIdStack[PlainView.dialogIdStack.length - 1];
-                view.removeDialog(dialogId);
-            }
-
-            if (!controller.isGameInProgress()) {
-
-                view.checkForEndgame();
-
-            } else {
-                let currentEnemy = controller.getCurrentRobotEnemy();
-                let currentWeapon = controller.getCurrentRobotWeapon();
-
-                if (controller.getCurrentRobot().hasAmmo() && currentWeapon &&  currentEnemy) {
-                    // Deselect the current weapon and current enemy in the view.
-                    view.selectCurrentRobotWeapon(controller.getCurrentRobot(), currentWeapon.internalName, false);
-                    view.selectEnemyRobot(currentEnemy, false);
-                }
-
-                controller.nextRobot();
-                view.updateRobots();
-
-                let aiPlayer = new AiPlayer(controller.getCurrentRobot().faction, controller, view);
-                aiPlayer.playOneRound(true, turnsToAutomate);
-            }
-        };
-    };
-
-
     // Using the current game as a starting condition, plays for the given
     // number of turns using the turn-playing AI and returns a combat
     // summary.
@@ -754,12 +740,27 @@ function AiPlayer(factionName, controller, view) {
     //   The turns argument works just fine in conjunction with the
     //   MonteCarloSimulation play style.
     //
-    // - playStyle: One of four values:
+    // - playStyle: One of three values:
     //   * AiPlayer.PlayStyleNormal: The AiPlayer will play all sides of
     //     the current game, including user dialog updates.  Essentially, any
     //     humans playing will lose control of the game other than being able
     //     to dismiss the dialogs.
     //
+    //     Since this mode returns immediately, the final report will be empty
+    //     and meaningless (the point is to make the AI visibly play the game,
+    //     not to gather statistics.)
+    //
+    //   * AiPlayer.PlayStyleSimulation: Plays a single virtual game using the
+    //     current starting conditions and returns a combat summary object
+    //     with a wide variety of fields.  The 'statistics' sub-object
+    //     contains hash tables whose keys are faction names and whose values
+    //     are indicated by the hash table name.
+    //
+    //   * AiPlayer.PlayStyleMonteCarlo: Runs the single-game simulation
+    //     repeatedly until a fixed period of time has passed, then returns
+    //     the same type of combat summary object.
+    //
+    // Returns the combat summary object.
     this.play = function(playStyle, turns) {
         turns = turns || 0;
 
@@ -767,10 +768,16 @@ function AiPlayer(factionName, controller, view) {
             winningFaction: "",
             survivingRobots: [],
             statistics: {
-                victoryProbability: { },
-                averageDamageDealt: { },
-                averageDAmageTaken: { },
-                averageTurnsToWin:  { }
+                averageGameDurationMilliseconds: 0,
+                // These hash tables all use faction names as keys and
+                // floating-point numbers or integers as values.
+                victoryProbability:      { }, // The most important statistic: games we won divided by the total games played.
+                totalGamesWon:           { }, // Needed to calculate the victory probability.
+                averageDamageDealt:      { },
+                averageDamagePrevented:  { }, // By armor or jumping.
+                averageDamageTaken:      { },
+                averageTargetsDestroyed: { }, // Our faction's average kill count.
+                averageTurnsToWin:       { }  // How many turns it took us to win (when we did win.)
             }
         };
 
@@ -787,6 +794,13 @@ function AiPlayer(factionName, controller, view) {
             if (turns < 0) {
                 console.warn("AiPlayer.play(): Having the AI take over the game for %d turns makes no sense.  Use a non-negative number of turns (0 to play until end of game.)", turns);
             } else {
+
+                // If there are any dialogs on the dialog stack, dismiss them.
+                while (PlainView.dialogIdStack.length > 0) {
+                    view.removeDialog();
+                }
+
+
                 if (turns === 0) {
                     turns = 1e6; // That should be good enough.
                 }
@@ -799,43 +813,295 @@ function AiPlayer(factionName, controller, view) {
                 let aiPlayer = new AiPlayer(controller.getCurrentRobot().faction, controller, view);
                 aiPlayer.playOneRound(true, turns);
             }
-        }
+
+        } else if (playStyle === AiPlayer.PlayStyleSimulation || playStyle === AiPlayer.PlayStyleMonteCarlo) {
+
+            // We're going to play the game virtually.
+            let currentFactionIndex = controller.getGameFactions().indexOf(controller.getCurrentRobot().faction);
+            if (currentFactionIndex < 0) {
+                // Won't ever happen.
+                console.error("AiPlayer.play(): Internal error: can't run" +
+                              " a %s simulation because the current robot," +
+                              " %s %s, has a faction of \"%s\" and we can't" +
+                              " find it.  Needless to say, this is quite" +
+                              " impossible.",
+                              playStyle,
+                              controller.getCurrentRobot().longName,
+                              controller.getCurrentRobot().id,
+                              controller.getCurrentRobot().faction);
+                return result;
+            }
+
+            // Helper function for advancing to the next turn in the
+            // simulation(s).
+            //
+            // Returns the index of the next living robot in the given faction
+            // object *after* the faction's currentRobotIndex.  If the
+            // currentRobotIndex is returned back to you, that's your sign
+            // that there's only one living robot left in the faction; if -1
+            // is returned, that means the whole faction is dead.
+
+            let findNextLivingRobot = function(faction) {
+                for (let index = (faction.currentRobotIndex + 1) % faction.robots.length;
+                     index != faction.currentRobotIndex;
+                     index = (index + 1) % faction.robots.length) {
+
+                    if (faction.robots[index].hitpoints > 0) {
+                        return index;
+                    }
+                }
+
+                // We've wrapped around to the beginning, so at *best*,
+                // faction.robots[faction.currentRobotIndex] is the last
+                // living robot in the faction.
+                if (faction.robots[faction.currentRobotIndex].hitpoints > 0) {
+                    return faction.currentRobotIndex;
+                }
+
+                // Even the _current_ robot's dead!
+                return -1;
+            };
+
+            // Reset statistics.
+            for (let i = 0, factions = controller.getGameFactions(); i < factions.length; ++i) {
+                result.statistics.victoryProbability[factions[i]]      = 0;
+                result.statistics.totalGamesWon[factions[i]]           = 0;
+                result.statistics.averageDamageDealt[factions[i]]      = 0;
+                result.statistics.averageDamagePrevented[factions[i]]  = 0;
+                result.statistics.averageDamageTaken[factions[i]]      = 0;
+                result.statistics.averageTargetsDestroyed[factions[i]] = 0;
+                result.statistics.averageTurnsToWin[factions[i]]       = 0;
+            }
 
 
-        // // This is not a while loop.  It is a state machine that will be
-        // // called several times in the course of a normal mode game.
-        // // That should probably be its own method.
-        //
-        // let done = false;
-        // let turnCounter = 0;
-        // while (!done) {
-        //     turnCounter += 1;
-        //
-        //     if (playStyle === AiPlayer.PlayStyleNormal) {
-        //
-        //         // Set all of the players to AI so that playing a round does
-        //         // not accidentally return control to the human.
-        //
-        //         let currentFaction = controller.getCurrentRobot().faction;
-        //         let oldFactionType = controller.getFactionType(currentFaction);
-        //         controller.setFactionType(currentFaction, "ai");
-        //
-        //         // Play the current player.
-        //         let player = new AiPlayer(controller.getCurrentRobot().faction, controller, view);
-        //         player.playOneRound(true);
-        //         if (!controller.isGameInProgress()) {
-        //
-        //         }
-        //     }
-        //
-        //
-        //
-        //
-        //     if (turnCounter > turns) {
-        //         // Done for now.
-        //         break;
-        //     }
-        // }
+            let gamesPlayed = 0;
+            let simulationStartTimeMilliseconds = Date.now();
+            let simulationEnded = false;
+
+            while (!simulationEnded) {
+
+                // At the beginning of each simulated game, we duplicate the
+                // starting conditions (i.e., the current state of the real
+                // game.)
+                let factions = [];
+                let allRobots = [];
+                for (let i = 0, factionNames = controller.getGameFactions(), currentRobotIndices = controller._getCurrentRobotIndices();
+                     i < controller.getGameFactions().length;
+                     ++i) {
+                    let faction = {
+                        name: factionNames[i],
+                        currentRobotIndex: currentRobotIndices[factionNames[i]], // Had to cheat a little on this one.
+                        robots: [],
+                        dead: false
+                    };
+                    for (let j = 0, robots = controller.getGameRobots(faction.name); j < robots.length; ++j) {
+
+                        // Copy the weapons, hitpoints, ammo, faction -- everything.
+                        //
+                        // The ID gets copied, too, so we fix that.
+                        let clonedRobot   = new Robot(robots[j].internalName);
+                        let clonedRobotId = clonedRobot.id;
+                        extend(robots[j], clonedRobot);
+                        clonedRobot.id    = clonedRobotId;
+                        faction.robots.push(clonedRobot);
+                        allRobots.push(clonedRobot);
+                    }
+
+                    factions.push(faction);
+                }
+
+                //////////////////////////////////
+                // Start of the simulated game. //
+                //////////////////////////////////
+
+                // Simulating for a number of rounds is perfectly possible,
+                // but keep in mind that it won't always result in the end of
+                // a game.
+                let startTimeMilliseconds = Date.now();
+                if (turns === 0) {
+                    turns = 1e6;
+                }
+                for (let i = 0; i < turns; ++i) {
+
+                    let currentFaction = factions[currentFactionIndex];
+                    let currentRobot = currentFaction.robots[currentFaction.currentRobotIndex];
+
+                    if (currentRobot.hitpoints > 0) {
+
+                        // "My center is giving way, my right is in retreat;
+                        // situation excellent. I shall attack."
+                        //
+                        // --Ferdinand Foch
+
+                        let attackInfo = this.chooseBestAttack(currentRobot, allRobots);
+                        if (attackInfo.enemy !== null && attackInfo.weaponName !== "") {
+
+                            let damageReport = currentRobot.fire(attackInfo.enemy,
+                                                                 attackInfo.weaponName,
+                                                                 Weapon.useRandomValues,
+                                                                 true);
+                            result.statistics.averageDamageDealt[currentRobot.faction] += damageReport.finalDamage;
+                            result.statistics.averageDamageTaken[attackInfo.enemy.faction] += damageReport.finalDamage;
+                            result.statistics.averageDamagePrevented[attackInfo.enemy.faction] += (damageReport.originalDamage.damage - damageReport.finalDamage);
+
+                            // console.debug("AiPlayer.play() [simulation mode - %d turns to go]: %s %s (%s) attacks %s %s (%s) for %d damage.",
+                            //               turns - i,
+                            //               currentRobot.longName,
+                            //               currentRobot.id,
+                            //               currentRobot.faction,
+                            //               attackInfo.enemy.longName,
+                            //               attackInfo.enemy.id,
+                            //               attackInfo.enemy.faction,
+                            //               damageReport.finalDamage);
+
+                            // Did the current robot make a kill?
+                            if (attackInfo.enemy.hitpoints <= 0) {
+                                result.statistics.averageTargetsDestroyed[currentRobot.faction] += 1;
+                            }
+
+                        } else {
+                            // The current robot can't attack for some reason.
+                            // (It's probably out of ammo.)
+                            // console.debug("AiPlayer.play() [simulation mode - %d turns to go]: %s %s (%s) skips its turn (it may be out of ammunition.)",
+                            //               turns - i,
+                            //               currentRobot.longName,
+                            //               currentRobot.id,
+                            //               currentRobot.faction);
+                        }
+
+                    } else {
+                        // console.debug("AiPlayer.play() [simulation mode - %d turns to go]: %s %s (%s) is dead.",
+                        //               turns - i,
+                        //               currentRobot.longName,
+                        //               currentRobot.id,
+                        //               currentRobot.faction);
+
+                        // The current robot's dead.  Maybe it was killed
+                        // during some other robot's turn.
+                        //
+                        // Let's find the next living robot in this faction
+                        // and schedule it to go next.
+                        let index = findNextLivingRobot(currentFaction);
+                        if (index < 0) {
+
+                            // console.debug("AiPlayer.play() [simulation mode - %d turns to go]: %s has lost its last Bot.",
+                            //               turns - i,
+                            //               currentRobot.faction);
+
+                            // This whole faction's dead!
+                            currentFaction.dead = true;
+
+                            // Schedule another living faction to go next.
+                            let factionIndex = (currentFactionIndex + 1) % factions.length;
+                            let originalFactionIndex = currentFactionIndex;
+                            while (factionIndex != currentFactionIndex) {
+                                if (!factions[factionIndex].dead) {
+                                    currentFactionIndex = factionIndex;
+                                    break;
+                                }
+                                factionIndex = (factionIndex + 1) % factions.length;;
+                            }
+
+                            if (factionIndex === originalFactionIndex) {
+                                // All factions are dead.  That's so
+                                // impossible that control will never make it
+                                // here.
+                                console.error("AiPlayer.play(): Internal error: All factions in this simulated game are dead.  This is impossible.  Abandoning the simulation.");
+                                return result;
+                            }
+
+                        } else {
+
+                            // We found another robot in this faction to go in
+                            // our stead.
+                            currentFaction.currentRobotIndex = index;
+                        }
+
+                        // This turn was a waste, but let's proceed with the
+                        // next turn.  Because we don't want to waste the
+                        // finite number of turns that we have been allotted,
+                        // we decrement the loop variable to roll back the
+                        // clock.
+                        //
+                        // Aye, it's a dirty trick, but I'd be doing the same
+                        // thing if this were a while loop instead of a for loop.
+                        i -= 1;
+
+                    } // end (if we have discovered, to our chagrin, that the current faction's current robot has already met its maker)
+
+                    // Check for endgame.
+                    let livingFactions = 0;
+                    let mostRecentSurvivingFaction = "";
+                    let mostRecentSurvivingFactionRobots = [];
+                    for (let j = 0; j < factions.length; ++j) {
+                        if (!factions[j].dead) {
+                            livingFactions += 1;
+                            mostRecentSurvivingFaction = factions[j].name;
+                            mostRecentSurvivingFactionRobots = factions[j].robots;
+                        }
+                    }
+                    if (livingFactions === 1) {
+                        // We have a winner!
+                        // console.debug("AiPlayer.play() [simulation mode]: %s has won game #%d.", mostRecentSurvivingFaction, gamesPlayed);
+                        result.statistics.totalGamesWon[mostRecentSurvivingFaction] += 1;
+                        result.statistics.averageTurnsToWin[mostRecentSurvivingFaction] += (i + 1);
+                        result.winningFaction = mostRecentSurvivingFaction;
+                        result.survivingRobots = mostRecentSurvivingFactionRobots.filter(function(robot) {
+                            return (robot.hitpoints > 0);
+                        });
+                        break;
+                    }
+
+                    // Next faction.
+                    currentFactionIndex = (currentFactionIndex + 1) % factions.length;
+
+                } // end (for each turn in the current simulated game)
+
+                ////////////////////////////
+                // End of simulated game. //
+                ////////////////////////////
+                gamesPlayed += 1;
+                result.statistics.averageGameDurationMilliseconds += (Date.now() - startTimeMilliseconds);
+
+                // Cleanup.
+                for (let i = 0; i < factions.length; ++i) {
+                    for (let j = 0; j < factions[i].robots.length; ++j) {
+                        factions[i].robots[j].unregister();
+                    }
+                }
+
+                // How many more games do we need to play?
+                if (playStyle === AiPlayer.PlayStyleSimulation) {
+                    // Just one.
+                    simulationEnded = true;
+                } else {
+                    // Potentially hundreds.
+                    let simulationMillisecondsElapsed = Date.now() - simulationStartTimeMilliseconds;
+                    if (simulationMillisecondsElapsed > AiPlayer.MonteCarloSimulationTimeMilliseconds) {
+                        simulationEnded = true;
+                    }
+                }
+            } // end (while the simulation has not ended)
+
+            // Compile final statistics.
+            result.statistics.averageGameDurationMilliseconds          /= gamesPlayed;
+            for (let i = 0, factions = controller.getGameFactions(); i < factions.length; ++i) {
+                result.statistics.victoryProbability[factions[i]]      = result.statistics.totalGamesWon[factions[i]] / gamesPlayed;
+                result.statistics.averageDamageDealt[factions[i]]      /= gamesPlayed;
+                result.statistics.averageDamagePrevented[factions[i]]  /= gamesPlayed;
+                result.statistics.averageDamageTaken[factions[i]]      /= gamesPlayed;
+                result.statistics.averageTargetsDestroyed[factions[i]] /= gamesPlayed;
+
+                if (result.statistics.totalGamesWon[factions[i]] > 0) {
+                    result.statistics.averageTurnsToWin[factions[i]]   /= result.statistics.totalGamesWon[factions[i]];
+                }
+            }
+            return result;
+
+        } // end (if we're using a simulation playstyle)
+
+
+
         return result;
     };
 
@@ -851,6 +1117,10 @@ function AiPlayer(factionName, controller, view) {
     // Possible values for the playStyle argument in AiPlayer.play().
     if (!AiPlayer.hasOwnProperty("PlayStyleNormal")) {
         AiPlayer.PlayStyleNormal = "PlayStyleNormal";
+        AiPlayer.PlayStyleSimulation = "PlayStyleSimulation";
+        AiPlayer.PlayStyleMonteCarlo = "PlayStyleMonteCarlo";
+
+        AiPlayer.MonteCarloSimulationTimeMilliseconds = 750;
     }
 
 

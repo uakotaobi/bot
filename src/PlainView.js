@@ -1075,8 +1075,9 @@ function PlainView(controller) {
             if (PlainView.dialogIdStack.length === 0) {
                 console.error("PlainView.removeDialog(): There is no " +
                               "topmost dialog to remove.");
+            } else {
+                dialogId = PlainView.dialogIdStack.pop();
             }
-            dialogId = PlainView.dialogIdStack.pop();
         } else {
             let index = PlainView.dialogIdStack.indexOf(dialogId);
 
@@ -2406,10 +2407,22 @@ function PlainView(controller) {
     // responsible for getting this function called; our job is to remove that
     // dialog, it having now served its purpose.
     //
+    // The turnsToAutomate argument, which defaults to 0, exists only for the
+    // benefit of AiPlayer.play().  If it is a positive number, it causes
+    // causes an AiPlayer to execute the next turn regardless of the faction
+    // type (ordinarily, human faction types cause human dialogs to appear and
+    // make the game wait for human input.)  The turnsToAutomate argument is
+    // passed verbatim into AiPlayer.playOneRound(), which decreases its value
+    // by 1 and sets this function up to be called again.  This "recursive"
+    // behavior allows the computer to take over the entire game for a given
+    // number of rounds.
+    //
     // Remember, this function is not the onclick handler itself -- it
     // generates one.
-    this.createAdvanceTurnOnClickHandler = function(view, dialogId) {
+    this.createAdvanceTurnOnClickHandler = function(view, dialogId, turnsToAutomate) {
         return function() {
+            turnsToAutomate = turnsToAutomate || 0;
+
             // Just in case we're the handler for a dialog and there's no
             // onclick handler on us for whatever reason, we can take care of
             // removing ourselves.
@@ -2452,16 +2465,17 @@ function PlainView(controller) {
                 controller.nextRobot();
                 view.updateRobots();
 
-                if (controller.getFactionType(controller.getCurrentRobot().faction) === "human") {
+                if (controller.getFactionType(controller.getCurrentRobot().faction) === "human" && turnsToAutomate <= 0) {
                     // If the now-current player is a human, show the next
                     // dialog the human should see (namely, the "it's your
                     // turn now" dialog.)
                     view.showNextDialogOrAdvanceTurn();
                 } else {
-                    // If the now-current player is an AI, let an AI player
-                    // handle it.
+                    // Either the now-current player is an AI or the game is
+                    // in AI-takeover mode (AiPlayer.PlayStyleNormal.)  Either
+                    // way, let an AI player handle the next turn.
                     let aiPlayer = new AiPlayer(controller.getCurrentRobot().faction, controller, view);
-                    aiPlayer.playOneRound(true);
+                    aiPlayer.playOneRound(true, turnsToAutomate);
                 }
 
             } // end (if the game isn't over yet)
