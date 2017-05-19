@@ -124,7 +124,7 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
         let key = String.format("{0}/{1}", score, multiplier);
 
         for (let i = 0; i < factions.length; ++i) {
-            let aiPlayer = new AiPlayer(factions[i], controller, null);
+            let aiPlayer = new AiPlayer(controller, null);
 
             // Create the second-level hashtable if it doesn't exist.
             if (!(factions[i] in factionComputerForces)) {
@@ -1234,7 +1234,7 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
         } else {
             // If it's an AI, perform the move at once and pop up a dialog box to
             // wait for the user to continue.
-            let aiPlayer = new AiPlayer(controller.getCurrentRobot().faction, controller, view);
+            let aiPlayer = new AiPlayer(controller, view);
             aiPlayer.playOneRound();
         }
 

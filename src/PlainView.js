@@ -2474,7 +2474,7 @@ function PlainView(controller) {
                     // Either the now-current player is an AI or the game is
                     // in AI-takeover mode (AiPlayer.PlayStyleNormal.)  Either
                     // way, let an AI player handle the next turn.
-                    let aiPlayer = new AiPlayer(controller.getCurrentRobot().faction, controller, view);
+                    let aiPlayer = new AiPlayer(controller, view);
                     aiPlayer.playOneRound(true, turnsToAutomate);
                 }
 

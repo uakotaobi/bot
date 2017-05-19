@@ -104,7 +104,7 @@ function Game() {
         } else {
             // If it's an AI, perform the move at once and pop up a dialog box to
             // wait for the user to continue.
-            let aiPlayer = new AiPlayer(controller.getCurrentRobot().faction, controller, view);
+            let aiPlayer = new AiPlayer(controller, view);
             aiPlayer.playOneRound();
         }
     };

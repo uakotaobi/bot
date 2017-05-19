@@ -22,7 +22,7 @@
 // annoying for a human opponent.                                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-function AiPlayer(factionName, controller, view) {
+function AiPlayer(controller, view) {
     "use strict";
 
     // -----------------------------------------------------------------------
@@ -467,7 +467,7 @@ function AiPlayer(factionName, controller, view) {
                 controller.getFactionIcon(ourBot.faction) + "\")";
             turnDialog.setAttribute("class", "dialog turn enemy red");
             turnDialog.querySelector(".title").style.display = "block";
-            turnDialog.querySelector(".title h2").textContent = this.faction;
+            turnDialog.querySelector(".title h2").textContent = ourBot.faction;
 
             if (turnsToAutomate <= 0) {
                 // Clicking will close our dialog and start the next turn.
@@ -866,7 +866,7 @@ function AiPlayer(factionName, controller, view) {
                 // forcibly played by the AI.  All the human will be able to
                 // do is click to dismiss the intermediate dialogs.
 
-                let aiPlayer = new AiPlayer(controller.getCurrentRobot().faction, controller, view);
+                let aiPlayer = new AiPlayer(controller, view);
                 aiPlayer.playOneRound(true, turns);
             }
 
@@ -1169,11 +1169,6 @@ function AiPlayer(factionName, controller, view) {
         return result;
     };
 
-
-    // -----------------------------------------------------------------------
-    // Public member variables (per-instance variables.)
-
-    this.faction = factionName;
 
     // -----------------------------------------------------------------------
     // Public static variables (class-level variables.)

@@ -22,17 +22,20 @@ JavaScript console on your web browser.
 1. Make the computer play for you:
    1. Create a stateless AI player object:
       ```javascript
-      a = new AiPlayer("The Star Alliance", g.controller(), g.view());
+      a = new AiPlayer(g.controller(), g.view());
       ```
    2. During your turn:
       ```javascript
-      a.playOneRound(true);
+      a.play(AiPlayer.PlayStyleNormal, 1);
       ```
 
+      You can, of course, pass in a higher value than 1 if you want the AI player
+      to control the next few turns of the game.  Pass in 0 to make the AI
+      player play each side until the end of the game.
 2. Ask the computer whom to shoot:
    1. Create a stateless AI player object:
       ```javascript
-      a = new AiPlayer("The Star Alliance", g.controller(), g.view());
+      a = new AiPlayer(g.controller(), g.view());
       ```
    2. During your turn:
       ```javascript
@@ -46,7 +49,31 @@ JavaScript console on your web browser.
    The computer player's _okay_, though it tends to treat damaged Bots the
    same way a hungry shark treats blood in the water.
 
-3. Test an explosion sequence:
+3. Ask the computer to gaze into the future with its crystal ball:
+
+   1. Create a stateless AI player object:
+      ```javascript
+      a = new AiPlayer(g.controller(), g.view());
+      ```
+   2. During your turn:
+      ```javascript
+      result = a.play(AiPlayer.PlayStyleMonteCarlo);
+      faction = g.controller().getCurrentRobot().faction
+
+      result.statistics.victoryProbability[faction]       // What the computer thinks your chances of winning are, between 0 and 1
+      result.statistics.survivalProbabilities[faction][0] // What the computer thinks your first robot's chances are of surviving the match
+      result.statistics.averageDamageTaken[faction]       // How much damage the computer thinks you'll take (compare to your total hitpoints.)
+      ```
+
+      There are other interesting data in `result.statistics` that you may
+      wish to examine.
+
+      The faster your browser's JavaScript engine, the more games will be
+      played before the timeout.  If you're willing to wait for a more
+      accurate measure, increase
+      `AiPlayer.MonteCarloSimulationTimeMilliseconds`.
+
+4. Test an explosion sequence:
    First, choose a robot.
    ```javascript
    robot = g.controller().getCurrentRobot()                     // The robot whose turn it currently is
@@ -65,7 +92,7 @@ JavaScript console on your web browser.
    You can also pass the special string "jump" as the second argument to make
    the robot jump rather than explode.
 
-4. Give yourself unfair reinforcements:
+5. Give yourself unfair reinforcements:
 
    ```javascript
    robot = new Robot("scarab")
