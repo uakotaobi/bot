@@ -63,8 +63,7 @@ function GameController() {
                 break;
         }
 
-        const min = 1, max = 3;
-        const color = Math.floor(Math.random() * (max - min + 1)) + min;
+        const color = random(1, 3);
         const diceName = prefix + "-" + color;
 
         span.setAttribute("class", "formula dice " + diceName);
@@ -777,7 +776,7 @@ function GameController() {
         // Randomize the faction start order.
         let min = 0;
         let max = playingFactions.length - 1;
-        currentFactionIndex = (Math.floor(Math.random() * (max - min + 1)) + min);
+        currentFactionIndex = random(min, max);
         playingFactions[currentFactionIndex].currentRobotIndex = 0;
 
         // The first robot has no weapon or enemy selected yet.

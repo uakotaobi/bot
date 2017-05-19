@@ -21,7 +21,9 @@
 /////////////////////////////////////////////////////////////////
 
 // An arbitrary object-cloning function taken from
-// http://stackoverflow.com/a/1042676.
+// http://stackoverflow.com/a/1042676.  Note that this function performs an
+// actual cloning operation if 'to' is null; otherwise, it merely copies those
+// attributes of 'from' which 'to' does not have yet.
 //
 // extends 'from' object with members from 'to'. If 'to' is null, a deep clone of 'from' is returned
 function extend(from, to)
@@ -39,11 +41,19 @@ function extend(from, to)
         from.constructor == String || from.constructor == Number || from.constructor == Boolean)
         return new from.constructor(from);
 
+    let cloning = (to === null);
     to = to || new from.constructor();
+
+    if (from.constructor == Robot && cloning) {
+        // Right now, 'to' is a Munchkin (like any new Robot() with no args.)
+        // We don't need the Munchkin itself, and we are in fact about to
+        // overwrite it, so it makes sense to unregister it beforehand.
+        to.unregister();
+    }
 
     for (var name in from)
     {
-        to[name] = typeof to[name] == "undefined" ? extend(from[name], null) : to[name];
+        to[name] = (typeof to[name] == "undefined" || cloning) ? extend(from[name], null) : to[name];
     }
 
     return to;

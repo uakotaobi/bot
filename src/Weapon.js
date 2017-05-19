@@ -76,7 +76,7 @@ function Weapon(weaponType) {
             longName     : "Short-Range Missile, Model A",
             shortName    : "SRM/A",
             class        : "heavy",
-            damage       : "1d20", // EV=10.5
+            damage       : "1d20", // EV=10.5, but with all extremes to be expected
             ammoPerRound : 1,
             ammo         : 3
         },
@@ -84,7 +84,7 @@ function Weapon(weaponType) {
             longName       : "Short-Range Missile, Model B",
             shortName      : "SRM/B",
             class          : "heavy",
-            damage         : "3d6", // EV=10.5
+            damage         : "3d6", // EV=10.5, but with the average being more common
             ammoPerRound   : 1,
             ammo           : 12
         },

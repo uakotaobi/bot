@@ -723,6 +723,59 @@ function AiPlayer(factionName, controller, view) {
     };
 
 
+    // Helper function for AiPlayer.play()'s PlayStyleSimulation and
+    // PlayStyleMonteCarlo playStyles -- this function is responsible for
+    // advancing to the next turn in the simulation(s).
+    //
+    // Returns the index of the next living robot in the given faction object
+    // *after* the faction's currentRobotIndex.  If the currentRobotIndex is
+    // returned back to you, that's your sign that there's only one living
+    // robot left in the faction; if -1 is returned, that means the whole
+    // faction is dead.
+
+    let findNextLivingRobot = function(faction) {
+        for (let index = (faction.currentRobotIndex + 1) % faction.robots.length;
+             index != faction.currentRobotIndex;
+             index = (index + 1) % faction.robots.length) {
+
+            if (faction.robots[index].hitpoints > 0) {
+                return index;
+            }
+        }
+
+        // We've wrapped around to the beginning, so at *best*,
+        // faction.robots[faction.currentRobotIndex] is the last
+        // living robot in the faction.
+        if (faction.robots[faction.currentRobotIndex].hitpoints > 0) {
+            return faction.currentRobotIndex;
+        }
+
+        // Even the _current_ robot's dead!
+        return -1;
+    };
+
+
+    // Helper function for AiPlayer.play()'s PlayStyleSimulation and
+    // PlayStyleMonteCarlo playStyles -- this function determines whether this
+    // point in the simulation represents the beginning of the real game (you
+    // know--the game whose outcome we are simulating.)
+    //
+    // How do we tell that when we have nothing like a "global turn
+    // counter" in the controller?  Simple: if every Bot in the
+    // allRobots array has its original hitpoints, we might as well
+    // *call* it the beginning of the game since nothing significant
+    // has happened yet!
+    let isStartOfGame = function(allRobots) {
+        for (let i = 0; i < allRobots.length; ++i) {
+            let robot = allRobots[i];
+            if (robot.hitpoints < Robot.dataTable[robot.internalName].hitpoints) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+
     // Using the current game as a starting condition, plays for the given
     // number of turns using the turn-playing AI and returns a combat
     // summary.
@@ -768,7 +821,9 @@ function AiPlayer(factionName, controller, view) {
             winningFaction: "",
             survivingRobots: [],
             statistics: {
+                totalGamesPlayed: 0,
                 averageGameDurationMilliseconds: 0,
+
                 // These hash tables all use faction names as keys and
                 // floating-point numbers or integers as values.
                 victoryProbability:      { }, // The most important statistic: games we won divided by the total games played.
@@ -777,7 +832,8 @@ function AiPlayer(factionName, controller, view) {
                 averageDamagePrevented:  { }, // By armor or jumping.
                 averageDamageTaken:      { },
                 averageTargetsDestroyed: { }, // Our faction's average kill count.
-                averageTurnsToWin:       { }  // How many turns it took us to win (when we did win.)
+                averageTurnsToWin:       { }, // How many turns it took us to win (when we did win.)
+                survivalProbabilities:   { }  // An array of N probabilities that faction.robots[N] lives through the match.
             }
         };
 
@@ -832,36 +888,6 @@ function AiPlayer(factionName, controller, view) {
                 return result;
             }
 
-            // Helper function for advancing to the next turn in the
-            // simulation(s).
-            //
-            // Returns the index of the next living robot in the given faction
-            // object *after* the faction's currentRobotIndex.  If the
-            // currentRobotIndex is returned back to you, that's your sign
-            // that there's only one living robot left in the faction; if -1
-            // is returned, that means the whole faction is dead.
-
-            let findNextLivingRobot = function(faction) {
-                for (let index = (faction.currentRobotIndex + 1) % faction.robots.length;
-                     index != faction.currentRobotIndex;
-                     index = (index + 1) % faction.robots.length) {
-
-                    if (faction.robots[index].hitpoints > 0) {
-                        return index;
-                    }
-                }
-
-                // We've wrapped around to the beginning, so at *best*,
-                // faction.robots[faction.currentRobotIndex] is the last
-                // living robot in the faction.
-                if (faction.robots[faction.currentRobotIndex].hitpoints > 0) {
-                    return faction.currentRobotIndex;
-                }
-
-                // Even the _current_ robot's dead!
-                return -1;
-            };
-
             // Reset statistics.
             for (let i = 0, factions = controller.getGameFactions(); i < factions.length; ++i) {
                 result.statistics.victoryProbability[factions[i]]      = 0;
@@ -871,8 +897,8 @@ function AiPlayer(factionName, controller, view) {
                 result.statistics.averageDamageTaken[factions[i]]      = 0;
                 result.statistics.averageTargetsDestroyed[factions[i]] = 0;
                 result.statistics.averageTurnsToWin[factions[i]]       = 0;
+                result.statistics.survivalProbabilities[factions[i]]   = [];
             }
-
 
             let gamesPlayed = 0;
             let simulationStartTimeMilliseconds = Date.now();
@@ -899,15 +925,24 @@ function AiPlayer(factionName, controller, view) {
                         // Copy the weapons, hitpoints, ammo, faction -- everything.
                         //
                         // The ID gets copied, too, so we fix that.
-                        let clonedRobot   = new Robot(robots[j].internalName);
-                        let clonedRobotId = clonedRobot.id;
-                        extend(robots[j], clonedRobot);
-                        clonedRobot.id    = clonedRobotId;
+                        let tempRobot = new Robot(robots[j].internalName);
+                        let id = tempRobot.id;
+                        tempRobot.unregister();
+                        let clonedRobot = extend(robots[j], null);
+                        clonedRobot.id = id;
+                        clonedRobot.register();
                         faction.robots.push(clonedRobot);
                         allRobots.push(clonedRobot);
                     }
 
                     factions.push(faction);
+                }
+
+                // If -- and only if! -- we are starting this simulation at
+                // turn #0 of the actual game, randomize the starting order to
+                // make the simulation more realistic.
+                if (isStartOfGame(allRobots)) {
+                    currentFactionIndex = random(0, factions.length - 1);
                 }
 
                 //////////////////////////////////
@@ -991,25 +1026,6 @@ function AiPlayer(factionName, controller, view) {
                             // This whole faction's dead!
                             currentFaction.dead = true;
 
-                            // Schedule another living faction to go next.
-                            let factionIndex = (currentFactionIndex + 1) % factions.length;
-                            let originalFactionIndex = currentFactionIndex;
-                            while (factionIndex != currentFactionIndex) {
-                                if (!factions[factionIndex].dead) {
-                                    currentFactionIndex = factionIndex;
-                                    break;
-                                }
-                                factionIndex = (factionIndex + 1) % factions.length;;
-                            }
-
-                            if (factionIndex === originalFactionIndex) {
-                                // All factions are dead.  That's so
-                                // impossible that control will never make it
-                                // here.
-                                console.error("AiPlayer.play(): Internal error: All factions in this simulated game are dead.  This is impossible.  Abandoning the simulation.");
-                                return result;
-                            }
-
                         } else {
 
                             // We found another robot in this faction to go in
@@ -1027,7 +1043,8 @@ function AiPlayer(factionName, controller, view) {
                         // thing if this were a while loop instead of a for loop.
                         i -= 1;
 
-                    } // end (if we have discovered, to our chagrin, that the current faction's current robot has already met its maker)
+                    } // end (if we have discovered, much to our chagrin, that the current faction's current robot has already met its maker)
+
 
                     // Check for endgame.
                     let livingFactions = 0;
@@ -1040,7 +1057,16 @@ function AiPlayer(factionName, controller, view) {
                             mostRecentSurvivingFactionRobots = factions[j].robots;
                         }
                     }
-                    if (livingFactions === 1) {
+
+                    if (livingFactions === 0) {
+
+                        // All factions are dead.  That's so impossible that
+                        // control will never make it here.
+                        console.error("AiPlayer.play(): Internal error: All factions in this simulated game are dead.  This is impossible.  Abandoning the simulation.");
+                        return result;
+
+                    } else if (livingFactions === 1) {
+
                         // We have a winner!
                         // console.debug("AiPlayer.play() [simulation mode]: %s has won game #%d.", mostRecentSurvivingFaction, gamesPlayed);
                         result.statistics.totalGamesWon[mostRecentSurvivingFaction] += 1;
@@ -1049,11 +1075,43 @@ function AiPlayer(factionName, controller, view) {
                         result.survivingRobots = mostRecentSurvivingFactionRobots.filter(function(robot) {
                             return (robot.hitpoints > 0);
                         });
+                        // Update survival probabilities (these are per-robot.)
+                        for (let j = 0; j < factions.length; ++j) {
+                            let probabilities = result.statistics.survivalProbabilities[factions[j].name];
+                            while (probabilities.length < factions[j].robots.length) {
+                                // Grow the array if necessary.  Only happens once per faction.
+                                probabilities.push(0);
+                            }
+                            for (let k = 0; k < factions[j].robots.length; ++k) {
+                                if (factions[j].robots[k].hitpoints > 0) {
+                                    probabilities[k] += 1;
+                                }
+                            }
+                        }
                         break;
                     }
 
-                    // Next faction.
-                    currentFactionIndex = (currentFactionIndex + 1) % factions.length;
+                    // Next *living* faction.  (We know there are at least two
+                    // since we just checked for endgame.)
+                    let oldFactionIndex = currentFactionIndex;
+                    for (let factionIndex = (currentFactionIndex + 1) % factions.length;
+                         factionIndex != currentFactionIndex;
+                         factionIndex = (factionIndex + 1) % factions.length) {
+
+                        if (!factions[factionIndex].dead) {
+                            currentFactionIndex = factionIndex;
+                            break;
+                        }
+                    }
+                    if (currentFactionIndex === oldFactionIndex) {
+                        // No other factions are alive.  This should never
+                        // happen because we *just* checked for endgame,
+                        // meaning there have to be at least two living
+                        // factions.
+                        console.error("AiPlayer.play() [simulation mode - %d turns to go]: Internal error: can't find any other living factions to go next.  That implies that the endgame check failed, which should never happen.  Abandoning the simulation.",
+                                      turns - i);
+                        return result;
+                    }
 
                 } // end (for each turn in the current simulated game)
 
@@ -1083,7 +1141,9 @@ function AiPlayer(factionName, controller, view) {
                 }
             } // end (while the simulation has not ended)
 
+
             // Compile final statistics.
+            result.statistics.totalGamesPlayed                          = gamesPlayed;
             result.statistics.averageGameDurationMilliseconds          /= gamesPlayed;
             for (let i = 0, factions = controller.getGameFactions(); i < factions.length; ++i) {
                 result.statistics.victoryProbability[factions[i]]      = result.statistics.totalGamesWon[factions[i]] / gamesPlayed;
@@ -1095,12 +1155,16 @@ function AiPlayer(factionName, controller, view) {
                 if (result.statistics.totalGamesWon[factions[i]] > 0) {
                     result.statistics.averageTurnsToWin[factions[i]]   /= result.statistics.totalGamesWon[factions[i]];
                 }
+
+                for (let j = 0, probabilities = result.statistics.survivalProbabilities[factions[i]], robots = controller.getGameRobots(factions[i]);
+                     j < robots.length;
+                     ++j) {
+                    probabilities[j]                                   /= gamesPlayed;
+                }
             }
             return result;
 
         } // end (if we're using a simulation playstyle)
-
-
 
         return result;
     };
