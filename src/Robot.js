@@ -111,7 +111,7 @@ function Robot(robotType) {
                 longName     : "Nomad",
                 idPattern    : "[100-999]-[A-Z][A-Z][A-Z][A-Z][A-Z]",
                 class        : "medium",
-                arsenal      : ["longrangemissile", "mediumlaser", "srm-nomad"],
+                arsenal      : ["midrangemissile", "mediumlaser", "srm-nomad"],
                 hitpoints    : 30,
                 armor        : "2",
                 jump         : false,
@@ -131,7 +131,7 @@ function Robot(robotType) {
                 longName     : "Stormcrow",
                 idPattern    : "GM1550-[0001-9999][a-z]",
                 class        : "medium",
-                arsenal      : ["ac-stormcrow", "ac-stormcrow", "midrangemissile", "mediumlaser"],
+                arsenal      : ["ac-stormcrow", "longrangemissile", "mediumlaser"],
                 hitpoints    : 25,
                 armor        : "",
                 jump         : true,
@@ -203,7 +203,7 @@ function Robot(robotType) {
                 longName     : "Imp",
                 idPattern    : "[110-119]:[100-999]-[10-99][a-b]",
                 class        : "heavy",
-                arsenal      : ["cluster", "cluster", "cluster", "cluster", "ppc", "shortrangemissile"],
+                arsenal      : ["cluster", "cluster", "ppc", "shortrangemissile"],
                 hitpoints    : 40,
                 armor        : "1d6",
                 jump         : false,
@@ -253,6 +253,26 @@ function Robot(robotType) {
                     " will <strong>barely make a dent</strong> in the GM2900's" +
                     " armor, and that its offensive capabilities are" +
                     " <strong>not to be trifled with</strong>.</p>"
+            },
+            "manowar"        : {
+                modelNumber  : "Fujitsu Laboratories F-1000",
+                longName     : "Man O’ War",
+                idPattern    : "M1[a-d]-[0000-9999]-[00-99]",
+                class        : "assault",
+                arsenal      : ["ac5", "ppc", "longrangemissile", "longrangemissile"],
+                hitpoints    : 60,
+                armor        : "1d8",
+                jump         : false,
+                speed        : 7,
+                score        : 55,
+                image        : "./assets/images/bots/700px-SpadeOfAce - Small Mech.png",
+                description  : "<p>The aptly-named Man O’ War is specifically" +
+                    " designed to counter other Bots of the same class.  Its" +
+                    " tremendously destructive Autocannon shells store enough" +
+                    " energy to <strong>vaporize</strong> smaller units.  Their" +
+                    " weakness lies in their armor: because it is not evenly" +
+                    " distributed around the chassis, some parts of the F-1000" +
+                    " are less protected than others.</p>"
             }
         };
     }

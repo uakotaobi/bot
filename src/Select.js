@@ -827,7 +827,9 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
 
         let robotData = Robot.dataTable[internalRobotName];
 
-        centerPanel.querySelector(".stats .bot-name").textContent = String.format("{0} {1}", robotData.modelNumber, robotData.longName);
+        centerPanel.querySelector(".stats .bot-name").innerHTML = String.format("<span class='make'>{0}</span> <span class='model'>{1}</span>",
+                                                                                robotData.modelNumber,
+                                                                                robotData.longName);
 
         let classString = String.format("{0}{1}",
                                         robotData.class[0].toUpperCase(),
@@ -1070,24 +1072,35 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
 
         let startTimeMilliseconds    = Date.now();
         let pageBackgroundUrlString  = window.getComputedStyle(document.querySelector("body > .select-a-mech")).backgroundImage; // url("http://example.com")
-        let pageBackgroundUrl        = pageBackgroundUrlString.substr(5, pageBackgroundUrlString.length - 7);                    // http://example.com
-        let pageBackgroundImage      = new Image();
-        pageBackgroundImage.src      = pageBackgroundUrl;
+        let pageBackgroundImage      = preload(pageBackgroundUrlString);
+        //let pageBackgroundUrl        = pageBackgroundUrlString.substr(5, pageBackgroundUrlString.length - 7);                    // http://example.com
+        //let pageBackgroundImage      = new Image();
+        //pageBackgroundImage.src      = pageBackgroundUrl;
         let panelBackgroundUrlString = window.getComputedStyle(document.querySelector(".select-a-mech .panel.left")).backgroundImage;
-        let panelBackgroundUrl       = panelBackgroundUrlString.substr(5, panelBackgroundUrlString.length - 7);
-        let panelBackgroundImage     = new Image();
-        panelBackgroundImage.src     = panelBackgroundUrl;
+        let panelBackgroundImage     = preload(panelBackgroundUrlString);
+        //let panelBackgroundUrl       = panelBackgroundUrlString.substr(5, panelBackgroundUrlString.length - 7);
+        //let panelBackgroundImage     = new Image();
+        //panelBackgroundImage.src     = panelBackgroundUrl;
 
         if (pageBackgroundUrlString  !== "none" && pageBackgroundImage.complete &&
             panelBackgroundUrlString !== "none" && panelBackgroundImage.complete) {
             console.debug("Select/waitUntilBackgroundIsLoaded(): Backgrounds loaded in %.2f seconds.  Initiating remaining preloads.",
-                          pageBackgroundUrl,
-                          panelBackgroundUrl,
                           (Date.now() - startTimeMilliseconds)/1000.0);
 
             Robot.preloadImages();
             SpriteBase.preloadImages();
-            // TODO: Preload success and failure background images.
+
+            let adornmentImageUrlString = window.getComputedStyle(document.querySelector(".select-a-mech .stats .adornment")).backgroundImage;
+            preload(adornmentImageUrlString);
+
+            // TODO: Instead of hard-coding these file names, parse them from
+            // getComputerStyle().
+
+            let successImagePath = "./assets/images/backgrounds/[CC0] Rawdanitsu - Another Space Backgrounds (space-background-10) [OpenGameArt]-85%25.jpg";
+            preload(successImagePath);
+
+            let failureImagePath = "./assets/images/backgrounds/[CC0] Cuzco - Space background (bg5) [OpengameArt]-85%25.jpg";
+            preload(failureImagePath);
 
         } else {
             window.setTimeout(waitUntilBackgroundIsLoaded, 100);
@@ -1261,7 +1274,7 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
         switch (keyboardEvent.key) {
             case " ":
             case "Enter":
-                this.launchGame();
+                that.launchGame();
                 break;
         }
     };

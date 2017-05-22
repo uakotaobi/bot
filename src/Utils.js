@@ -79,16 +79,57 @@ if (!String.format) {
 // Just returns a random integer between a and b, inclusive.
 function random(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-
 // Assigns the given path to an in-memory Image object.  The Image will load
 // the resource asynchronously, and you can check on its progress by checking
 // myImage.complete.
 //
-// We understand HTTP and HTTPS URIs, relative paths, and url("http://example.net/foo/bar").
+// We understand HTTP and HTTPS URIs, relative paths, and
+// url("http://example.net/foo/bar") strings.
+//
+// Returns the Image object if the imagePath could be parsed, and null
+// otherwise.
 function preload(imagePath) {
+
+    const urlExpressionRegex = /^url\([\'\"](.*)[\'\"]\)$/i;
+    const fileRegex = /^file:\/\/.*$/i;
+    const relativePathRegex = /^.{1,2}\/.*/i;
 
     // This is @stephenhay's regex from
     // https://mathiasbynens.be/demo/url-regex, with the forward slashes in
     // the middle escaped appropriately.
     const uriRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
+
+    let uri = "";
+
+    let urlExpressionMatch = imagePath.match(urlExpressionRegex);
+    if (urlExpressionMatch !== null) {
+        uri = urlExpressionMatch[1];
+    } else {
+        let uriRegexMatch = imagePath.match(uriRegex);
+        if (uriRegexMatch !== null) {
+            uri = uriRegexMatch[0];
+        } else {
+            let fileRegexMatch = imagePath.match(fileRegex);
+            if (fileRegexMatch !== null) {
+                uri = fileRegexMatch[0];
+            } else {
+                let relativePathRegexMatch = imagePath.match(relativePathRegex);
+                if (relativePathRegexMatch !== null) {
+                    uri = relativePathRegexMatch[0];
+                }
+            }
+        }
+    }
+
+    if (uri === "") {
+        console.warn("Cannot preload \"%s\" because it is neither a CSS url()" +
+                     " expression, a relative path, nor a valid file://," +
+                     " http://, https://, or ftp:// URI.",
+                     imagePath);
+        return null;
+    }
+
+    let img = new Image;
+    img.src = uri;
+    return img;
 }

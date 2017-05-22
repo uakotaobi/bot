@@ -46,7 +46,7 @@ function PlainView(controller) {
 
 
     // When we're positioning the robots, we position them in a virtual grid
-    // in order to maximize the are allotted to each bot.  The faction divs
+    // in order to maximize the area allotted to each bot.  The faction divs
     // are positioned the same way.
     //
     // What should size of these divs be?  Well, that depends on the number of
@@ -72,7 +72,16 @@ function PlainView(controller) {
         13: [0.25,   0.25],
         14: [0.25,   0.25],
         15: [0.25,   0.25],
-        16: [0.25,   0.25]
+        16: [0.20,   0.25],
+        17: [0.20,   0.25],
+        18: [0.20,   0.25],
+        19: [0.20,   0.25],
+        20: [0.20,   0.25],
+        21: [0.20,   0.20],
+        22: [0.20,   0.20],
+        23: [0.20,   0.20],
+        24: [0.20,   0.20],
+        25: [0.20,   0.20]
     };
 
     // -----------------------------------------------------------------------
@@ -2632,7 +2641,6 @@ function PlainView(controller) {
                                   controller.getFactionIcon(controller.winningFaction()),
                                   "./assets/images/backgrounds/[CC0] Cuzco - Space background (bg5) [OpengameArt]-85%25.jpg");
                 content.style.display = "block";
-
             } else {
 
                 // A computer won a computer-only match.  Show the victory dialog.
@@ -2658,7 +2666,10 @@ function PlainView(controller) {
         let dialogId = dialog.getAttribute("id");
         dialog.querySelector(".overlay").onclick = this.createEndgameOnClickHandler(this, dialogId);
 
-        dialog.style.display = "block";
+        window.setTimeout(function() {
+            // Wait a short time for the content switch to take place before rendering.
+            dialog.style.display = "block";
+        }, 30);
     };
 
     return this;

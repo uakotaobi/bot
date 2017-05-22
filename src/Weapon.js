@@ -92,7 +92,7 @@ function Weapon(weaponType) {
             longName       : "Mid-Range Missile",
             shortName      : "MRM",
             class          : "medium",
-            damage         : "((2d4 - 2) * 1d4) + 1", // EV=8.5 -- toned down from its original 8.75 because that made it unusually strong for a medium weapon.
+            damage         : "2d6", // EV=7
             ammoPerRound   : 1,
             ammo           : 15
         },
@@ -105,12 +105,12 @@ function Weapon(weaponType) {
             ammo           : 30
         },
         "ac-stormcrow"     : {
-            longName       : "Autocannon 5-pack",
-            shortName      : "AC/5",
+            longName       : "Autocannon 20-pack",
+            shortName      : "AC/20",
             class          : "medium",
-            damage         : "1d8", // EV=4.5 (but used in pairs for 9)
-            ammoPerRound   : 1,
-            ammo           : 5
+            damage         : "(1d2 * 2d2) + (1d2 * 2d2)", // EV=9
+            ammoPerRound   : 2,
+            ammo           : 20
         },
         "ac10"             : {
             longName       : "Autocannon 10-pack",
@@ -119,6 +119,14 @@ function Weapon(weaponType) {
             damage         : "(1d2 * 1d6) + (1d2 * 1d6)", // EV=10.5, same as a 3D6!
             ammoPerRound   : 1,
             ammo           : 10
+        },
+        "ac5"             : {
+            longName       : "Autocannon 5-pack",
+            shortName      : "AC/5",
+            class          : "assault",
+            damage         : "(1d3 * 1d6) + (1d4 * 1d5)", // EV=14.5, stronger than the Gauss Gun
+            ammoPerRound   : 1,
+            ammo           : 5
         },
         "lightpulse"       : {
             longName       : "Light Impulse",
@@ -169,8 +177,8 @@ function Weapon(weaponType) {
             ammo           : 20
         },
         "arc"              : {
-            longName       : "Disruption Wave",
-            shortName      : "D. WAVE",
+            longName       : "Disruptor Beam",
+            shortName      : "D. BEAM",
             class          : "medium",
             damage         : "15 - 2d6", // EV=8
             ammoPerRound   : 0,
@@ -188,15 +196,15 @@ function Weapon(weaponType) {
             longName       : "Cluster Bomb Battery",
             shortName      : "CLUSTER",
             class          : "heavy",
-            damage         : "2d2", // Best used in packs of 4 or 6 (EV=12 or 15.)
-            ammoPerRound   : 4,
-            ammo           : 16
+            damage         : "7d2 - 4", // EV=6.5, but used in packs of 2 for 13.
+            ammoPerRound   : 7,
+            ammo           : 28
         },
         "gauss"            : {
             longName       : "Gauss Gun",
             shortName      : "GAUSS",
             class          : "assault",
-            damage         : "4d6", // EV=14; stronger than the EMF.
+            damage         : "4d6", // EV=14; stronger than the EMF (and the 3d8 Plama Grenade.)
             ammoPerRound   : 1,
             ammo           : 5
         },
