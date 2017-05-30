@@ -1991,6 +1991,7 @@ function PlainView(controller) {
         if (damageReport.originalDamage.damage > 30) { // EMF damage levels and above
             let n = Math.random();
             if (n > 0.75) {
+                // damageAdjective = "a <strong>resounding</strong> ";
                 damageAdjective = "an <strong>overwhelming</strong> ";
             } else if (n > 0.5) {
                 // damageAdjective = "an <strong>unbelievable</strong> ";
@@ -2009,11 +2010,10 @@ function PlainView(controller) {
             if (n > 0.75) {
                 damageAdjective = "just ";
             } else if (n > 0.5) {
+                // damageAdjective = "a paltry ";
                 damageAdjective = "a measly ";
             } else if (n > 0.25) {
-                // damageAdjective = "a rather pathetic ";
                 // damageAdjective = "a quite pathetic ";
-                // damageAdjective = "a disappointing ";
                 // damageAdjective = "a mere ";
                 // damageAdjective = "a meager ";
                 // damageAdjective = "an underwhelming ";
@@ -2021,37 +2021,61 @@ function PlainView(controller) {
             }
         }
 
-        let maxPossibleDamage =
-                Weapon.calculateDamage(damageReport.originalDamage.damageString,
-                                       Weapon.useMaximumValues).damage;
-        let expectedDamage =
-                Weapon.calculateDamage(damageReport.originalDamage.damageString,
-                                       Weapon.useExpectedValues).damage;
-        // Dealing the 75th percentile of damage for your damage curve
-        // (rounded up, of course) is worthy of at least minor praise.
-        let threshold = Math.ceil(expectedDamage + maxPossibleDamage)/2;
-        if (damageReport.originalDamage.damage >= threshold) {
-            // Okay, let's talk numbers:
-            //
-            // - The Cluster Bomb 4x is really an 8d2, and so has an expected
-            //   damage of 12 and a max damage of 16.  You're only
-            //   "impressive" at 14 or more, meaning you only get to miss two
-            //   coin flips out of 8 (a 13% chance of happening.)
-            //
-            // - A theoretical 1d6 + ((1d2 * 1d2) * (1d2 * 1d2)) has a max of
-            //   22, an expected damage of 3.5 + (1.5)^4 = 8.5625 (fairly
-            //   low--coins do that a lot), and would only be "impressive"
-            //   under this new heuristic if it dealt greater than
-            //   ceil(15.28125) damage, which it has a ~6% chance to do.
-            //
-            // - For a mundane amount of damage like the well-studied 3d6,
-            //   "impressive" is ceil(14.25) damage or more (about a 9% chance
-            //   of happening.)
-            damageAdjective = "a respectable ";
-            if (damageReport.originalDamage.damage > threshold) {
-                damageAdjective = "an impressive ";
+        if (damageAdjective === "" && Math.random() > 0.25) {
+            // These are some fallback adjectives we use in certain scenarios.
+
+            let maxPossibleDamage = Weapon.calculateDamage(damageReport.originalDamage.damageString,
+                                                           Weapon.useMaximumValues).damage;
+            let expectedDamage = Weapon.calculateDamage(damageReport.originalDamage.damageString,
+                                                        Weapon.useExpectedValues).damage;
+
+            // Dealing the 75th percentile of damage for your damage curve
+            // (rounded up, of course) is worthy of at least minor praise.
+            let upperThreshold = Math.ceil((expectedDamage + maxPossibleDamage)/2);
+            if (damageReport.originalDamage.damage >= upperThreshold) {
+                // Okay, let's talk numbers:
+                //
+                // - The Cluster Bomb 4x is really an 8d2, and so has an expected
+                //   damage of 12 and a max damage of 16.  You're only
+                //   "impressive" at 14 or more, meaning you only get to miss two
+                //   coin flips out of 8 (a 13% chance of happening.)
+                //
+                // - A theoretical 1d6 + ((1d2 * 1d2) * (1d2 * 1d2)) has a max of
+                //   22, an expected damage of 3.5 + (1.5)^4 = 8.5625 (fairly
+                //   low--coins do that a lot), and would only be "impressive"
+                //   under this new heuristic if it dealt greater than
+                //   ceil(15.28125) damage, which it has a ~6% chance to do.
+                //
+                // - For a mundane amount of damage like the well-studied 3d6,
+                //   "impressive" is ceil(14.25) damage or more (about a 9% chance
+                //   of happening.)
+                damageAdjective = "a respectable ";
+                if (damageReport.originalDamage.damage > upperThreshold) {
+                    damageAdjective = "an impressive ";
+                }
             }
-        }
+
+            let minPossibleDamage = Weapon.calculateDamage(damageReport.originalDamage.damageString,
+                                                           Weapon.useMinimumValues).damage;
+
+            // Similarly, dealing less than the 25th percentile of damage
+            // qualifies you for modest admonishment.
+            let lowerThreshold = Math.floor((minPossibleDamage + expectedDamage)/2);
+            if (damageReport.originalDamage.damage < lowerThreshold) {
+                let n = Math.random();
+                if (n > 0.6) {
+                    damageAdjective = "a rather disappointing ";
+                } else if (n > 0.3) {
+                    // damageAdjective = "a depressingly low ";
+                    damageAdjective = "a surprisingly low ";
+                } else {
+                    // damageAdjective = "a less-than-impressive ";
+                    // damageAdjective = "an admittedly bad ";
+                    damageAdjective = "an unimpressive ";
+                }
+            }
+        } // end (if we don't have a damage adjective yet and the system feels like adding one)
+
 
         // It's like Mad Libs with robots.
         let narrative = "";
@@ -2529,7 +2553,7 @@ function PlainView(controller) {
             for (let i = 0; i < robots.length; ++i) {
                 recalculateImageHeight(robots[i]);
             }
-        }, 6000);
+        }, 7000);
     };
 
 

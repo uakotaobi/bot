@@ -138,6 +138,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     width: 80%;
     /* height: 100%; */
 }
+.dialog.turn .content > table td { padding: 0; }
 .dialog.turn .logo {
     float: left;
     width: 20%;
@@ -147,7 +148,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     background-size: contain;
 }
 .dialog.turn .title { font-size: 0.8vw; }
-.dialog.turn.enemy .title { font-size: 1.2vw; }
+/*.dialog.turn.enemy .title { font-size: 1.2vw; }*/
 .dialog.turn .title h2 { margin: 0; }
 .dialog.turn .text { text-align: center; }
 

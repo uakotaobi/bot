@@ -67,10 +67,10 @@ function Weapon(weaponType) {
         "heavylaser"       : {
             longName       : "Heavy Laser",
             shortName      : "HV. LASER",
-            class          : "medium",
-            damage         : "2d8", // EV=9
-            ammoPerRound   : 1,
-            ammo           : 20
+            class          : "heavy",
+            damage         : "2d9", // EV=10, making it a bit less powerful than the srm-nomad
+            ammoPerRound   : 0,
+            ammo           : 1
         },
         "srm-nomad"      : {
             longName     : "Short-Range Missile, Model A",
@@ -198,7 +198,7 @@ function Weapon(weaponType) {
             class          : "heavy",
             damage         : "7d2 - 4", // EV=6.5, but used in packs of 2 for 13.
             ammoPerRound   : 7,
-            ammo           : 28
+            ammo           : 35
         },
         "gauss"            : {
             longName       : "Gauss Gun",
@@ -214,6 +214,14 @@ function Weapon(weaponType) {
             class          : "heavy",
             damage         : "1d6*1d6", // EV=12.25: less intimidating than it looks, but with limitless ammo.
             ammoPerRound   : 0,
+            ammo           : 1
+        },
+        "emp"              : {
+            longName       : "Electromagnetic Pulse Bomb",
+            shortName      : "EMP",
+            class          : "assault",
+            damage         : "3d2*3d2", // EV=20.25, with a high probability of dealing the average damage.
+            ammoPerRound   : 1,
             ammo           : 1
         },
         "railgun"          : {

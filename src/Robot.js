@@ -148,7 +148,7 @@ function Robot(robotType) {
                 longName     : "Bullfrog",
                 idPattern    : "[50-59]:[100-999]-[10-99][a-b]",
                 class        : "medium",
-                arsenal      : ["heavylaser", "mortar", "lightpulse"],
+                arsenal      : ["heavylaser", "emp"],
                 hitpoints    : 20,
                 armor        : "",
                 jump         : true,
@@ -158,9 +158,9 @@ function Robot(robotType) {
                 description  : "<p>Originally intended as scouting 'Bots," +
                     " Bullfrogs under the control of competent pilots rarely" +
                     " come in contact with solid ground. Each unit is equipped" +
-                    " with a <strong>high-yield laser cannon</strong> that" +
-                    " inflicts considerable damage at the cost of draining the" +
-                    " regrettably small on-board combat capacitors.</p>"
+                    " with a <strong>high-yield laser cannon</strong> and a" +
+                    " <strong>electromagnetic pulse</strong> device that " +
+                    " serves as a defensive deterrent.</p>"
             },
             "kraken"         : {
                 modelNumber  : "Edison Heavy Industries M3",
@@ -205,7 +205,7 @@ function Robot(robotType) {
                 class        : "heavy",
                 arsenal      : ["cluster", "cluster", "ppc", "shortrangemissile"],
                 hitpoints    : 40,
-                armor        : "1d6",
+                armor        : "1d7",
                 jump         : false,
                 speed        : 9,
                 score        : 40,
