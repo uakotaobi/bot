@@ -109,7 +109,7 @@ function Weapon(weaponType) {
             shortName      : "AC/20",
             class          : "medium",
             damage         : "(1d2 * 2d2) + (1d2 * 2d2)", // EV=9
-            ammoPerRound   : 2,
+            ammoPerRound   : 1,
             ammo           : 20
         },
         "ac10"             : {
@@ -129,7 +129,7 @@ function Weapon(weaponType) {
             ammo           : 5
         },
         "lightpulse"       : {
-            longName       : "Light Impulse",
+            longName       : "Light Pulse Cannon",
             shortName      : "LT. PULSE",
             class          : "light",
             damage         : "1 + 2d2", // EV=4, slightly better than a lightlaser
@@ -137,12 +137,20 @@ function Weapon(weaponType) {
             ammo           : 1
         },
         "mediumpulse"      : {
-            longName       : "Medium Impulse",
+            longName       : "Medium Pulse Cannon",
             shortName      : "MD. PULSE",
             class          : "medium",
             damage         : "1 + 1d12", // EV=7.5, better than the mortar on average (but with lower max damage)
             ammoPerRound   : 1,
             ammo           : 20
+        },
+        "heavypulse"      : {
+            longName       : "Heavy Pulse Cannon",
+            shortName      : "HV. PULSE",
+            class          : "assault",
+            damage         : "1 + (1d8*1d5)", // EV=14.5, same as the 2x mortar (but with a slightly higher probability of dealing max damage)
+            ammoPerRound   : 1,
+            ammo           : 6
         },
         "mortar"           : {
             longName       : "Mortar Cannon",

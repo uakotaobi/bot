@@ -239,7 +239,7 @@ function Robot(robotType) {
                 longName     : "Executioner",
                 idPattern    : "GM2900-[01-99][a-z]",
                 class        : "assault",
-                arsenal      : ["emf", "gauss", "mortar", "mortar"],
+                arsenal      : ["emf", "gauss", "heavypulse"],
                 hitpoints    : 50,
                 armor        : "5",
                 jump         : false,
