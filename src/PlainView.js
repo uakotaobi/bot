@@ -1419,7 +1419,36 @@ function PlainView(controller) {
             }
         }
 
-        mainImageDivImage.setAttribute("src", robot.image);
+
+        // We want the robot div using our image.  But we're no longer doing
+        // it this way:
+        //
+        //   mainImageDivImage.setAttribute("src", robot.image);
+        //
+        // The reason being that this leads to a consistent cross-browser
+        // problem: the mainImageDivImage.naturalHeight is sometimes able to
+        // retain the naturalHeight that is had *before* the src attribute was
+        // modified.  And since the src attribute defaults to the 200px-high
+        // Munchkin in game.html, this results in Munchkin-sized light,
+        // medium, and heavy Bots.
+        //
+        // Calling recalculateImageHeight() a second time instantly corrects
+        // the problem (i.e., the naturalHeight adjusts to a value that
+        // matches the new image source), but by then, the damage is done
+        // because the game looked silly.
+        //
+        // I don't know why this happens; I'd expect someImage.naturalHeight to
+        // always change in response to a change in someImage.src.  Whatever's
+        // causing it, it has something to do with images that are not cached.
+        //
+        // What follows is a workaround.
+        if (mainImageDivImage.getAttribute("src") !== robot.image) {
+            mainImageDivImage.remove();
+            mainImageDivImage = document.createElement("img");
+            mainImageDivImage.setAttribute("src", robot.image);
+            mainImageDiv.appendChild(mainImageDivImage);
+        }
+
         let scaledRobotImageHeight = (mainImageDivHeight * mainImageDivImage.naturalHeight) / 700;
         result.height = scaledRobotImageHeight;
         let padding = (mainImageDivHeight - scaledRobotImageHeight) / 2;
@@ -1427,6 +1456,13 @@ function PlainView(controller) {
         result.paddingBottom = padding;
 
         if (adjust) {
+            // console.debug("recalculateImageHeight(): Resizing %s %s's image height from %s to %.2f.  Natural height is %.2f px.",
+            //               robot.longName,
+            //               robot.id,
+            //               mainImageDivImage.style.height,
+            //               scaledRobotImageHeight,
+            //               mainImageDivImage.naturalHeight);
+
             mainImageDivImage.style.height = result.height + "px";
             mainImageDivImage.style.paddingTop = result.paddingTop + "px";
             mainImageDivImage.style.paddingBottom = result.paddingBottom + "px";
