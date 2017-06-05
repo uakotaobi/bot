@@ -530,6 +530,57 @@ function PlainView(controller) {
                 window.requestAnimationFrame(animate);
                 break;
             }
+            case "blast-lrm":
+            case "blast-mrm":
+            case "blast-srm":
+            case "blast-srm-nomad":
+            {
+                let sequence = [];
+                let pos = {
+                    x: random(robotImageWidth * 0, robotImageWidth * 1),
+                    y: random(robotImageHeight * 0, robotImageHeight * 1)
+                };
+                switch(explosionType) {
+                    case "blast-lrm":
+                        explosionDurationMilliseconds += random(1, 500);
+                        sequence = [
+                            { type: "e2", width: 128, height: 128, duration: 1.0 },
+                            { type: "e1", width: 128, height: 128, duration: 0.6, overlap: 1.0 }
+                        ];
+                        break;
+                    case "blast-mrm":
+                        sequence = [
+                            { type: "e11", width: 100, height: 100, duration: 1.0 },
+                        ];
+                        break;
+                    case "blast-srm":
+                        sequence = [
+                            { type: "e3", width: 128, height: 128, duration: 0.8 },
+                            { type: "e12", width: 100, height: 100, duration: 1.0, overlap: 1.0 }
+                        ];
+                        break;
+                    case "blast-srm-nomad":
+                        sequence = [
+                            { type: "e3", width: 128, height: 128, duration: 0.8 },
+                            { type: "e16", width: 100, height: 100,duration: 0.8, overlap: 0.6 },
+                        ];
+                        break;
+                }
+                for (let i = 0, delay = 0; i < sequence.length; ++i) {
+                    let durationMilliseconds = explosionDurationMilliseconds * sequence[i].duration;
+                    this.createEffect(imageDiv, sequence[i].type,
+                                      (imageDivWidth/2 - robotImageWidth/2) + pos.x - sequence[i].width/2,
+                                      (robotImageBottomY - robotImageHeight) + pos.y - sequence[i].height/2,
+                                      durationMilliseconds,
+                                      delay);
+                    delay += durationMilliseconds;
+                    if (i < sequence.length - 1 && sequence[i + 1].overlap) {
+                        delay -= (explosionDurationMilliseconds * sequence[i + 1].overlap);
+                    }
+                }
+                break;
+            }
+
             // case "assault":
             //     break;
             default:
@@ -2438,7 +2489,9 @@ function PlainView(controller) {
             // Make the board show what the user has done.
             this.updateRobots();
 
-            // Sprite effects are best done after the robot divs have adjusted in size.
+            // Sprite effects are best done after the robot divs have adjusted
+            // in size.
+            this.explodeWeapon(theBadGuy, theGoodGuy, theGoodGuyWeapon, o.damageReport);
             if (theBadGuy.hitpoints <= 0) {
 
                 this.explodeRobot(theBadGuy);
@@ -2590,6 +2643,40 @@ function PlainView(controller) {
                 recalculateImageHeight(robots[i]);
             }
         }, 7000);
+    };
+
+    // The only reason this is here is so that I only have to implement the
+    // weapon explosion launching code once.  (You'll note this is a public
+    // function of the PlainView instance, so an AiPlayer can call it, too.)
+    this.explodeWeapon = function(theirRobot, ourRobot, ourWeapon, ourDamageReport) {
+        if (!ourWeapon.explosion) {
+            // Our weapon doesn't have an explosion animation.
+            return;
+        }
+        if (ourDamageReport.originalDamage.damage <= 0) {
+            // Our weapon misfired.
+            return;
+        }
+        if (ourDamageReport.jumped === true &&
+            ourDamageReport.jumpDamage.damage >= ourDamageReport.originalDamage.damage) {
+            // Their robot dodged the attack by jumping.
+            return;
+        }
+
+        // If control made it here, our weapon at least _connected_ (whether
+        // it dealt any damage is another question entirely.)
+        //
+        // All weapons of the same type are fired simultaneously, so they
+        // should explode simultaneously.
+        for (let i = 0, matchingWeapons = ourRobot.findWeapons(ourWeapon.internalName);
+             i < matchingWeapons.length;
+             ++i) {
+
+            this.explode(theirRobot,
+                         ourWeapon.explosion,
+                         0,
+                         ourWeapon.duration !== undefined ? ourWeapon.duration : 1000);
+        }
     };
 
 

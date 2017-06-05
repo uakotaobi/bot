@@ -29,6 +29,8 @@ function Weapon(weaponType) {
             shortName      : "SLING",           // Short name for display.
             class          : "light",           // Weapon class: light, medium, or heavy.
             damage         : "1d2*1d3*1d4",     // Damage expression (see Weapon.calculateDamage().)
+            explosion      : "blast-lrm",       // Optional PlainView.explode() explosion type for a successful hit
+            duration       : 1000,              // Optional duration of the explosion, in milliseconds (default is 1000)
             ammoPerRound   : 1,                 // Bullets consumed with each shot.
             ammo           : 2                  // Number of bullets.
         },
@@ -72,19 +74,23 @@ function Weapon(weaponType) {
             ammoPerRound   : 0,
             ammo           : 1
         },
-        "srm-nomad"      : {
-            longName     : "Short-Range Missile, Model A",
-            shortName    : "SRM/A",
-            class        : "heavy",
-            damage       : "1d20", // EV=10.5, but with all extremes to be expected
-            ammoPerRound : 1,
-            ammo         : 3
+        "srm-nomad"        : {
+            longName       : "Short-Range Missile, Model A",
+            shortName      : "SRM/A",
+            class          : "heavy",
+            damage         : "1d20", // EV=10.5, but with all extremes to be expected
+            explosion      : "blast-srm-nomad",
+            duration       : 2000,
+            ammoPerRound   : 1,
+            ammo           : 3
         },
         "shortrangemissile": {
             longName       : "Short-Range Missile, Model B",
             shortName      : "SRM/B",
             class          : "heavy",
             damage         : "3d6", // EV=10.5, but with the average being more common
+            explosion      : "blast-srm",
+            duration       : 2500,
             ammoPerRound   : 1,
             ammo           : 12
         },
@@ -93,14 +99,18 @@ function Weapon(weaponType) {
             shortName      : "MRM",
             class          : "medium",
             damage         : "2d6", // EV=7
+            explosion      : "blast-mrm",
+            duration       : 2000,
             ammoPerRound   : 1,
-            ammo           : 15
+            ammo           : 20
         },
         "longrangemissile" : {
             longName       : "Long-Range Missile",
             shortName      : "LRM",
             class          : "light",
             damage         : "1d6 + 2", // EV=5.5
+            explosion      : "blast-lrm",
+            duration       : 1500,
             ammoPerRound   : 1,
             ammo           : 30
         },
@@ -833,7 +843,9 @@ function Weapon(weaponType) {
     this.shortName    = dataTable[weaponType].shortName;
     this.longName     = dataTable[weaponType].longName;
     this.class        = dataTable[weaponType].class;
-    this.damage       = dataTable[weaponType].damage; // Actually an expression string.
+    this.damage       = dataTable[weaponType].damage;    // Actually an expression string.
+    this.explosion    = dataTable[weaponType].explosion; // Could be undefined.
+    this.duration     = dataTable[weaponType].duration;  // Could be undefined.
     this.ammoPerRound = Number(dataTable[weaponType].ammoPerRound);
     this.ammo         = Number(dataTable[weaponType].ammo);
 

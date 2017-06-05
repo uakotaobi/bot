@@ -95,7 +95,8 @@ function Game() {
              ++i) {
             view.addRobot(robots[i]);
         }
-        view.updateRobots();
+        // The resize bug's been fixed, so I don't need this.
+        // view.updateRobots();
 
 
         if (controller.getFactionType(controller.getCurrentRobot().faction) === "human") {
