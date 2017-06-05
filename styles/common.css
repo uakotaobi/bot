@@ -274,7 +274,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
 }
 .dialog.endgame .content.success {
     display: none;
-    background: url("../assets/images/icons/[CC-BY-3.0] jreijonen - star_0_0 [OpenGameArt]-256px.png") 50% 50% / contain no-repeat,
+    background: url("../assets/images/icons/[CC-BY-3.0] jreijonen - Faction symbols (allies & axis) (star_0_0) [OpenGameArt]-512px.png") 50% 50% / contain no-repeat,
                 url("../assets/images/backgrounds/[CC0] Rawdanitsu - Another Space Backgrounds (space-background-10) [OpenGameArt]-85%25.jpg") 50% 50% / cover no-repeat;
 }
 .dialog.endgame .content.success .header {

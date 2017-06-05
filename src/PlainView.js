@@ -418,7 +418,7 @@ function PlainView(controller) {
                                                (robotImageBottomY - h) + pos.y,
                                                fireDurationMilliseconds + random(100, 500),
                                                explosionDurationMilliseconds * 0.5);
-                    f1.framesPerSecond += random(-5, 15);
+                    f1.framesPerSecond += 2 * random(-3, 12);
                 }
 
                 // Grand finale: a single e9 spark, then a rapid sequence of closely-spaced e6 blasts.
@@ -534,6 +534,9 @@ function PlainView(controller) {
             case "blast-mrm":
             case "blast-srm":
             case "blast-srm-nomad":
+            case "blast-ac-medium":
+            case "blast-ac-heavy":
+            case "blast-ac-assault":
             {
                 let sequence = [];
                 let pos = {
@@ -565,6 +568,27 @@ function PlainView(controller) {
                             { type: "e16", width: 100, height: 100,duration: 0.8, overlap: 0.6 },
                         ];
                         break;
+                    case "blast-ac-medium":
+                        sequence = [
+                            { type: "e16", width: 100, height: 100, duration: 1.0 },
+                            { type: "e11", width: 100, height: 100, duration: 0.9, overlap: 0.9  },
+                            { type: "e16", width: 100, height: 100, duration: 0.8, overlap: 0.8  },
+                        ];
+                        break;
+                    case "blast-ac-heavy":
+                        sequence = [
+                            { type: "e8", width: 256, height: 256, duration: 0.8 },
+                            // { type: "e16", width: 100, height: 100, duration: 0.9, overlap: 0.9 },
+                            // { type: "e12", width: 100, height: 100, duration: 0.9, overlap: 0.9 },
+                        ];
+                        break;
+                    case "blast-ac-assault":
+                        sequence = [
+                            { type: "e6", width: 256, height: 256, duration: 0.8 },
+                            { type: "e6", width: 256, height: 256, duration: 0.9, overlap: 0.9 },
+                            { type: "e6", width: 256, height: 256, duration: 0.5, overlap: 0.5 },
+                        ];
+                        break;
                 }
                 for (let i = 0, delay = 0; i < sequence.length; ++i) {
                     let durationMilliseconds = explosionDurationMilliseconds * sequence[i].duration;
@@ -580,7 +604,65 @@ function PlainView(controller) {
                 }
                 break;
             }
+            case "blast-cluster":
+            case "blast-machinegun-light":
+            case "blast-machinegun-medium":
+            {
+                let spriteType = "";
+                let count = 0;
+                let durationMilliseconds = 0;
+                let delayMilliseconds = 0;
+                switch(explosionType) {
+                    case "blast-cluster":
+                        spriteType = ["e12", "e13", "e14"];
+                        w = 100;
+                        h = 100;
+                        count = 14/2;
+                        durationMilliseconds = 0.35;
+                        // Explosion 0 has a start time of 0.
+                        // Explosion 13 has a start time of 0.65 (1.0 - duration).
+                        // Delay between start times would be 0.65/count, but duration must be taken into account.
+                        delayMilliseconds = (1.0 - durationMilliseconds)/count - durationMilliseconds;
+                        break;
+                    case "blast-machinegun-light":
+                        spriteType = ["e5"];
+                        w = 64;
+                        h = 64;
+                        count = 10/2;
+                        durationMilliseconds = 0.3;
+                        delayMilliseconds = (1.0 - durationMilliseconds)/count - durationMilliseconds;
+                        break;
+                    case "blast-machinegun-medium":
+                        spriteType = ["e4"];
+                        w = 128;
+                        h = 128;
+                        count = Math.ceil(10/3);
+                        durationMilliseconds = 0.4;
+                        delayMilliseconds = (1.0 - durationMilliseconds)/count - durationMilliseconds;
+                        break;
+                }
 
+                // Convert from percentage to actual units of time.
+                delayMilliseconds *= explosionDurationMilliseconds;
+                durationMilliseconds *= explosionDurationMilliseconds;
+
+                // A series of short-length, possibly-overlapping explosions.
+                for (let i = 0, delay = 0; i < count; ++i) {
+                    let pos = {
+                        x: random(robotImageWidth * 0,  robotImageWidth),
+                        y: random(robotImageHeight * 0, Math.min(robotImageWidth, robotImageHeight))
+                    };
+                    this.createEffect(imageDiv, spriteType[random(0, spriteType.length - 1)],
+                                      (imageDivWidth/2 - robotImageWidth/2) + pos.x - w/2,
+                                      (robotImageBottomY - robotImageHeight) + pos.y - h/2,
+                                      durationMilliseconds,
+                                      delay);
+                    delay += durationMilliseconds;
+                    delay += delayMilliseconds;
+                    delay += random(-250, 250);
+                }
+                break;
+            }
             // case "assault":
             //     break;
             default:
@@ -2668,10 +2750,15 @@ function PlainView(controller) {
         //
         // All weapons of the same type are fired simultaneously, so they
         // should explode simultaneously.
-        for (let i = 0, matchingWeapons = ourRobot.findWeapons(ourWeapon.internalName);
-             i < matchingWeapons.length;
-             ++i) {
+        let matchingWeapons = ourRobot.findWeapons(ourWeapon.internalName);
+        if (matchingWeapons.length === 0) {
+            // Just ran out of ammo this round.
+            let tempRobot = new Robot(ourRobot.internalName);
+            matchingWeapons = tempRobot.findWeapons(ourWeapon.internalName);
+            tempRobot.unregister();
+        }
 
+        for (let i = 0; i < matchingWeapons.length; ++i) {
             this.explode(theirRobot,
                          ourWeapon.explosion,
                          0,

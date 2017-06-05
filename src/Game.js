@@ -95,8 +95,9 @@ function Game() {
              ++i) {
             view.addRobot(robots[i]);
         }
-        // The resize bug's been fixed, so I don't need this.
-        // view.updateRobots();
+
+        // Correct for incorrect robot div widths at the start of the game.
+        view.updateRobots();
 
 
         if (controller.getFactionType(controller.getCurrentRobot().faction) === "human") {

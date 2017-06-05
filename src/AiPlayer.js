@@ -577,7 +577,9 @@ function AiPlayer(controller, view) {
 
                 // Add sprite effects stemming from the damageReport.
                 //
-                // Sprite effects are best done after the robot divs have adjusted in size.
+                // Sprite effects are best done after the robot divs have
+                // adjusted in size.
+                view.explodeWeapon(theirBot, ourBot, ourBotWeapon, o.damageReport);
                 if (theirBot.hitpoints <= 0) {
                     view.explodeRobot(theirBot);
                 } else if (o.damageReport.jumped === true) {

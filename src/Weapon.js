@@ -39,6 +39,8 @@ function Weapon(weaponType) {
             shortName      : "MACH. GUN",
             class          : "medium",
             damage         : "1d7", // EV=4, but used in sets of 2 for 8
+            explosion      : "blast-machinegun-light",
+            duration       : 1500,
             ammoPerRound   : 10,
             ammo           : 200
         },
@@ -47,6 +49,8 @@ function Weapon(weaponType) {
             shortName      : "MACH. GUN",
             class          : "heavy",
             damage         : "1d5", // EV=3, but used in sets of 3 for 9
+            explosion      : "blast-machinegun-medium",
+            duration       : 1000,
             ammoPerRound   : 10,
             ammo           : 150
         },
@@ -119,6 +123,8 @@ function Weapon(weaponType) {
             shortName      : "AC/20",
             class          : "medium",
             damage         : "(1d2 * 2d2) + (1d2 * 2d2)", // EV=9
+            explosion      : "blast-ac-medium",
+            duration       : 2500,
             ammoPerRound   : 1,
             ammo           : 20
         },
@@ -127,6 +133,8 @@ function Weapon(weaponType) {
             shortName      : "AC/10",
             class          : "heavy",
             damage         : "(1d2 * 1d6) + (1d2 * 1d6)", // EV=10.5, same as a 3D6!
+            explosion      : "blast-ac-heavy",
+            duration       : 5000,
             ammoPerRound   : 1,
             ammo           : 10
         },
@@ -215,6 +223,8 @@ function Weapon(weaponType) {
             shortName      : "CLUSTER",
             class          : "heavy",
             damage         : "7d2 - 4", // EV=6.5, but used in packs of 2 for 13.
+            explosion      : "blast-cluster",
+            duration       : 3000,
             ammoPerRound   : 7,
             ammo           : 35
         },

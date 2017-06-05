@@ -354,7 +354,7 @@ function SpecialEffectSprite(effectName) {
         {
             let sprite = new SpriteBase(256, 256);
             sprite.addFramesFromSpriteSheet("./assets/images/effects/FireLoop1-50-frames-256x256.png", 10, 5);
-            sprite.framesPerSecond = 25;
+            sprite.framesPerSecond = 30;
             sprite.maxAgeMilliseconds = 15000;
             return sprite;
         }
