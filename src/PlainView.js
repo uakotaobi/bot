@@ -1044,7 +1044,13 @@ function PlainView(controller) {
             PlainView.oldDocumentOnKeyPress = document.onkeypress;
         }
 
-        document.onkeypress = view.keyboardHandler;
+        // The keypress event is not fired for the arrow keys in WebKit
+        // browsers.  The keydown event is, though!
+        //
+        //document.onkeypress = view.keyboardHandler;
+        //document.addEventListener("keypress", view.keyboardHandler, false);
+
+        document.onkeydown = view.keyboardHandler;
     };
 
 
