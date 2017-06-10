@@ -143,11 +143,13 @@ function Weapon(weaponType) {
             shortName      : "AC/5",
             class          : "assault",
             damage         : "(1d3 * 1d6) + (1d4 * 1d5)", // EV=14.5, stronger than the Gauss Gun
+            explosion      : "blast-ac-assault",
+            duration       : 3500,
             ammoPerRound   : 1,
             ammo           : 5
         },
         "lightpulse"       : {
-            longName       : "Light Pulse Cannon",
+            longName       : "Light Pulse Laser",
             shortName      : "LT. PULSE",
             class          : "light",
             damage         : "1 + 2d2", // EV=4, slightly better than a lightlaser
@@ -155,12 +157,12 @@ function Weapon(weaponType) {
             ammo           : 1
         },
         "mediumpulse"      : {
-            longName       : "Medium Pulse Cannon",
+            longName       : "Medium Pulse Laser",
             shortName      : "MD. PULSE",
             class          : "medium",
             damage         : "1 + 1d12", // EV=7.5, better than the mortar on average (but with lower max damage)
             ammoPerRound   : 1,
-            ammo           : 20
+            ammo           : 15
         },
         "heavypulse"      : {
             longName       : "Heavy Pulse Cannon",

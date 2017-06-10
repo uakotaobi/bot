@@ -534,11 +534,25 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     font-size: 14pt;
     text-shadow: 0px 0px 2px black;
 
-    border: 2px solid lime;
-    box-shadow: 0px 0px 20px 2px lime;
+    animation-duration: 2.5s;
+    animation-name: panel-border-flash;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+
+    /*border: 2px solid lime;
+    box-shadow: 0px 0px 20px 2px lime;*/
     background: url('../assets/images/backgrounds/[CC-BY-3.0] [GPL-2.0] [GPL-3.0] Silver IV - Grid HUD (Grid3) [OpenGameArt]-tileable.png') 50% 50% repeat;
 }
-
+@keyframes panel-border-flash {
+    from {
+        border: 2px solid green;
+        box-shadow: 0px 0px 15px 2px green;
+    }
+    to {
+        border: 2px solid lime;
+        box-shadow: 0px 0px 20px 2px lime;
+    }
+}
 .select-a-mech .content .panel.left {
     left: 2%;
     top: 10%;

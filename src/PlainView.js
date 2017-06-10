@@ -315,8 +315,9 @@ function PlainView(controller) {
                     { type: "e8", delay: 0, duration: explosionDurationMilliseconds/2, w: 256, h:256 }
                 ];
 
-                // Two f2s spaced about 30 pixels apart really do look like
-                // one continuous flame.  So let's have as many as it takes to cover the div's width.
+                // Two f2 fire sprites spaced about 30 pixels apart really do
+                // look like one continuous flame.  So let's have as many as
+                // it takes to cover the div's width.
                 w=81; h=123;
                 for (let x = imageDivWidth/2 - robotImageWidth/2, effectiveFireWidth = w - 60;
                      x < imageDivWidth/2 + robotImageWidth/2 - w;
@@ -335,21 +336,21 @@ function PlainView(controller) {
                      i < smallExplosionCount;
                      ++i, delay += delayIncrement) {
 
-                    let duration = explosionDurationMilliseconds / random(5, 10);
+                    let duration = explosionDurationMilliseconds * random(50, 250)/200;
                     explosions.push({
                         type: "e4",
                         delay: delay,
-                        duration: duration,
+                        duration: duration * i/Math.max(smallExplosionCount, 1),
                         w: 128,
                         h: 128
                     });
                 }
                 // One last burst.
-                explosions.push({ type: "e7", delay: explosionDurationMilliseconds, duration: explosionDurationMilliseconds/2, w: 256, h:256 });
+                explosions.push({ type: "e7", delay: explosionDurationMilliseconds*0.75, duration: explosionDurationMilliseconds*0.9, w: 256, h:256 });
 
                 for (let index = 0; index < explosions.length; ++index) {
                     let pos = {
-                        x: random(robotImageWidth * 0.25, robotImageWidth * 0.75),
+                        x: random(robotImageWidth * 0, robotImageWidth * 1),
                         y: random(robotImageHeight * 0.25, robotImageHeight * 0.75)
                     };
                     this.createEffect(imageDiv, explosions[index].type,
@@ -538,6 +539,9 @@ function PlainView(controller) {
             case "blast-ac-heavy":
             case "blast-ac-assault":
             {
+                // These are not explosions, either, but one-off sprite
+                // effects that are used to provide the impression of being
+                // hit by a weapon.
                 let sequence = [];
                 let pos = {
                     x: random(robotImageWidth * 0, robotImageWidth * 1),
@@ -608,13 +612,13 @@ function PlainView(controller) {
             case "blast-machinegun-light":
             case "blast-machinegun-medium":
             {
-                let spriteType = "";
+                let spriteTypes = [];
                 let count = 0;
                 let durationMilliseconds = 0;
                 let delayMilliseconds = 0;
                 switch(explosionType) {
                     case "blast-cluster":
-                        spriteType = ["e12", "e13", "e14"];
+                        spriteTypes = ["e12", "e13", "e14"];
                         w = 100;
                         h = 100;
                         count = 14/2;
@@ -625,7 +629,7 @@ function PlainView(controller) {
                         delayMilliseconds = (1.0 - durationMilliseconds)/count - durationMilliseconds;
                         break;
                     case "blast-machinegun-light":
-                        spriteType = ["e5"];
+                        spriteTypes = ["e5"];
                         w = 64;
                         h = 64;
                         count = 10/2;
@@ -633,7 +637,7 @@ function PlainView(controller) {
                         delayMilliseconds = (1.0 - durationMilliseconds)/count - durationMilliseconds;
                         break;
                     case "blast-machinegun-medium":
-                        spriteType = ["e4"];
+                        spriteTypes = ["e4"];
                         w = 128;
                         h = 128;
                         count = Math.ceil(10/3);
@@ -652,7 +656,7 @@ function PlainView(controller) {
                         x: random(robotImageWidth * 0,  robotImageWidth),
                         y: random(robotImageHeight * 0, Math.min(robotImageWidth, robotImageHeight))
                     };
-                    this.createEffect(imageDiv, spriteType[random(0, spriteType.length - 1)],
+                    this.createEffect(imageDiv, spriteTypes[random(0, spriteTypes.length - 1)],
                                       (imageDivWidth/2 - robotImageWidth/2) + pos.x - w/2,
                                       (robotImageBottomY - robotImageHeight) + pos.y - h/2,
                                       durationMilliseconds,
