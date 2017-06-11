@@ -822,6 +822,7 @@ function AiPlayer(controller, view) {
         let result = {
             winningFaction: "",
             survivingRobots: [],
+
             statistics: {
                 totalGamesPlayed: 0,
                 averageGameDurationMilliseconds: 0,
@@ -835,7 +836,14 @@ function AiPlayer(controller, view) {
                 averageDamageTaken:      { },
                 averageTargetsDestroyed: { }, // Our faction's average kill count.
                 averageTurnsToWin:       { }, // How many turns it took us to win (when we did win.)
-                survivalProbabilities:   { }  // An array of N probabilities that faction.robots[N] lives through the match.
+                survivalProbabilities:   { }, // An array of N probabilities that faction.robots[N] lives through the match.
+
+                // This faction-independent hash table measures overall
+                // effectiveness of each Bot (at least when commanded by an
+                // AiPlayer.)  The keys are robot InternalNames; the values
+                // are the average damage delath per game for each robot type,
+                // *divided* by the robot's cost.
+                effectiveDamagePerUnitCost: { }
             }
         };
 
@@ -891,6 +899,9 @@ function AiPlayer(controller, view) {
             }
 
             // Reset statistics.
+            for (let i = 0, robots = controller.getGameRobots(); i < robots.length; ++i) {
+                result.statistics.effectiveDamagePerUnitCost[robots[i].internalName] = 0;
+            }
             for (let i = 0, factions = controller.getGameFactions(); i < factions.length; ++i) {
                 result.statistics.victoryProbability[factions[i]]      = 0;
                 result.statistics.totalGamesWon[factions[i]]           = 0;
@@ -962,6 +973,7 @@ function AiPlayer(controller, view) {
 
                     let currentFaction = factions[currentFactionIndex];
                     let currentRobot = currentFaction.robots[currentFaction.currentRobotIndex];
+                    let nextRobotIndexForCurrentFaction = findNextLivingRobot(currentFaction);
 
                     if (currentRobot.hitpoints > 0) {
 
@@ -980,6 +992,20 @@ function AiPlayer(controller, view) {
                             result.statistics.averageDamageDealt[currentRobot.faction] += damageReport.finalDamage;
                             result.statistics.averageDamageTaken[attackInfo.enemy.faction] += damageReport.finalDamage;
                             result.statistics.averageDamagePrevented[attackInfo.enemy.faction] += (damageReport.originalDamage.damage - damageReport.finalDamage);
+
+                            // When we're measuring overall combat
+                            // effectiveness, do we want to measure the damage
+                            // the robot _tried_ to dish out
+                            // (damageReport.originalDamage.damage), or the
+                            // damage that the robot _actually_ dished out
+                            // (damageReport.finalDamage)?  I say the former.
+                            // The armor or jumping that the robot had to deal
+                            // with is circumstantial, and the caller is
+                            // interested in how much damage they expect the
+                            // robot to deal in general.
+                            //
+                            // result.statistics.effectiveDamagePerUnitCost[currentRobot.internalName] += damageReport.finalDamage;
+                            result.statistics.effectiveDamagePerUnitCost[currentRobot.internalName] += damageReport.originalDamage.damage;
 
                             // console.debug("AiPlayer.play() [simulation mode - %d turns to go]: %s %s (%s) attacks %s %s (%s) for %d damage.",
                             //               turns - i,
@@ -1016,26 +1042,7 @@ function AiPlayer(controller, view) {
                         // The current robot's dead.  Maybe it was killed
                         // during some other robot's turn.
                         //
-                        // Let's find the next living robot in this faction
-                        // and schedule it to go next.
-                        let index = findNextLivingRobot(currentFaction);
-                        if (index < 0) {
-
-                            // console.debug("AiPlayer.play() [simulation mode - %d turns to go]: %s has lost its last Bot.",
-                            //               turns - i,
-                            //               currentRobot.faction);
-
-                            // This whole faction's dead!
-                            currentFaction.dead = true;
-
-                        } else {
-
-                            // We found another robot in this faction to go in
-                            // our stead.
-                            currentFaction.currentRobotIndex = index;
-                        }
-
-                        // This turn was a waste, but let's proceed with the
+                        // Sure, this turn was a waste, but let's proceed with the
                         // next turn.  Because we don't want to waste the
                         // finite number of turns that we have been allotted,
                         // we decrement the loop variable to roll back the
@@ -1045,7 +1052,28 @@ function AiPlayer(controller, view) {
                         // thing if this were a while loop instead of a for loop.
                         i -= 1;
 
+                        // Force our faction's next living robot to go next,
+                        // if we have one.
+                        if (nextRobotIndexForCurrentFaction >= 0) {
+                            currentFaction.currentRobotIndex = nextRobotIndexForCurrentFaction;
+                            continue;
+                        }
+
                     } // end (if we have discovered, much to our chagrin, that the current faction's current robot has already met its maker)
+
+                    // Schedule the next robot for this faction.
+                    if (nextRobotIndexForCurrentFaction < 0) {
+                        // console.debug("AiPlayer.play() [simulation mode - %d turns to go]: %s has lost its last Bot.",
+                        //               turns - i,
+                        //               currentRobot.faction);
+
+                        // This whole faction's dead!
+                        currentFaction.dead = true;
+                    } else {
+                        // We found another robot in this faction to go in
+                        // our stead.
+                        currentFaction.currentRobotIndex = nextRobotIndexForCurrentFaction;
+                    }
 
 
                     // Check for endgame.
@@ -1080,10 +1108,12 @@ function AiPlayer(controller, view) {
                         // Update survival probabilities (these are per-robot.)
                         for (let j = 0; j < factions.length; ++j) {
                             let probabilities = result.statistics.survivalProbabilities[factions[j].name];
+
+                            // Grow the array if necessary.  Only happens once per faction.
                             while (probabilities.length < factions[j].robots.length) {
-                                // Grow the array if necessary.  Only happens once per faction.
                                 probabilities.push(0);
                             }
+
                             for (let k = 0; k < factions[j].robots.length; ++k) {
                                 if (factions[j].robots[k].hitpoints > 0) {
                                     probabilities[k] += 1;
@@ -1163,6 +1193,26 @@ function AiPlayer(controller, view) {
                      ++j) {
                     probabilities[j]                                   /= gamesPlayed;
                 }
+            }
+            for (let robotInternalName in result.statistics.effectiveDamagePerUnitCost) {
+
+                let numberOfUnitsOfThisType = 0;
+                for (let i = 0, robots = controller.getGameRobots(); i < robots.length; ++i) {
+                    if (robots[i].internalName === robotInternalName) {
+                        numberOfUnitsOfThisType += 1;
+                    }
+                }
+
+                let totalDamageDealtByAllUnitsOfThisType = result.statistics.effectiveDamagePerUnitCost[robotInternalName];
+                let totalDamageDealtByAverageUnitOfThisType = totalDamageDealtByAllUnitsOfThisType / numberOfUnitsOfThisType;
+                let averageDamageDealtByAverageUnitOfThisTypePerGame = totalDamageDealtByAverageUnitOfThisType / gamesPlayed;
+                result.statistics.effectiveDamagePerUnitCost[robotInternalName] = averageDamageDealtByAverageUnitOfThisTypePerGame / Robot.dataTable[robotInternalName].score;
+                // let equation = String.format("({0})/({1} * {2} * {3})",
+                //                             totalDamageDealtByAllUnitsOfThisType,
+                //                             numberOfUnitsOfThisType,
+                //                             gamesPlayed,
+                //                             Robot.dataTable[robotInternalName].score);
+                // result.statistics.effectiveDamagePerUnitCost[robotInternalName] = equation;
             }
             return result;
 
