@@ -820,15 +820,22 @@ function AiPlayer(controller, view) {
         turns = turns || 0;
 
         let result = {
-            winningFaction: "",
-            survivingRobots: [],
 
-            statistics: {
-                totalGamesPlayed: 0,
-                averageGameDurationMilliseconds: 0,
+            totalGamesPlayed: 0,
+            averageGameDurationMilliseconds: 0,
+            winner: "",
 
-                // These hash tables all use faction names as keys and
-                // floating-point numbers or integers as values.
+            // These hash tables all use robot internalNames as keys and
+            // floating point or integer numbers as values.
+            robotStatistics: {
+                averageLongevity:        { }, // Average turns played per game before destruction.  Needed to calculate cost and combat effectiveness.
+                costEffectiveness:       { }, // Average originalDamage dealt per turn, per game, divided by cost.
+                combatEffectiveness:     { }  // Average finalDamage dealt per turn, per game.
+            },
+
+            // These hash tables all use faction names as keys and
+            // floating-point numbers or integers as values.
+            factionStatistics: {
                 victoryProbability:      { }, // The most important statistic: games we won divided by the total games played.
                 totalGamesWon:           { }, // Needed to calculate the victory probability.
                 averageDamageDealt:      { },
@@ -836,14 +843,7 @@ function AiPlayer(controller, view) {
                 averageDamageTaken:      { },
                 averageTargetsDestroyed: { }, // Our faction's average kill count.
                 averageTurnsToWin:       { }, // How many turns it took us to win (when we did win.)
-                survivalProbabilities:   { }, // An array of N probabilities that faction.robots[N] lives through the match.
-
-                // This faction-independent hash table measures overall
-                // effectiveness of each Bot (at least when commanded by an
-                // AiPlayer.)  The keys are robot InternalNames; the values
-                // are the average damage delath per game for each robot type,
-                // *divided* by the robot's cost.
-                effectiveDamagePerUnitCost: { }
+                survivalProbabilities:   { }  // An array of N probabilities that faction.robots[N] lives through the match.
             }
         };
 
@@ -900,17 +900,19 @@ function AiPlayer(controller, view) {
 
             // Reset statistics.
             for (let i = 0, robots = controller.getGameRobots(); i < robots.length; ++i) {
-                result.statistics.effectiveDamagePerUnitCost[robots[i].internalName] = 0;
+                result.robotStatistics.averageLongevity[robots[i].internalName]    = 0;
+                result.robotStatistics.costEffectiveness[robots[i].internalName]   = 0;
+                result.robotStatistics.combatEffectiveness[robots[i].internalName] = 0;
             }
             for (let i = 0, factions = controller.getGameFactions(); i < factions.length; ++i) {
-                result.statistics.victoryProbability[factions[i]]      = 0;
-                result.statistics.totalGamesWon[factions[i]]           = 0;
-                result.statistics.averageDamageDealt[factions[i]]      = 0;
-                result.statistics.averageDamagePrevented[factions[i]]  = 0;
-                result.statistics.averageDamageTaken[factions[i]]      = 0;
-                result.statistics.averageTargetsDestroyed[factions[i]] = 0;
-                result.statistics.averageTurnsToWin[factions[i]]       = 0;
-                result.statistics.survivalProbabilities[factions[i]]   = [];
+                result.factionStatistics.victoryProbability[factions[i]]           = 0;
+                result.factionStatistics.totalGamesWon[factions[i]]                = 0;
+                result.factionStatistics.averageDamageDealt[factions[i]]           = 0;
+                result.factionStatistics.averageDamagePrevented[factions[i]]       = 0;
+                result.factionStatistics.averageDamageTaken[factions[i]]           = 0;
+                result.factionStatistics.averageTargetsDestroyed[factions[i]]      = 0;
+                result.factionStatistics.averageTurnsToWin[factions[i]]            = 0;
+                result.factionStatistics.survivalProbabilities[factions[i]]        = [];
             }
 
             let gamesPlayed = 0;
@@ -989,23 +991,23 @@ function AiPlayer(controller, view) {
                                                                  attackInfo.weaponName,
                                                                  Weapon.useRandomValues,
                                                                  true);
-                            result.statistics.averageDamageDealt[currentRobot.faction] += damageReport.finalDamage;
-                            result.statistics.averageDamageTaken[attackInfo.enemy.faction] += damageReport.finalDamage;
-                            result.statistics.averageDamagePrevented[attackInfo.enemy.faction] += (damageReport.originalDamage.damage - damageReport.finalDamage);
+                            result.factionStatistics.averageDamageDealt[currentRobot.faction] += damageReport.finalDamage;
+                            result.factionStatistics.averageDamageTaken[attackInfo.enemy.faction] += damageReport.finalDamage;
+                            result.factionStatistics.averageDamagePrevented[attackInfo.enemy.faction] += (damageReport.originalDamage.damage - damageReport.finalDamage);
 
-                            // When we're measuring overall combat
-                            // effectiveness, do we want to measure the damage
-                            // the robot _tried_ to dish out
-                            // (damageReport.originalDamage.damage), or the
-                            // damage that the robot _actually_ dished out
-                            // (damageReport.finalDamage)?  I say the former.
-                            // The armor or jumping that the robot had to deal
-                            // with is circumstantial, and the caller is
-                            // interested in how much damage they expect the
-                            // robot to deal in general.
-                            //
-                            // result.statistics.effectiveDamagePerUnitCost[currentRobot.internalName] += damageReport.finalDamage;
-                            result.statistics.effectiveDamagePerUnitCost[currentRobot.internalName] += damageReport.originalDamage.damage;
+                            // Cost effectiveness cares about the damage the
+                            // robot potentially deals, since that's largely
+                            // independent of the opponents a robot faces.
+                            result.robotStatistics.costEffectiveness[currentRobot.internalName] += damageReport.originalDamage.damage;
+
+                            // Combat effectiveness cares about the damage the
+                            // robot dealt in the real world, and very much
+                            // depends on the enemies it faces and the enemies
+                            // that the AI makes it target.
+                            result.robotStatistics.combatEffectiveness[currentRobot.internalName] += damageReport.finalDamage;
+
+                            // This robot type survived another turn.
+                            result.robotStatistics.averageLongevity[currentRobot.internalName] += 1;
 
                             // console.debug("AiPlayer.play() [simulation mode - %d turns to go]: %s %s (%s) attacks %s %s (%s) for %d damage.",
                             //               turns - i,
@@ -1019,7 +1021,7 @@ function AiPlayer(controller, view) {
 
                             // Did the current robot make a kill?
                             if (attackInfo.enemy.hitpoints <= 0) {
-                                result.statistics.averageTargetsDestroyed[currentRobot.faction] += 1;
+                                result.factionStatistics.averageTargetsDestroyed[currentRobot.faction] += 1;
                             }
 
                         } else {
@@ -1099,15 +1101,12 @@ function AiPlayer(controller, view) {
 
                         // We have a winner!
                         // console.debug("AiPlayer.play() [simulation mode]: %s has won game #%d.", mostRecentSurvivingFaction, gamesPlayed);
-                        result.statistics.totalGamesWon[mostRecentSurvivingFaction] += 1;
-                        result.statistics.averageTurnsToWin[mostRecentSurvivingFaction] += (i + 1);
-                        result.winningFaction = mostRecentSurvivingFaction;
-                        result.survivingRobots = mostRecentSurvivingFactionRobots.filter(function(robot) {
-                            return (robot.hitpoints > 0);
-                        });
+                        result.factionStatistics.totalGamesWon[mostRecentSurvivingFaction] += 1;
+                        result.factionStatistics.averageTurnsToWin[mostRecentSurvivingFaction] += (i + 1);
+
                         // Update survival probabilities (these are per-robot.)
                         for (let j = 0; j < factions.length; ++j) {
-                            let probabilities = result.statistics.survivalProbabilities[factions[j].name];
+                            let probabilities = result.factionStatistics.survivalProbabilities[factions[j].name];
 
                             // Grow the array if necessary.  Only happens once per faction.
                             while (probabilities.length < factions[j].robots.length) {
@@ -1151,7 +1150,7 @@ function AiPlayer(controller, view) {
                 // End of simulated game. //
                 ////////////////////////////
                 gamesPlayed += 1;
-                result.statistics.averageGameDurationMilliseconds += (Date.now() - startTimeMilliseconds);
+                result.averageGameDurationMilliseconds += (Date.now() - startTimeMilliseconds);
 
                 // Cleanup.
                 for (let i = 0; i < factions.length; ++i) {
@@ -1175,26 +1174,28 @@ function AiPlayer(controller, view) {
 
 
             // Compile final statistics.
-            result.statistics.totalGamesPlayed                          = gamesPlayed;
-            result.statistics.averageGameDurationMilliseconds          /= gamesPlayed;
+            result.totalGamesPlayed                                            = gamesPlayed;
+            result.averageGameDurationMilliseconds                            /= gamesPlayed;
             for (let i = 0, factions = controller.getGameFactions(); i < factions.length; ++i) {
-                result.statistics.victoryProbability[factions[i]]      = result.statistics.totalGamesWon[factions[i]] / gamesPlayed;
-                result.statistics.averageDamageDealt[factions[i]]      /= gamesPlayed;
-                result.statistics.averageDamagePrevented[factions[i]]  /= gamesPlayed;
-                result.statistics.averageDamageTaken[factions[i]]      /= gamesPlayed;
-                result.statistics.averageTargetsDestroyed[factions[i]] /= gamesPlayed;
+                // Per-faction statistics.
+                result.factionStatistics.victoryProbability[factions[i]]       = result.factionStatistics.totalGamesWon[factions[i]] / gamesPlayed;
+                result.factionStatistics.averageDamageDealt[factions[i]]      /= gamesPlayed;
+                result.factionStatistics.averageDamagePrevented[factions[i]]  /= gamesPlayed;
+                result.factionStatistics.averageDamageTaken[factions[i]]      /= gamesPlayed;
+                result.factionStatistics.averageTargetsDestroyed[factions[i]] /= gamesPlayed;
 
-                if (result.statistics.totalGamesWon[factions[i]] > 0) {
-                    result.statistics.averageTurnsToWin[factions[i]]   /= result.statistics.totalGamesWon[factions[i]];
+                if (result.factionStatistics.totalGamesWon[factions[i]] > 0) {
+                    result.factionStatistics.averageTurnsToWin[factions[i]]   /= result.factionStatistics.totalGamesWon[factions[i]];
                 }
 
-                for (let j = 0, probabilities = result.statistics.survivalProbabilities[factions[i]], robots = controller.getGameRobots(factions[i]);
+                for (let j = 0, probabilities = result.factionStatistics.survivalProbabilities[factions[i]], robots = controller.getGameRobots(factions[i]);
                      j < robots.length;
                      ++j) {
                     probabilities[j]                                   /= gamesPlayed;
                 }
             }
-            for (let robotInternalName in result.statistics.effectiveDamagePerUnitCost) {
+            for (let robotInternalName in result.robotStatistics.averageLongevity) {
+                // Per-robot statistics.
 
                 let numberOfUnitsOfThisType = 0;
                 for (let i = 0, robots = controller.getGameRobots(); i < robots.length; ++i) {
@@ -1203,17 +1204,34 @@ function AiPlayer(controller, view) {
                     }
                 }
 
-                let totalDamageDealtByAllUnitsOfThisType = result.statistics.effectiveDamagePerUnitCost[robotInternalName];
-                let totalDamageDealtByAverageUnitOfThisType = totalDamageDealtByAllUnitsOfThisType / numberOfUnitsOfThisType;
-                let averageDamageDealtByAverageUnitOfThisTypePerGame = totalDamageDealtByAverageUnitOfThisType / gamesPlayed;
-                result.statistics.effectiveDamagePerUnitCost[robotInternalName] = averageDamageDealtByAverageUnitOfThisTypePerGame / Robot.dataTable[robotInternalName].score;
-                // let equation = String.format("({0})/({1} * {2} * {3})",
-                //                             totalDamageDealtByAllUnitsOfThisType,
-                //                             numberOfUnitsOfThisType,
-                //                             gamesPlayed,
-                //                             Robot.dataTable[robotInternalName].score);
-                // result.statistics.effectiveDamagePerUnitCost[robotInternalName] = equation;
+                let totalTurnsForAllUnitsOfThisType = result.robotStatistics.averageLongevity[robotInternalName];
+                let totalAttemptedDamageForAllUnitsOfThisType = result.robotStatistics.costEffectiveness[robotInternalName];
+                let totalAchievedDamageForAllUnitsOfThisType = result.robotStatistics.combatEffectiveness[robotInternalName];
+
+                result.robotStatistics.costEffectiveness[robotInternalName] =
+                    totalAttemptedDamageForAllUnitsOfThisType / (numberOfUnitsOfThisType * totalTurnsForAllUnitsOfThisType * Robot.dataTable[robotInternalName].score);
+
+                // This is the average finalDamage dealt per bot, per turn.
+                // result.robotStatistics.combatEffectiveness[robotInternalName] =
+                //     totalAchievedDamageForAllUnitsOfThisType / (numberOfUnitsOfThisType * totalTurnsForAllUnitsOfThisType);
+                // And this, what I really want, is the average finalDamage
+                // dealt per bot, per game.
+                result.robotStatistics.combatEffectiveness[robotInternalName] =
+                     totalAchievedDamageForAllUnitsOfThisType / (gamesPlayed * numberOfUnitsOfThisType);
+
+                result.robotStatistics.averageLongevity[robotInternalName]  =
+                    totalTurnsForAllUnitsOfThisType / (gamesPlayed * numberOfUnitsOfThisType);
             }
+            // Who won overall?
+            let winningFactionProbability = 0;
+            let winningFactionName = "";
+            for (let i = 0, factions = controller.getGameFactions(); i < factions.length; ++i) {
+                if (result.factionStatistics.victoryProbability[factions[i]] > winningFactionProbability) {
+                    winningFactionProbability = result.factionStatistics.victoryProbability[factions[i]];
+                    winningFactionName = factions[i];
+                }
+            }
+            result.winner = winningFactionName;
             return result;
 
         } // end (if we're using a simulation playstyle)
