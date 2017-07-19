@@ -331,7 +331,7 @@ function PlainView(controller) {
                 }
 
                 // It also triggers many smaller e4 blasts.
-                let smallExplosionCount = Math.round((robotArea / (128*128)) * 3.8);
+                let smallExplosionCount = Math.round((robotArea / (128*128)) * 4.4);
                 for (let i = 0, delay = 0, delayIncrement = (explosionDurationMilliseconds - explosions[0].duration)/smallExplosionCount;
                      i < smallExplosionCount;
                      ++i, delay += delayIncrement) {
@@ -2246,7 +2246,9 @@ function PlainView(controller) {
                     damageAdjective = "a rather disappointing ";
                 } else if (n > 0.3) {
                     // damageAdjective = "a depressingly low ";
-                    damageAdjective = "a surprisingly low ";
+                    // damageAdjective = "a surprisingly low ";
+                    // damageAdjective = "an unusually low ";
+                    damageAdjective = "an unexpectedly low ";
                 } else {
                     // damageAdjective = "a less-than-impressive ";
                     // damageAdjective = "an admittedly bad ";
@@ -2404,10 +2406,17 @@ function PlainView(controller) {
                 // worked, we should show that.
 
                 if (damageReport.armorDamage.damage > 0) {
-                    narrative += String.format(".  The <span class='enemy name'>{0}'s</span> {1}armor plating <strong class='enemy'>prevents</strong> {2} damage.",
+
+                    let addendum = ".";
+                    if (defendingRobot.hitpoints <= 0) {
+                        addendum = ", but this is not enough.";
+                    }
+
+                    narrative += String.format(".  The <span class='enemy name'>{0}'s</span> {1}armor plating <strong class='enemy'>prevents</strong> {2} damage{3}",
                                                defendingRobot.longName,
                                                armorAdjective,
-                                               damageReport.armorDamage.damage);
+                                               damageReport.armorDamage.damage,
+                                               addendum);
                 } else {
                     // The armor didn't work.  The whole point of armor is to
                     // *protect* you!

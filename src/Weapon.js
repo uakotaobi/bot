@@ -176,7 +176,7 @@ function Weapon(weaponType) {
             longName       : "Mortar Cannon",
             shortName      : "MORTAR",
             class          : "medium",
-            damage         : "1 + (1d4)^2", // EV=just 7.25, a wee bit better than 2D6.  But 2 of them together are better than a Gauss Gun!
+            damage         : "1 + (1d4*1d4)", // EV=just 7.25, a wee bit better than 2D6.  But 2 of them together are better than a Gauss Gun!
             ammoPerRound   : 1,
             ammo           : 6
         },
@@ -185,6 +185,14 @@ function Weapon(weaponType) {
             shortName      : "H. MORTAR",
             class          : "heavy",
             damage         : "2 + (1d5)^2", // Scary, but the EV is only 11.
+            ammoPerRound   : 1,
+            ammo           : 5
+        },
+        "thermaldetonator" : {
+            longName       : "G2150 Thermal Detonator",
+            shortName      : "DETONATOR",
+            class          : "heavy",
+            damage         : "1d2 + 1d12 + (1d4)^2", // EV is 14.25, just a bit less than the AC/5.
             ammoPerRound   : 1,
             ammo           : 5
         },

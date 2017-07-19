@@ -213,8 +213,8 @@ function Robot(robotType) {
                 description  : "<p>Few 'Bots are fast enough to escape the Imp's" +
                     " powerful <strong>cluster bomb barrage</strong> without" +
                     " sustaining heavy damage.  Imp pilots then pick off the" +
-                    " casualties at their leisure with a mix of long- and" +
-                    " short-range weaponry.</p>"
+                    " casualties at their leisure with a combination of long-" +
+                    " and short-range weaponry.</p>"
             },
             "charon"            : {
                 modelNumber  : "Edison Heavy Industries M35",

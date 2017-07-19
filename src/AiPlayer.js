@@ -545,7 +545,7 @@ function AiPlayer(controller, view) {
             // left the emergency logging in just to be sure.
             if (ourBot.id !== controller.getCurrentRobot().id) {
                 let currentBot = controller.getCurrentRobot();
-                console.error(String.format("AiPlayer.playOneRound(): {0} {1} ({2}) has prepared an attack, but it cannot execute it because the game now thinks that it's {3} {4} ({5})'s turn.  That is a *BUG* and needs to be fixed.  Skipping the {6}'s turn for now.",
+                console.error(String.format("AiPlayer.playOneRound(): Internal error: {0} {1} ({2}) has prepared an attack, but it cannot execute it because the game now thinks that it's {3} {4} ({5})'s turn.  That is a *BUG* and needs to be fixed.  Skipping the {6}'s turn for now.",
                                             ourBot.longName,
                                             ourBot.id,
                                             ourBot.faction,
@@ -1224,14 +1224,38 @@ function AiPlayer(controller, view) {
             }
             // Who won overall?
             let winningFactionProbability = 0;
-            let winningFactionName = "";
+            let winningFactionNames = [];
             for (let i = 0, factions = controller.getGameFactions(); i < factions.length; ++i) {
                 if (result.factionStatistics.victoryProbability[factions[i]] > winningFactionProbability) {
                     winningFactionProbability = result.factionStatistics.victoryProbability[factions[i]];
-                    winningFactionName = factions[i];
+                    winningFactionNames = [ factions[i] ];
+                } else if (result.factionStatistics.victoryProbability[factions[i]] === winningFactionProbability) {
+                    winningFactionNames.push(factions[i]);
                 }
             }
-            result.winner = winningFactionName;
+
+            let numberOfWins = result.factionStatistics.totalGamesWon[winningFactionNames[0]];
+            if (winningFactionNames.length === 1) {
+                result.winner = winningFactionNames[0];
+            } else if (winningFactionNames.length == 2) {
+                  result.winner = String.format("Tie between {0} and {1} ({2} match{3} each)",
+                                                winningFactionNames[0],
+                                                winningFactionNames[1],
+                                                numberOfWins,
+                                                (numberOfWins > 1 ? "es" : ""));
+            } else {
+                let listOfWinners = "";
+                for (let i = 0; i < winningFactionNames.length - 1; ++i) {
+                    listOfWinners += String.format("{0}, ", winningFactionNames[i]);
+                }
+                listOfWinners += String.format("and {0}", winningFactionNames[winningFactionNames.length - 1]);
+
+                result.winner = String.format("{0}-way tie between {1} ({2} match{3} each)",
+                                              winningFactionNames.length,
+                                              listOfWinners,
+                                              numberOfWins,
+                                              (numberOfWins > 1 ? "es" : ""));
+            }
             return result;
 
         } // end (if we're using a simulation playstyle)
