@@ -31,11 +31,11 @@ function AiPlayer(controller, view) {
     // Find the most effective attack (that is, a weapon name/enemy pair) for
     // an arbitrary robot at this point in time.
     //
-    // The allRobots argument exists only for the benefit of AiPlayer.play(),
-    // and only for the PlayStyleSimulation and PlayStyleMonteCarlo simulated
-    // play styles at that.  It causes us to derive our list of allies and
-    // adversaries from the then list instead of using the GameController's
-    // list.
+    // The allRobots[] array argument exists only for the benefit of
+    // AiPlayer.play(), and only for the PlayStyleSimulation and
+    // PlayStyleMonteCarlo simulated play styles at that.  It causes us to
+    // derive our list of allies and adversaries from the given list instead
+    // of using the GameController's official list.
     //
     // Returns an object with the following fields:
     // - weaponName: The name of the weapon that this robot should attack

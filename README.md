@@ -97,7 +97,7 @@ JavaScript console on your web browser.
    ```javascript
    robot = new Robot("scarab")
    g.controller().addRobot("The Star Alliance", robot)
-   g.view().addRobot(r)
+   g.view().addRobot(robot)
    g.view().updateRobots()
    ```
 

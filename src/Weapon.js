@@ -809,7 +809,7 @@ function Weapon(weaponType) {
     // expression (but keep in mind that a 2d6 will be split into two 1d6
     // rolls).
     //
-    // If the dmaageType is not Weapon.useExpectedValues or if the
+    // If the damageType is not Weapon.useExpectedValues or if the
     // damageString had no die token in the first place, the rolls array
     // will be empty.
 

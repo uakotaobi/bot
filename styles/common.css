@@ -431,6 +431,15 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
                 height 1s ease-in,
                 left 1s cubic-bezier(0.6, -0.28, 0.735, 0.045),
                 top 1s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+    /* This game involves a lot of double-clicking, and that inadvertently
+       selects all the text on the page more often than not.  Disable that
+       annoyance.
+
+       User-select is just too new to have widespread support right now. */
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 .robot.active { border: 2px outset gray; }
 .robot.targeted { border: 2px inset red; }

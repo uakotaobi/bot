@@ -208,7 +208,7 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
 
 
     // Looks at the current faction selections for each player, then assures
-    // that the faction's flag appears to the right of that row.'
+    // that the faction's flag appears to the right of that row.
     let updatePlayerRowFlags = function() {
 
         let playerRows = container.querySelectorAll(".player-list .player.row");

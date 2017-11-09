@@ -114,9 +114,6 @@ function Game() {
 
     // Hides our view and shows the selection screen instead.  Surprisingly
     // simple for such an important function.
-    //
-    // TODO: Should we call a function to reset anything, or is it okay to
-    // just leave it the way it was?
     this.launchSelectScreen = function() {
         view.hide();
         select.show();

@@ -220,6 +220,9 @@ function PlainView(controller) {
     // TODO: Nothing's stopping me from also adding various weapon internal
     // names to the switch and just *not* disappearing the robot in those
     // cases.  That gives us per-weapon explosion effects, which could be fun.
+    //
+    // UPDATE: That's what I ended up doing; see the "blast-" cases in the
+    // switch.
 
     this.explode = function(robot, explosionType, fireDurationMilliseconds, explosionDurationMilliseconds) {
 
@@ -1017,7 +1020,7 @@ function PlainView(controller) {
                 case "Escape":
                 {
                     let robotsCleanedUp = view.removeDeadRobots(controller.getCurrentRobot().faction);
-                    if (robotsCleanedUp == 0) {
+                    if (robotsCleanedUp === 0) {
                         // I suppose we could use this to pop up a dialog to
                         // end the game.  I don't see why, but we could.
                     }
@@ -1407,7 +1410,7 @@ function PlainView(controller) {
             // Clicking on the robot div will enemy-select it, same as clicking on the radio button.
             robotContainer.onclick = getRobotOnClickHandler(this, robotSelectRadioButton);
 
-            // Step 4: Set the callbacks for this robot's 'close button so
+            // Step 4: Set the callbacks for this robot's 'close' button so
             // that the player can remove it from the system (if and only if
             // it's dead.)
             let closeButton = document.querySelector("#" + id(robot.id) + " .top-bar .close");
@@ -1570,7 +1573,7 @@ function PlainView(controller) {
         //
         // The reason being that this leads to a consistent cross-browser
         // problem: the mainImageDivImage.naturalHeight is sometimes able to
-        // retain the naturalHeight that is had *before* the src attribute was
+        // retain the naturalHeight that it had *before* the src attribute was
         // modified.  And since the src attribute defaults to the 200px-high
         // Munchkin in game.html, this results in Munchkin-sized light,
         // medium, and heavy Bots.
@@ -1923,8 +1926,8 @@ function PlainView(controller) {
 
             let hitpointsDiv = document.querySelector("#" + id(robot.id) + " .top-bar .hp .number");
             hitpointsDiv.textContent = robot.hitpoints;
-            // Our team's hitpoints change color to let us know at a glance
-            // how badly we're doing.
+            // Our team's bot hitpoints change color to let us know at a
+            // glance how badly we're doing.
             if (activeRobot && robot.faction === activeRobot.faction) {
                 if (robot.hitpoints/robot.originalHitpoints < 0.333) {
                     hitpointsDiv.setAttribute("class", "number low");
@@ -2830,9 +2833,9 @@ function PlainView(controller) {
                 losingFactions.push(factions[i]);
             }
         }
-        if (losingFactions.length == 1) {
+        if (losingFactions.length === 1) {
             losingFactionString = String.format("<span class='enemy name'>{0}</span>", losingFactions[0]);
-        } else if (losingFactions.length == 2) {
+        } else if (losingFactions.length === 2) {
             losingFactionString = String.format("<span class='enemy name'>{0} and <span class='enemy name'>{1}</span>",
                                                 losingFactions[0],
                                                 losingFactions[1]);
