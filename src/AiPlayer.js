@@ -242,6 +242,8 @@ function AiPlayer(controller, view) {
                     if (!(friendlyRobot.id in bestWeaponsAgainstOurFaction) ||
                         expectedDamage > bestWeaponsAgainstOurFaction[friendlyRobot.id].expectedDamage) {
 
+                        // So far, this is the enemyRobot's most effective
+                        // weapon again this ally.
                         bestWeaponsAgainstOurFaction[friendlyRobot.id] = {
                             expectedDamage: expectedDamage,
                             weapon: currentEnemyWeapon

@@ -625,7 +625,7 @@ function PlainView(controller) {
                         w = 100;
                         h = 100;
                         count = 14/2;
-                        durationMilliseconds = 0.35;
+                        durationMilliseconds = 0.66;  //0.35;
                         // Explosion 0 has a start time of 0.
                         // Explosion 13 has a start time of 0.65 (1.0 - duration).
                         // Delay between start times would be 0.65/count, but duration must be taken into account.
@@ -2371,6 +2371,11 @@ function PlainView(controller) {
                                                        damageReport.armorDamage.damage,
                                                        (damageReport.armorDamage.damage > 1 ? "are" : "is"),
                                                        armorAdjective);
+
+                        } else if (damageReport.armorDamage.damage === 0) {
+
+                            narrative += String.format(" at a point where its armor is <strong>weakest</strong>.");
+
                         } else {
                             // The jump did the trick, but the armor failed to play its part.
                             narrative += String.format(". Curiously, its armor plating affords it <strong>no protection</strong>.");
@@ -2393,6 +2398,11 @@ function PlainView(controller) {
                                                        armorAdjective,
                                                        damageReport.armorDamage.damage,
                                                        (damageReport.armorDamage.damage > 1 ? "s" : ""));
+
+                        } else if (damageReport.armorDamage.damage === 0) {
+
+                            narrative += String.format(".  An exposed part of its chassis takes a <strong>direct hit</strong>");
+
                         } else {
                             // The jump misfired *and* the armor misfired.
                             // Whatever you paid for this Bot, you should ask
@@ -2420,6 +2430,14 @@ function PlainView(controller) {
                                                armorAdjective,
                                                damageReport.armorDamage.damage,
                                                addendum);
+
+
+                } else if (damageReport.armorDamage.damage === 0) {
+
+                    narrative += String.format(" and scores a <strong>direct hit</strong> in a gap between the <span class='enemy name'>{0}</span>'s {1} armor plating.",
+                                               defendingRobot.longName,
+                                               armorAdjective);
+
                 } else {
                     // The armor didn't work.  The whole point of armor is to
                     // *protect* you!
