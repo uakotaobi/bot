@@ -60,7 +60,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     width: 50%;
     /* No default height.  Dialogs are adjustible by default. */
     /* height: 50%; */
-    padding: 20px;
+    padding: 20px 20px 10px 20px;
 
     box-shadow: 8px 8px 8px 4px black;
 
@@ -119,6 +119,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     background-image: url("../assets/images/icons/[CC-BY-SA-3.0] Myckel - 6 Sci-Fi symbols (sci-fi_symbols) [OpenGameArt]-%235.png");
 }
 .dialog.turn {
+    padding: 10px;
     width: 30%;
     /* height: 15%; */
     /* I'd like the bigger AI turn dialogs to expand to fill their content.  You'd
