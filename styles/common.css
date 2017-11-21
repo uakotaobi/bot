@@ -252,6 +252,7 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
 .dialog.endgame {
     height: 75%;
     top: 12%;
+    padding: 20px;
 }
 .dialog.endgame .background {
     height: 100%;

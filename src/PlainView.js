@@ -2149,6 +2149,10 @@ function PlainView(controller) {
     // controller.getCurrentRobot() and controller.getCurrentRobotEnemy()
     // won't work.)
     //
+    // We use <span/> and <strong/> to describe events which are favorable for
+    // the *attacker*, and <span class='enemy'/> and <strong class='enemy'/>
+    // to describe events which are favorable for the defender.
+    //
     // Returns the sentence string.
     this.weaveNarrative = function(damageReport, attackingRobot, attackingRobotWeapon, defendingRobot) {
         let enemyName = String.format("the <strong class='enemy name'>{0}</strong>", defendingRobot.longName);
@@ -2367,17 +2371,33 @@ function PlainView(controller) {
                     if (defendingRobot.armor !== "") {
 
                         if (damageReport.armorDamage.damage > 0) {
-                            narrative += String.format(", {0} of which {1} <strong class='enemy'>deflected</strong> by its {2}armor plating.",
-                                                       damageReport.armorDamage.damage,
-                                                       (damageReport.armorDamage.damage > 1 ? "are" : "is"),
-                                                       armorAdjective);
+
+                            if (defendingRobot.hitpoints > 0) {
+                                // The defender partially jumped, had armor to
+                                // protect it, and survived.
+                                narrative += String.format(", {0} of which {1} <strong class='enemy'>deflected</strong> by its {2}armor plating.",
+                                                           damageReport.armorDamage.damage,
+                                                           (damageReport.armorDamage.damage > 1 ? "are" : "is"),
+                                                           armorAdjective);
+                            } else {
+                                // The defender partially jumped, had armor to
+                                // protect it, and still blew up.
+                                narrative += String.format(".  Its {0}armor plating <strong class='enemy'>deflects</strong> {1} damage, this is not enough.",
+                                                           armorAdjective,
+                                                           damageReport.armorDamage.damage);
+                            }
 
                         } else if (damageReport.armorDamage.damage === 0) {
 
+                            // The defender partially jumped, had armor to
+                            // protect it, and got a really bad armor roll.
                             narrative += String.format(" at a point where its armor is <strong>weakest</strong>.");
 
                         } else {
-                            // The jump did the trick, but the armor failed to play its part.
+                            // The defender partially jumped, but then its
+                            // armor roll failed so badly that technically
+                            // speaking, they ought to be taking damage from
+                            // it.
                             narrative += String.format(". Curiously, its armor plating affords it <strong>no protection</strong>.");
                         }
 
@@ -2394,14 +2414,21 @@ function PlainView(controller) {
                     // they do exist.
                     if (defendingRobot.armor !== "") {
                         if (damageReport.armorDamage.damage > 0) {
-                            narrative += String.format("; its {0}armor still prevents {1} point{2} of damage.",
+
+                            let addendum = ".";
+                            if (defendingRobot.hitpoints <= 0) {
+                                addendum = ", but this is not enough.";
+                            }
+
+                            narrative += String.format("; its {0}armor still prevents {1} point{2} of damage{3}",
                                                        armorAdjective,
                                                        damageReport.armorDamage.damage,
-                                                       (damageReport.armorDamage.damage > 1 ? "s" : ""));
+                                                       (damageReport.armorDamage.damage > 1 ? "s" : ""),
+                                                       addendum);
 
                         } else if (damageReport.armorDamage.damage === 0) {
 
-                            narrative += String.format(".  An exposed part of its chassis takes a <strong>direct hit</strong>");
+                            narrative += String.format(".  An exposed part of its chassis suffers a <strong>direct hit</strong>");
 
                         } else {
                             // The jump misfired *and* the armor misfired.
@@ -2522,6 +2549,7 @@ function PlainView(controller) {
             return;
         }
 
+        let cssDialogTop = "5%";
         if (controller.getCurrentRobot().hasAmmo() === false) {
 
             // If you're out of ammo, obviously you can't select anything.
@@ -2533,7 +2561,7 @@ function PlainView(controller) {
             console.debug("The human-controlled %s %s is out of ammunition.  Displaying out-of-ammo dialog.",
                           controller.getCurrentRobot().longName,
                           controller.getCurrentRobot().id);
-            let dialog = this.addDialog("generic", "30%", "15%", "40%", "",
+            let dialog = this.addDialog("generic", "30%", cssDialogTop, "40%", "",
                                         0, true);
             dialog.querySelector(".title").textContent = "Damage Report";
 
@@ -2556,7 +2584,7 @@ function PlainView(controller) {
 
             // We don't have any of our critical data.  That's our signal that
             // the turn has just begun.
-            let dialog = this.addDialog("turn", "35%", "5%", "30%", "15%", 1500,
+            let dialog = this.addDialog("turn", "35%", cssDialogTop, "30%", "10%", 1500,
                                         true);
             dialog.querySelector(".logo").style.backgroundImage = "url(\"" +
                 currentFactionIcon + "\")";
@@ -2570,7 +2598,7 @@ function PlainView(controller) {
 
             // We're still missing a weapon to shoot.
 
-            let dialog = this.addDialog("small", "45%", "10%", "10%", "2em",
+            let dialog = this.addDialog("small", "45%", cssDialogTop, "10%", "2em",
                                         1500, true);
             dialog.setAttribute("class", "dialog small green");
             dialog.querySelector(".content").textContent = "Select a weapon to fire.";
@@ -2580,7 +2608,7 @@ function PlainView(controller) {
 
             // We're still missing an enemy to shoot.
 
-            let dialog = this.addDialog("small", "45%", "10%", "10%", "2em",
+            let dialog = this.addDialog("small", "45%", cssDialogTop, "10%", "2em",
                                         1500, true);
             dialog.setAttribute("class", "dialog small green");
             dialog.querySelector(".content").textContent = "Select an enemy to attack.";
@@ -2594,7 +2622,7 @@ function PlainView(controller) {
             let theBadGuy = controller.getCurrentRobotEnemy();
             let o = controller.attackCurrentEnemy();
 
-            let dialog = this.addDialog("generic", "30%", "15%", "40%", "",
+            let dialog = this.addDialog("generic", "30%", cssDialogTop, "40%", "",
                                         0, true);
             dialog.querySelector(".title").textContent = "Damage Report";
 
