@@ -2273,9 +2273,7 @@ function PlainView(controller) {
             // Your weapon's intrinsic damage was non-positive?  Its
             // damageString must be terrible!
             narrative +=
-                String.format("The <span class='name'>{0}'s</span> " +
-                              "{1} <strong class='enemy'>jams</strong>, " +
-                              "dealing no damage this round.",
+                String.format("The <span class='name'>{0}'s</span> {1} <strong class='enemy'>jams</strong>, dealing no damage this round.",
                               attackingRobot.longName,
                               attackingRobotWeapon.longName);
 
@@ -2294,9 +2292,7 @@ function PlainView(controller) {
 
                     // The jump prevented all the damage on its own.
                     narrative +=
-                        String.format("The <span class='enemy name'>{0}</span> " +
-                                      "<strong class='enemy'>jumps</strong>, " +
-                                      "avoiding {1} point{2} of damage from {3}.",
+                        String.format("The <span class='enemy name'>{0}</span> <strong class='enemy'>jumps</strong>, avoiding {1} point{2} of damage from {3}.",
                                       defendingRobot.longName,
                                       damageReport.originalDamage.damage,
                                       (damageReport.originalDamage.damage > 1 ? "s" : ""),
@@ -2308,22 +2304,14 @@ function PlainView(controller) {
                     // the moment.)
 
                     narrative +=
-                        String.format("The <span class='name'>{0}</span> " +
-                                      "attacks {1} for {2}{3} damage",
+                        String.format("The <span class='name'>{0}</span> attacks {1} for {2}{3} damage",
                                       attackingRobot.longName,
                                       enemyName,
                                       damageAdjective,
                                       damageReport.originalDamage.damage);
 
                     narrative +=
-                        String.format(". The <span class='enemy" +
-                                      "name'>{0}</span> " +
-                                      "<strong>partially</strong> dodges " +
-                                      "the attack by jumping, but the " +
-                                      "remaining {1} damage is <strong " +
-                                      "class='enemy'>deflected</strong> by " +
-                                      "its armor plating.  It takes no " +
-                                      "damage this round.",
+                        String.format(". The <span class='enemy name'>{0}</span> <strong>partially</strong> dodges the attack by jumping, but the remaining {1} damage is <strong class='enemy'>deflected</strong> by its armor plating.  It takes no damage this round.",
                                       defendingRobot.longName,
                                       damageReport.originalDamage.damage - Math.floor(damageReport.jumpDamage.damage));
 
@@ -2332,12 +2320,7 @@ function PlainView(controller) {
 
                 // The enemy's armor alone was responsible.
                 narrative +=
-                    String.format("The <span class='name'>{0}</span> deals " +
-                                  "{1} damage, but it is <strong " +
-                                  "class='enemy'>completely " +
-                                  "deflected</strong> by the <span " +
-                                  "class='enemy name'>{2}'s</span> " +
-                                  "{3}armor plating.",
+                    String.format("The <span class='name'>{0}</span> deals {1} damage, but it is <strong class='enemy'>completely deflected</strong> by the <span class='enemy name'>{2}'s</span> {3}armor plating.",
                                   attackingRobot.longName,
                                   damageReport.originalDamage.damage,
                                   defendingRobot.longName,
@@ -2348,8 +2331,7 @@ function PlainView(controller) {
             // You dealt at least some damage.  We need a full report.
 
             narrative +=
-                String.format("The <span class='name'>{0}</span> " +
-                              "attacks {1} for {2}{3} damage",
+                String.format("The <span class='name'>{0}</span> attacks {1} for {2}{3} damage",
                               attackingRobot.longName,
                               enemyName,
                               damageAdjective,
@@ -2382,8 +2364,7 @@ function PlainView(controller) {
                             } else {
                                 // The defender partially jumped, had armor to
                                 // protect it, and still blew up.
-                                narrative += String.format(".  Its {0}armor plating <strong class='enemy'>deflects</strong> {1} damage, this is not enough.",
-                                                           armorAdjective,
+                                narrative += String.format(".  Its armor plating only <strong class='enemy'>deflects</strong> {0} damage, and this is <strong>not enough</strong>.",
                                                            damageReport.armorDamage.damage);
                             }
 
@@ -2402,6 +2383,7 @@ function PlainView(controller) {
                         }
 
                     } else {
+                        // The defender partially jumped and had no armor.
                         narrative += ".";
                     }
                 } else {
@@ -2415,20 +2397,29 @@ function PlainView(controller) {
                     if (defendingRobot.armor !== "") {
                         if (damageReport.armorDamage.damage > 0) {
 
-                            let addendum = ".";
-                            if (defendingRobot.hitpoints <= 0) {
-                                addendum = ", but this is not enough.";
-                            }
+                            if (defendingRobot.hitpoints > 0) {
+                                // The defender failed to jump, had armor to
+                                // protect it, and survived.
+                                narrative += String.format("; its {0}armor still prevents {1} point{2} of damage.",
+                                                           armorAdjective,
+                                                           damageReport.armorDamage.damage,
+                                                           (damageReport.armorDamage.damage > 1 ? "s" : ""));
 
-                            narrative += String.format("; its {0}armor still prevents {1} point{2} of damage{3}",
-                                                       armorAdjective,
-                                                       damageReport.armorDamage.damage,
-                                                       (damageReport.armorDamage.damage > 1 ? "s" : ""),
-                                                       addendum);
+                            } else {
+                                // The defender failed to jump, had armor to
+                                // protect it, and still blew up.
+                                narrative += String.format(", and while its {0}armor prevents {1} point{2} of damage, this is <strong>not enough</strong>.",
+                                                           armorAdjective,
+                                                           damageReport.armorDamage.damage,
+                                                           (damageReport.armorDamage.damage > 1 ? "s" : ""));
+
+                            }
 
                         } else if (damageReport.armorDamage.damage === 0) {
 
-                            narrative += String.format(".  An exposed part of its chassis suffers a <strong>direct hit</strong>");
+                            // The defender failed to jump, had armor to
+                            // protect it, and got really bad armor roll.
+                            narrative += String.format(".  An exposed part of its chassis suffers a <strong>direct hit</strong>.");
 
                         } else {
                             // The jump misfired *and* the armor misfired.
@@ -2437,6 +2428,7 @@ function PlainView(controller) {
                             narrative += String.format(" and takes <strong>full damage</strong>, thanks in no small part to its laughable excuse for armor.");
                         }
                     } else {
+                        // The defender failed to jump and had no armor.
                         narrative += ".";
                     }
                 }
@@ -2449,7 +2441,7 @@ function PlainView(controller) {
 
                     let addendum = ".";
                     if (defendingRobot.hitpoints <= 0) {
-                        addendum = ", but this is not enough.";
+                        addendum = ", but this is <strong>not enough</strong>.";
                     }
 
                     narrative += String.format(".  The <span class='enemy name'>{0}'s</span> {1}armor plating <strong class='enemy'>prevents</strong> {2} damage{3}",
