@@ -122,17 +122,15 @@ body > .content.backdrop-2 { background: url("../assets/images/backgrounds/ISS00
     padding: 10px;
     width: 30%;
     /* height: 15%; */
-    /* I'd like the bigger AI turn dialogs to expand to fill their content.  You'd
-       think setting a min-height would be enough to do this, but you'd be
-       wrong: the height calculated using min-height is not inherited.  This
-       is a deficiency in the CSS spec that is unlikely to ever change.
-
-       Flexboxes (display: flex; flex-direction: column) work, but they're
-       new.
-
-       The old standby is display:table here and display:table-cell for the
-       .content.  This also works in practice, so that's what we use.  (These
-       are set programmatically.) */
+}
+.dialog.turn .content {
+    /* Fix the enemy (well, AI) turn dialog for Safari (but the changes should
+       work everywhere else.)  Without this override, you won't see the
+       borders of the turn dialog because the padding and margin positioning
+       from .dialog .content will cover it up. */
+    margin-left: 0px;
+    margin-top: 0px;
+    padding: 0px;
 }
 .dialog.turn .content > table {
     float: left;

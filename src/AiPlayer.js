@@ -621,11 +621,7 @@ function AiPlayer(controller, view) {
                 // turnDialog.onclick = view.createAdvanceTurnOnClickHandler(view, turnDialog.id);
 
                 // Show the dialog.
-                //
-                // See common.css for an explanation of why .dialog.turn isn't
-                // using "display: block" here like other dialogs do.
-                turnDialog.querySelector(".content").style.display = "table-cell";
-                turnDialog.style.display = "table";
+                turnDialog.style.display = "block";
             }
         }
 
