@@ -633,8 +633,11 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
                     clonedRow.setAttribute("class", String.format("row {0}", factionClass));
                     clonedRow.style.display = "block";
 
+                    // Selecting either an existing robot or a different one
+                    // updates the central display.
                     let robotSelect = clonedRow.querySelector(".type");
                     robotSelect.onchange = getRobotSelectChangeFunction(factionIndex, factionRobotRows.length + i);
+                    robotSelect.onmousedown = function() { that.updateCenterPanel(robotSelect.value ); };
 
                     // Where will we put it?
                     if (factionRobotRows.length === 0) {
