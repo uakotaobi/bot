@@ -465,7 +465,7 @@ function AiPlayer(controller, view) {
 
             // Create the end-of-turn dialog.
             let cssDialogTop = "5%";
-            turnDialog = view.addDialog("turn", "30%", cssDialogTop, "40%", "8em", 0/*8000*/, false);
+            turnDialog = view.addDialog("turn", "30%", cssDialogTop, "40%", "9em", 0/*8000*/, false);
             turnDialog.querySelector(".logo").style.backgroundImage = "url(\"" +
                 controller.getFactionIcon(ourBot.faction) + "\")";
             turnDialog.setAttribute("class", "dialog turn enemy red");
