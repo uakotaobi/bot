@@ -599,7 +599,7 @@ function AiPlayer(controller, view) {
                     }
 
                     const smokeDurationMilliseconds = 1000;
-                    view.explode(attackInfo.enemy, "jump", smokeDurationMilliseconds, jumpDurationMilliseconds);
+                    view.explode(attackInfo.enemy, Explosions.Jump, smokeDurationMilliseconds, jumpDurationMilliseconds);
                 }
 
                 // Add some narrative to the dialog.

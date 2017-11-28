@@ -259,7 +259,7 @@ function PlainView(controller) {
         let h                    = 0;
 
         switch(explosionType) {
-            case "light":
+            case Explosions.Light:
             {
                 // A rapid mix of small explosions.
                 let explosions = [
@@ -310,7 +310,7 @@ function PlainView(controller) {
 
                 break;
             }
-            case "medium":
+            case Explosions.Medium:
             {
                 // A couple of random e8s with some small blasts in between.
                 // Don't forget the fire.
@@ -367,7 +367,7 @@ function PlainView(controller) {
                 }, Math.max(0, explosionDurationMilliseconds - 2000));
                 break;
             }
-            case "heavy": case "assault":
+            case Explosions.Heavy: case Explosions.Assault:
             {
                 // First, start with a cascade of detailed little e1 blasts.
                 w = 128;
@@ -451,7 +451,7 @@ function PlainView(controller) {
                 // Phew!
                 break;
             }
-            case "jump":
+            case Explosions.Jump:
             {
                 // This is not an explosion, _sensu stricto_ (i.e., it does
                 // not result in the robot image being hidden at the end of
@@ -2652,7 +2652,7 @@ function PlainView(controller) {
                 }
 
                 const smokeDurationMilliseconds = 1000;
-                this.explode(theBadGuy, "jump", smokeDurationMilliseconds, jumpDurationMilliseconds);
+                this.explode(theBadGuy, Explosions.Jump, smokeDurationMilliseconds, jumpDurationMilliseconds);
             }
 
 
@@ -2756,15 +2756,16 @@ function PlainView(controller) {
     this.explodeRobot = function(robot) {
         switch(robot.class) {
             case "light":
-                this.explode(robot, robot.class, 10 * 1000, 2500);
+                this.explode(robot, Explosions.Light, 10 * 1000, 2500);
                 break;
             case "medium":
-                this.explode(robot, robot.class, 20 * 1000, 2000);
+                this.explode(robot, Explosions.Medium, 20 * 1000, 2000);
                 break;
             case "heavy": case "assault":
-                this.explode(robot, robot.class, 30 * 1000, 5000);
+                this.explode(robot, Explosions.Heavy, 30 * 1000, 5000);
                 break;
             default:
+                // Can't happen.
                 this.explode(robot, robot.class, 0, 1000);
                 break;
         }
