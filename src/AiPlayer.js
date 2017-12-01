@@ -598,7 +598,7 @@ function AiPlayer(controller, view) {
                         jumpDurationMilliseconds /= 10;
                     }
 
-                    const smokeDurationMilliseconds = 1000;
+                    const smokeDurationMilliseconds = 325;
                     view.explode(attackInfo.enemy, Explosions.Jump, smokeDurationMilliseconds, jumpDurationMilliseconds);
                 }
 

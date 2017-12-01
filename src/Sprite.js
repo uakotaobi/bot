@@ -20,13 +20,12 @@
 // A sprite is effectively an array of images with timing and position         //
 // information.  Having just one image is quite acceptable.                    //
 //                                                                             //
-// Width and Height are the starting width and height of the sprite in pixels. //
+// Width and Height are the starting width and height of the sprite (not the   //
+// sprite sheet!) in pixels.                                                   //
 /////////////////////////////////////////////////////////////////////////////////
 
 // All sprites, whether they are animated or not, are really instances of the
 // SpriteBase object.  It's the type that does the actual work.
-//
-// The width and the height must be in pixels.
 function SpriteBase(width, height) {
 
     // -----------------------------------------------------------------------
@@ -44,10 +43,11 @@ function SpriteBase(width, height) {
 
             let startTimeMilliseconds = Date.now();
 
-            // At the time of writing, there are 3 fire sprites and 16
-            // explosion sprites.  But it helps to overplan.
-            const fireSprites = 20;
+            // At the time of writing, there are only a handful of smoke,
+            // fire, and explosion sprites.  But it helps to overplan.
+            const fireSprites = 40;
             const explosionSprites = 40;
+            const smokeSprites = 40;
             let sprites = [];
 
             for (let i = 1; i <= fireSprites; ++i) {
@@ -59,6 +59,13 @@ function SpriteBase(width, height) {
             }
             for (let i = 1; i <= explosionSprites; ++i) {
                 let sprite = SpecialEffectSprite(String.format("e{0}", i));
+                if (sprite.totalFrames() > 0) {
+                    sprite.preload();
+                    sprites.push(sprite);
+                }
+            }
+            for (let i = 1; i <= smokeSprites; ++i) {
+                let sprite = SpecialEffectSprite(String.format("s{0}", i));
                 if (sprite.totalFrames() > 0) {
                     sprite.preload();
                     sprites.push(sprite);
@@ -317,7 +324,8 @@ function Sprite(width, height, imagePath) {
 
 
 // Creates a special effect sprite by name.  Sensible defaults are chosen when
-// the effect is created; you can override these if needed.
+// the effect is created; you can override these if needed.  (And in practice,
+// the PlainView usually does.)
 function SpecialEffectSprite(effectName) {
 
     switch(effectName) {
@@ -334,8 +342,10 @@ function SpecialEffectSprite(effectName) {
             sprite.framesPerSecond = 30;
             return sprite;
         }
-        // 81x123, 40 frames; short, detailed flame (forward version).  A decent
-        // campfire, but it's no conflagration.
+        // 81x123, 40 frames; short, detailed flame (forward version).  A
+        // decent campfire, but it's no conflagration.
+        //
+        // Still, this is the best fire animation I currently have.
         case "f2":
         {
             let sprite = new SpriteBase(81, 123);
@@ -344,8 +354,8 @@ function SpecialEffectSprite(effectName) {
             sprite.framesPerSecond = 20;
             return sprite;
         }
-        // 256x256, 50 frames; high-resolution, very detailed flame.  This is
-        // the best fire animation I currently have.
+        // 256x256, 50 frames; high-resolution.  You'd think it would have
+        // more detail.  Does not look good when stacked.
         //
         // The author actually has animations of this same fire with 75
         // frames, but that is a single 3MB sprite sheet, so disk space
@@ -356,6 +366,49 @@ function SpecialEffectSprite(effectName) {
             sprite.addFramesFromSpriteSheet("./assets/images/effects/FireLoop1-50-frames-256x256.png", 10, 5);
             sprite.framesPerSecond = 30;
             sprite.maxAgeMilliseconds = 15000;
+            return sprite;
+        }
+        // 128x128, 16 frames: an expanding ring of blue smoke.
+        case "s1":
+        {
+            let sprite = new SpriteBase(128, 128);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC0] [CC-BY-3.0] Soluna Software - Explosion effects and more (Effect95) [OpenGameArt].png", 4, 4);
+            sprite.loop = false;
+            sprite.maxFrameCount = 16;
+            sprite.framesPerSecond = 30;
+            return sprite;
+        }
+        // 1536x128, 6 frames: an oval cloud of gray smoke with a smattering
+        // of tumbling particles within.
+        case "s2":
+        {
+            let sprite = new SpriteBase(256, 128);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC-BY-3.0] Clint Bellanger - Quake Spell (quake_0_0) [OpenGameArt].png", 1, 6);
+            sprite.loop = false;
+            sprite.maxFrameCount = 6;
+            sprite.framesPerSecond = 54; // 6 frames in 325 milliseconds is approximately this.
+            return sprite;
+        }
+        // 1536x128, 6 frames: an oval cloud of fiery smoke with a smattering
+        // of tumbling particles within.
+        case "s3":
+        {
+            let sprite = new SpriteBase(256, 128);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC-BY-3.0] Clint Bellanger - Quake Spell (quake_0_1) [OpenGameArt].png", 1, 6);
+            sprite.loop = false;
+            sprite.maxFrameCount = 6;
+            sprite.framesPerSecond = 54;
+            return sprite;
+        }
+        // 1536x128, 6 frames: an oval cloud of blue smoke with a smattering
+        // of tumbling particles within.
+        case "s4":
+        {
+            let sprite = new SpriteBase(256, 128);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC-BY-3.0] Clint Bellanger - Quake Spell (quake_0_2) [OpenGameArt].png", 1, 6);
+            sprite.loop = false;
+            sprite.maxFrameCount = 6;
+            sprite.framesPerSecond = 54;
             return sprite;
         }
         // 128x128, 16 frames; brighter, spherical blast.  The most realistic
@@ -455,16 +508,9 @@ function SpecialEffectSprite(effectName) {
             sprite.framesPerSecond = 36;
             return sprite;
         }
-        // 128x128, 16 frames: an expanding ring of blue smoke.
-        case "e10":
-        {
-            let sprite = new SpriteBase(128, 128);
-            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC0] [CC-BY-3.0] Soluna Software - Explosion effects and more (Effect95) [OpenGameArt].png", 4, 4);
-            sprite.loop = false;
-            sprite.maxFrameCount = 16;
-            sprite.framesPerSecond = 30;
-            return sprite;
-        }
+
+        // Placeholder for e10.
+
         // 100x100, 30 frames: Burns fiery and hot before quickly turning
         // into rising soot and ash.
         case "e11":

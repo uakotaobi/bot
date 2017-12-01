@@ -493,13 +493,18 @@ function PlainView(controller) {
                         break;
                 }
 
-                // Let off e10 smoke ring explosions to mimic our "jump
+                // Let off s4 smoke ring explosions to mimic our "jump
                 // thrusters" impacting "the ground".
+                //
+                // If the jump is too short (with a cheating, hard-coded
+                // definition of "too short"), then use gray smoke from s2 to
+                // represent a misfire.
+                let smokeEffect = (explosionDurationMilliseconds <= 200 ? "s2" : "s4");
                 for (let w=128, h=128, i=0; i < smokeRings; ++i) {
                     let x = random(imageDivWidth/2 - robotImageWidth/2, imageDivWidth/2 + robotImageWidth/2);
                     let y = random(robotImageBottomY - 10, robotImageBottomY + 10);
                     let duration = random(fireDurationMilliseconds - 500, fireDurationMilliseconds + 500);
-                    this.createEffect(imageDiv, "e10",
+                    this.createEffect(imageDiv, smokeEffect,
                                       x - w/2,
                                       y - h/2,
                                       duration,
@@ -2651,7 +2656,7 @@ function PlainView(controller) {
                     jumpDurationMilliseconds /= 10;
                 }
 
-                const smokeDurationMilliseconds = 1000;
+                const smokeDurationMilliseconds = 325;
                 this.explode(theBadGuy, Explosions.Jump, smokeDurationMilliseconds, jumpDurationMilliseconds);
             }
 
