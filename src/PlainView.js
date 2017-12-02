@@ -493,13 +493,13 @@ function PlainView(controller) {
                         break;
                 }
 
-                // Let off s4 smoke ring explosions to mimic our "jump
-                // thrusters" impacting "the ground".
+                // Let off s3 smoke ring explosions to mimic our "jump
+                // thrusters" impacting "the ground" while "burning hot."
                 //
                 // If the jump is too short (with a cheating, hard-coded
                 // definition of "too short"), then use gray smoke from s2 to
                 // represent a misfire.
-                let smokeEffect = (explosionDurationMilliseconds <= 200 ? "s2" : "s4");
+                let smokeEffect = (explosionDurationMilliseconds <= 200 ? "s2" : "s3");
                 for (let w=128, h=128, i=0; i < smokeRings; ++i) {
                     let x = random(imageDivWidth/2 - robotImageWidth/2, imageDivWidth/2 + robotImageWidth/2);
                     let y = random(robotImageBottomY - 10, robotImageBottomY + 10);
@@ -546,15 +546,28 @@ function PlainView(controller) {
             case "blast-ac-medium":
             case "blast-ac-heavy":
             case "blast-ac-assault":
+            case "blast-emf":
             {
                 // These are not explosions, either, but one-off sprite
                 // effects that are used to provide the impression of being
                 // hit by a weapon.
                 let sequence = [];
+                let radius = 0.5 * Math.min(robotImageWidth, robotImageHeight);
+                let theta = random(0, 2 * Math.PI);
                 let pos = {
-                    x: random(robotImageWidth * 0, robotImageWidth * 1),
-                    y: random(robotImageHeight * 0, robotImageHeight * 1)
+                    x: robotImageWidth/2  + random(0, 1) * radius * Math.cos(theta),
+                    y: robotImageHeight/2 + random(0, 1) * radius * Math.sin(theta)
                 };
+
+                // Note that the durations and overlaps below are all in
+                // relative time units.  A duration of 0.8 means "this lasts
+                // for 100% of the explosion duration", and an overlap of 0.6
+                // means "this explosion will start (0.6 * explosion duration)
+                // seconds after the previous explosion started."
+                //
+                // An overlap equal to the previous explosion's duration leads
+                // to a strictly linear sequence of explosions with no overlap
+                // and no gaps.
                 switch(explosionType) {
                     case "blast-lrm":
                         explosionDurationMilliseconds += random(1, 500);
@@ -599,6 +612,34 @@ function PlainView(controller) {
                             { type: "e6", width: 256, height: 256, duration: 0.8 },
                             { type: "e6", width: 256, height: 256, duration: 0.9, overlap: 0.9 },
                             { type: "e6", width: 256, height: 256, duration: 0.5, overlap: 0.5 },
+                        ];
+                        break;
+                    case "blast-emf":
+                        // Lower the radius.
+                        pos = {
+                            x: robotImageWidth/2  + random(0, 0.5) * radius * Math.cos(theta),
+                            y: robotImageHeight/2 + random(0, 0.5) * radius * Math.sin(theta)
+                        };
+                        // Shorten the duration.
+                        explosionDurationMilliseconds += random(-2, 0) * 250;
+                        sequence = [
+                            // "Strong pulse" using a lot of overlapping e10s.
+                            { type: "e9",  width: 320, height: 320, duration: 0.1 },
+                            { type: "e10", width: 256, height: 256, duration: 0.5,  overlap: 0.1 },
+                            { type: "e10", width: 256, height: 256, duration: 0.45, overlap: 0.45 },
+                            { type: "e10", width: 256, height: 256, duration: 0.40, overlap: 0.40 },
+                            { type: "e10", width: 256, height: 256, duration: 0.35, overlap: 0.35 },
+
+                            // It starts to fizzle into a series of weaker, shorter pulses.
+                            { type: "e9",  width: 320, height: 320, duration: 0.1, overlap: -0.1 }, // Start AFTER, not before!
+                            { type: "e10", width: 256, height: 256, duration: 0.1, overlap: 0.1 },
+
+                            { type: "e9",  width: 320, height: 320, duration: 0.05, overlap: -0.1 },
+                            { type: "e10", width: 256, height: 256, duration: 0.05, overlap: 0.05 },
+
+                            { type: "e10", width: 256, height: 256, duration: 0.05, overlap: -0.1 },
+
+                            { type: "e10", width: 256, height: 256, duration: 0.05, overlap: -0.2 },
                         ];
                         break;
                 }

@@ -508,9 +508,15 @@ function SpecialEffectSprite(effectName) {
             sprite.framesPerSecond = 36;
             return sprite;
         }
-
-        // Placeholder for e10.
-
+        // 256x256, 12 frames; a repeating corona of yellow electric discharges.
+        case "e10":
+        {
+            let sprite = new SpriteBase(256, 256);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC-BY-4.0] [CC-BY-3.0] [GPL-3.0] [GPL-2.0] ashishlko11 - Free Game FX Vol.02 (5) [openGameArt].png", 3, 4);
+            sprite.loop = true;
+            sprite.framesPerSecond = 25;
+            return sprite;
+        }
         // 100x100, 30 frames: Burns fiery and hot before quickly turning
         // into rising soot and ash.
         case "e11":

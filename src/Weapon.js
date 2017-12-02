@@ -251,6 +251,8 @@ function Weapon(weaponType) {
             shortName      : "EMF",
             class          : "heavy",
             damage         : "1d6*1d6", // EV=12.25: less intimidating than it looks, but with limitless ammo.
+            explosion      : "blast-emf",
+            duration       : 2000,
             ammoPerRound   : 0,
             ammo           : 1
         },
