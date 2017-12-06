@@ -402,7 +402,7 @@ function AiPlayer(controller, view) {
             enemyRobotScores[i].recommendedWeaponWithoutAmmo = recommendedWeaponWithoutAmmo;
             enemyRobotScores[i].recommendedWeaponWithAmmo = recommendedWeaponWithAmmo;
 
-            // Award a score based on our sheer hatred of the human race and
+            // Award a score based on our sheer hatred for the human race and
             // everyone in it (w5).
             enemyRobotScores[i].hatredOfHumanPlayersScore = 0;
             if (factions.length > 2 &&
@@ -460,6 +460,7 @@ function AiPlayer(controller, view) {
         result.reasons.push(String.format("Our threat level to the target is {0} if we want to preserve ammunition and {1} if we don't.",
                                           enemyRobotScores[0].vulnerabilityToWeaponWithoutAmmoScore.toFixed(4),
                                           enemyRobotScores[0].vulnerabilityToWeaponWithAmmoScore.toFixed(4)));
+
         if (enemyRobotScores.length > 1) {
             let badRobot = enemyRobotScores[enemyRobotScores.length - 1].robotToTarget;
             result.reasons.push(String.format("The worst-scoring enemy was {0} {1} ({2} hp), with a score of {3}.  We are ignoring it.",

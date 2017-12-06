@@ -1393,7 +1393,7 @@ function PlainView(controller) {
     // screen.
     //
     // Returns the DOM object we just created (or the existing element if we
-    // didn't need to create it.
+    // didn't need to create it.)
 
     this.addRobot = function(robot) {
 
@@ -2199,7 +2199,7 @@ function PlainView(controller) {
     // the *attacker*, and <span class='enemy'/> and <strong class='enemy'/>
     // to describe events which are favorable for the defender.
     //
-    // Returns the sentence string.
+    // Returns the sentence markup string.
     this.weaveNarrative = function(damageReport, attackingRobot, attackingRobotWeapon, defendingRobot) {
         let enemyName = String.format("the <strong class='enemy name'>{0}</strong>", defendingRobot.longName);
         if (defendingRobot.longName === attackingRobot.longName) {

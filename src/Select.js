@@ -1097,7 +1097,7 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
             preload(adornmentImageUrlString);
 
             // TODO: Instead of hard-coding these file names, parse them from
-            // getComputerStyle().
+            // getComputedStyle().
 
             let successImagePath = "./assets/images/backgrounds/[CC0] Rawdanitsu - Another Space Backgrounds (space-background-10) [OpenGameArt]-85%25.jpg";
             preload(successImagePath);

@@ -378,7 +378,7 @@ function SpecialEffectSprite(effectName) {
             sprite.framesPerSecond = 30;
             return sprite;
         }
-        // 1536x128, 6 frames: an oval cloud of gray smoke with a smattering
+        // 256x128, 6 frames: an oval cloud of gray smoke with a smattering
         // of tumbling particles within.
         case "s2":
         {
@@ -389,7 +389,7 @@ function SpecialEffectSprite(effectName) {
             sprite.framesPerSecond = 54; // 6 frames in 325 milliseconds is approximately this.
             return sprite;
         }
-        // 1536x128, 6 frames: an oval cloud of fiery smoke with a smattering
+        // 256x128, 6 frames: an oval cloud of fiery smoke with a smattering
         // of tumbling particles within.
         case "s3":
         {
@@ -400,7 +400,7 @@ function SpecialEffectSprite(effectName) {
             sprite.framesPerSecond = 54;
             return sprite;
         }
-        // 1536x128, 6 frames: an oval cloud of blue smoke with a smattering
+        // 256x128, 6 frames: an oval cloud of blue smoke with a smattering
         // of tumbling particles within.
         case "s4":
         {
