@@ -328,33 +328,73 @@ function AiPlayer(controller, view) {
             // and without ammo (w4) are to kill you.
             let vulnerabilityToWeaponWithoutAmmoScore = -1;
             let vulnerabilityToWeaponWithAmmoScore = -1;
+            let recommendedEmergencyWeaponScore = -1;
             let recommendedWeaponWithoutAmmo = null;
             let recommendedWeaponWithAmmo = null;
+            let recommendedEmergencyWeapon = null;
             let hasAmmo = false;
             for (let j = 0; j < robot.arsenal.length; ++j) {
                 let currentWeapon = robot.arsenal[j];
                 if (currentWeapon.ammo < currentWeapon.ammoPerRound) {
+                    // The current weapon has finite ammo, and it's out of it.
                     continue;
                 }
 
                 hasAmmo = true;
-                let damageReport = robot.fire(enemyRobot, currentWeapon.internalName, Weapon.useExpectedValues, false);
-                let expectedDamage = damageReport.finalDamage;
-                let score = Math.max(0, Math.min(1, expectedDamage/enemyRobot.hitpoints));
+                let damageReport        = robot.fire(enemyRobot, currentWeapon.internalName, Weapon.useExpectedValues, false);
+                let expectedDamage      = damageReport.finalDamage;
+                let score               = Math.max(0, Math.min(1, expectedDamage/enemyRobot.hitpoints));
+                let maximumDamageReport = robot.fire(enemyRobot, currentWeapon.internalName, Weapon.useMaximumValues, false);
+                let maximumDamage       = maximumDamageReport.finalDamage;
+                let maximumDamageScore  = Math.max(0, Math.min(1, maximumDamage/enemyRobot.hitpoints));
+
+                if (score === 0 && maximumDamageScore > 0 && maximumDamageScore > recommendedEmergencyWeaponScore) {
+                    // Our weapon is weak on average, but has a finite
+                    // probability of penetrating the enemy's massive
+                    // defenses.  Remember this for later--we might needed it
+                    // if we can't find something better.
+                    recommendedEmergencyWeapon = currentWeapon;
+                    recommendedEmergencyWeaponScore = maximumDamageScore;
+                }
 
                 if (currentWeapon.ammoPerRound > 0 && score > vulnerabilityToWeaponWithAmmoScore) {
+
+                    // The best limited weapon we've seen so far.
                     recommendedWeaponWithAmmo = currentWeapon;
                     vulnerabilityToWeaponWithAmmoScore = score;
+
                 } else if (currentWeapon.ammoPerRound <= 0 && score > vulnerabilityToWeaponWithoutAmmoScore) {
+
+                    // The best limitless weapon we've seen so far.  (Of
+                    // course, Bots usually only have one limitless
+                    // weapon.)
                     recommendedWeaponWithoutAmmo = currentWeapon;
                     vulnerabilityToWeaponWithoutAmmoScore = score;
                 }
-            }
+            } // end (for each weapon we can fire at the enemy)
 
             if (!hasAmmo) {
                 // All this time!
                 result.reasons.push("This robot is out of ammunition.  It cannot attack.");
                 return result;
+            }
+
+            if (vulnerabilityToWeaponWithAmmoScore === 0 && vulnerabilityToWeaponWithoutAmmoScore === 0) {
+                // W3 and W4 scores are 0, meaning that on average we're
+                // harmless to this enemy robot.  But if we have a weapon that
+                // can penetrate the defenses at maximum damage, then let's go
+                // for broke and try that.
+                if (recommendedEmergencyWeaponScore > 0) {
+                    if (recommendedEmergencyWeapon.ammoPerRound > 0) {
+                        recommendedWeaponWithAmmo = recommendedEmergencyWeapon;
+                        vulnerabilityToWeaponWithAmmoScore = recommendedEmergencyWeaponScore;
+                    } else {
+                        recommendedWeaponWithoutAmmo = recommendedEmergencyWeapon;
+                        vulnerabilityToWeaponWithoutAmmoScore = recommendedEmergencyWeaponScore;
+                    }
+                } else {
+                    // It is *impossible* for us to damage the enemy!
+                }
             }
 
             enemyRobotScores[i].vulnerabilityToWeaponWithoutAmmoScore = Math.max(0, vulnerabilityToWeaponWithoutAmmoScore);
