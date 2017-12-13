@@ -576,6 +576,16 @@ function SpecialEffectSprite(effectName) {
             sprite.framesPerSecond = 30;
             return sprite;
         }
+        // 256x256, 24 frames: a small shower of glowing, fading blue sparks.
+        case "e18":
+        {
+            let sprite = new SpriteBase(256, 256);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC-BY-3.0] Tiamalt - Coloured Particle Explosions (blue_explosion) [OpenGameArt].png", 4, 6);
+            sprite.loop = false;
+            sprite.maxFrameCount = 24;
+            sprite.framesPerSecond = 30;
+            return sprite;
+        }
         default:
         {
             // Almost surely not what you want.

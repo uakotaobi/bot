@@ -546,6 +546,7 @@ function PlainView(controller) {
             case "blast-ac-medium":
             case "blast-ac-heavy":
             case "blast-ac-assault":
+            case "blast-pulse-medium":
             case "blast-emf":
             {
                 // These are not explosions, either, but one-off sprite
@@ -560,14 +561,22 @@ function PlainView(controller) {
                 };
 
                 // Note that the durations and overlaps below are all in
-                // relative time units.  A duration of 0.8 means "this lasts
-                // for 100% of the explosion duration", and an overlap of 0.6
-                // means "this explosion will start (0.6 * explosion duration)
-                // seconds after the previous explosion started."
+                // relative time units.
+                // - A duration of 0.8 means "this lasts for 80% of the
+                //   explosionDurationMilliseconds."
+                // - An overlap of 0.6 means "this explosion will start (1 - 0.6) *
+                //   explosionDurationMilliseconds) after the previous explosion
+                //   started."
+                //
+                // An overlap of 0 leads to a strictly linear sequence of
+                // explosions with no overlap and no gaps.
                 //
                 // An overlap equal to the previous explosion's duration leads
-                // to a strictly linear sequence of explosions with no overlap
-                // and no gaps.
+                // to simultaneous explosions.
+                //
+                // Negative overlaps are allowed.  They're equivalent to
+                // adding an intentional delay.
+
                 switch(explosionType) {
                     case "blast-lrm":
                         explosionDurationMilliseconds += random(1, 500);
@@ -612,6 +621,13 @@ function PlainView(controller) {
                             { type: "e6", width: 256, height: 256, duration: 0.8 },
                             { type: "e6", width: 256, height: 256, duration: 0.9, overlap: 0.9 },
                             { type: "e6", width: 256, height: 256, duration: 0.5, overlap: 0.5 },
+                        ];
+                        break;
+                    case "blast-pulse-medium":
+                        sequence = [
+                            { type: "e18", width: 256, height: 256, duration: 1.0 },
+                            { type: "e18", width: 256, height: 256, duration: 0.95, overlap: 0.95 },
+                            { type: "s1", width: 128, height: 128, duration: 0.75, overlap: 1.0 },
                         ];
                         break;
                     case "blast-emf":

@@ -161,6 +161,8 @@ function Weapon(weaponType) {
             shortName      : "MD. PULSE",
             class          : "medium",
             damage         : "1 + 1d12", // EV=7.5, better than the mortar on average (but with lower max damage)
+            explosion      : "blast-pulse-medium",
+            duration       : 700,
             ammoPerRound   : 1,
             ammo           : 15
         },
