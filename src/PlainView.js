@@ -710,7 +710,6 @@ function PlainView(controller) {
                         h = 64;
                         count = 10/2;
                         durationMilliseconds = 0.3;
-                        delayMilliseconds = (1.0 - durationMilliseconds)/count - durationMilliseconds;
                         break;
                     case "blast-machinegun-medium":
                         spriteTypes = ["e4"];
@@ -2279,7 +2278,7 @@ function PlainView(controller) {
             }
         }
 
-        if (damageAdjective === "" && Math.random() > 0.25) {
+        if (damageAdjective === "" && Math.random() > 0.60) {
             // These are some fallback adjectives we use in certain scenarios.
 
             let maxPossibleDamage = Weapon.calculateDamage(damageReport.originalDamage.damageString,

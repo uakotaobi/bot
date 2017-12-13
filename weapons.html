@@ -174,7 +174,7 @@
 
                  let weapon = new Weapon(weaponInternalName);
                  let count = buckets[weaponInternalName];
-                 let key = weapon.longName;
+                 let key = weapon.longName + ": " + count;
                  let combinedDamageString = Weapon.getCombinedDamageString(weapon.damage, count);
 
                  allRobotWeapons[key] = {
@@ -222,7 +222,7 @@
                                                                      optionalComma,
                                                                      weaponCountString);
              newRow.querySelector(".class").textContent = weaponData.weapon.class[0].toUpperCase() + weaponData.weapon.class.substr(1).toLowerCase();
-             newRow.querySelector(".damageString").textContent = weaponData.weapon.damage;
+             newRow.querySelector(".damageString").textContent = weaponData.combinedDamageString;
 
              newRow.querySelector(".min").textContent = Number(Weapon.calculateDamage(weaponData.combinedDamageString, Weapon.useMinimumValues).damage).toFixed(1);
              newRow.querySelector(".max").textContent = Number(Weapon.calculateDamage(weaponData.combinedDamageString, Weapon.useMaximumValues).damage).toFixed(1);
