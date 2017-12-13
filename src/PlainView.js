@@ -81,7 +81,18 @@ function PlainView(controller) {
         22: [0.20,   0.20],
         23: [0.20,   0.20],
         24: [0.20,   0.20],
-        25: [0.20,   0.20]
+        25: [0.20,   0.20],
+        26: [1/6,    0.20],
+        27: [1/6,    0.20],
+        28: [1/6,    0.20],
+        29: [1/6,    0.20],
+        30: [1/6,    0.20],
+        31: [1/6,    1/6],
+        32: [1/6,    1/6],
+        33: [1/6,    1/6],
+        34: [1/6,    1/6],
+        35: [1/6,    1/6],
+        36: [1/6,    1/6],
     };
 
     // -----------------------------------------------------------------------
@@ -1925,7 +1936,7 @@ function PlainView(controller) {
             // to display dead robots (if for now other reason than to show
             // the towering column of flame that represents its dead remains.)
             //
-            // We're going to start having problems after the 25th robot in a
+            // We're going to start having problems after the 36th robot in a
             // faction.
             let robotWidthPercentage = 0.2;
             let robotHeightPercentage = 0.2;
@@ -1964,7 +1975,6 @@ function PlainView(controller) {
                 /////////////////////////////////////////////////////////////
                 // This robot is on the user's side (but it's not active.) //
                 /////////////////////////////////////////////////////////////
-
 
                 robotDiv.setAttribute("class", "robot inactive" + deadClass);
 
