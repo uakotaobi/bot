@@ -171,6 +171,8 @@ function Weapon(weaponType) {
             shortName      : "HV. PULSE",
             class          : "assault",
             damage         : "1 + (1d8*1d5)", // EV=14.5, same as the 2x mortar (but with a slightly higher probability of dealing max damage)
+            explosion      : "blast-pulse-assault",
+            duration       : 1500,
             ammoPerRound   : 1,
             ammo           : 6
         },

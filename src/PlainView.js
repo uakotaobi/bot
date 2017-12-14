@@ -558,21 +558,26 @@ function PlainView(controller) {
             case "blast-ac-heavy":
             case "blast-ac-assault":
             case "blast-pulse-medium":
+            case "blast-pulse-assault":
             case "blast-emf":
             {
                 // These are not explosions, either, but one-off sprite
                 // effects that are used to provide the impression of being
                 // hit by a weapon.
                 let sequence = [];
+
+                // Position the blast within a random circle centered on the
+                // robot.
                 let radius = 0.5 * Math.min(robotImageWidth, robotImageHeight);
-                let theta = random(0, 2 * Math.PI);
+                let theta = Math.random() * 2 * Math.PI;
                 let pos = {
-                    x: robotImageWidth/2  + random(0, 1) * radius * Math.cos(theta),
-                    y: robotImageHeight/2 + random(0, 1) * radius * Math.sin(theta)
+                    x: robotImageWidth/2  + random(0, radius * Math.cos(theta)),
+                    y: robotImageHeight/2 + random(0, radius * Math.sin(theta))
                 };
 
                 // Note that the durations and overlaps below are all in
                 // relative time units.
+                //
                 // - A duration of 0.8 means "this lasts for 80% of the
                 //   explosionDurationMilliseconds."
                 // - An overlap of 0.6 means "this explosion will start (1 - 0.6) *
@@ -641,11 +646,40 @@ function PlainView(controller) {
                             { type: "s1", width: 128, height: 128, duration: 0.75, overlap: 1.0 },
                         ];
                         break;
+                    case "blast-pulse-assault":
+                        // Cluster a bunch of e17 spark showers around the
+                        // same point.
+                        let w = 256;
+                        let h = 256;
+                        let count = Math.round(12 * (robotArea / (w * h))) + 6;
+                        let blastRadius = Math.min(robotImageWidth, robotImageHeight) / 9;
+                        let maxStartTimeMilliseconds = 0.4 * explosionDurationMilliseconds;
+                        for (let i = 0; i < count; ++i) {
+                            let theta = Math.random() * 2 * Math.PI;
+                            // Keeping all of the blasts at the same distance
+                            // from the center actually makes the blast *look*
+                            // more powerful.
+                            let x = pos.x + blastRadius * Math.cos(theta);
+                            let y = pos.y + blastRadius * Math.sin(theta);
+                            let delay = maxStartTimeMilliseconds * (i / count);
+                            let durationMilliseconds = Math.random() * (maxStartTimeMilliseconds - explosionDurationMilliseconds);
+                            this.createEffect(imageDiv, "e17",
+                                              (imageDivWidth/2 - robotImageWidth/2) + x - w/2,
+                                              (robotImageBottomY - robotImageHeight) + y - h/2,
+                                              durationMilliseconds,
+                                              delay);
+                        }
+                        // Start a big s5 smoke at the destination point.
+                        sequence = [
+                            { type: "s5", width: 196, height: 190, duration: 1.0 },
+                            { type: "s5", width: 196, height: 190, duration: 0.8, overlap: 0.8 },
+                        ];
+                        break;
                     case "blast-emf":
                         // Lower the radius.
                         pos = {
-                            x: robotImageWidth/2  + random(0, 0.5) * radius * Math.cos(theta),
-                            y: robotImageHeight/2 + random(0, 0.5) * radius * Math.sin(theta)
+                            x: robotImageWidth/2  + random(0, 0.5 * radius * Math.cos(theta)),
+                            y: robotImageHeight/2 + random(0, 0.5 * radius * Math.sin(theta))
                         };
                         // Shorten the duration.
                         explosionDurationMilliseconds += random(-2, 0) * 250;

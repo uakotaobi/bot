@@ -411,6 +411,18 @@ function SpecialEffectSprite(effectName) {
             sprite.framesPerSecond = 54;
             return sprite;
         }
+        // 196x190, 13 frames: an expanding cloud of smoke that cools from
+        // fiery to gray.  There aren't enough frames to make the dissipation
+        // look natural, so keep the play time short -- say, under a second.
+        case "s5":
+        {
+            let sprite = new SpriteBase(196, 190);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC-BY-3.0] Bleed - Simple Explosion - Bleeds Game Art (explosion_01_strip13) [OpenGameArt].png", 1, 13);
+            sprite.loop = false;
+            sprite.maxFrameCount = 13;
+            sprite.framesPerSecond = 25;
+            return sprite;
+        }
         // 128x128, 16 frames; brighter, spherical blast.  The most realistic
         // of the short blasts.
         case "e1":
@@ -576,7 +588,18 @@ function SpecialEffectSprite(effectName) {
             sprite.framesPerSecond = 30;
             return sprite;
         }
+        // 256x256, 24 frames: a small shower of glowing, fading green sparks.
+        case "e17":
+        {
+            let sprite = new SpriteBase(256, 256);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC-BY-3.0] Tiamalt - Coloured Particle Explosions (green_explosion) [OpenGameArt].png", 4, 6);
+            sprite.loop = false;
+            sprite.maxFrameCount = 24;
+            sprite.framesPerSecond = 30;
+            return sprite;
+        }
         // 256x256, 24 frames: a small shower of glowing, fading blue sparks.
+        // Goes well with smoke s1 and a scone.
         case "e18":
         {
             let sprite = new SpriteBase(256, 256);
