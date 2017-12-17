@@ -609,6 +609,28 @@ function SpecialEffectSprite(effectName) {
             sprite.framesPerSecond = 30;
             return sprite;
         }
+        // 256x256, 24 frames: a small shower of glowing, fading red sparks.
+        case "e19":
+        {
+            let sprite = new SpriteBase(256, 256);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC-BY-3.0] Tiamalt - Coloured Particle Explosions (red_explosion) [OpenGameArt].png", 4, 6);
+            sprite.loop = false;
+            sprite.maxFrameCount = 24;
+            sprite.framesPerSecond = 30;
+            return sprite;
+        }
+        // 64x64, 12 frames: a *tiny*, bright blast that is only going to look
+        // good when played quickly.  It's really a lot smaller than 64x64 and
+        // is more suitable as a spark than as a blast.
+        case "e20":
+        {
+            let sprite = new SpriteBase(64, 64);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC-BY-4.0] [CC-BY-3.0] [GPL-3.0] [GPL-2.0] ashishlko11 - Explosion [OpenGameArt].png", 3, 4);
+            sprite.loop = false;
+            sprite.maxFrameCount = 12;
+            sprite.framesPerSecond = 30;
+            return sprite;
+        }
         default:
         {
             // Almost surely not what you want.

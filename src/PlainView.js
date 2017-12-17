@@ -557,6 +557,7 @@ function PlainView(controller) {
             case "blast-ac-medium":
             case "blast-ac-heavy":
             case "blast-ac-assault":
+            case "blast-pulse-light":
             case "blast-pulse-medium":
             case "blast-pulse-assault":
             case "blast-emf":
@@ -637,6 +638,12 @@ function PlainView(controller) {
                             { type: "e6", width: 256, height: 256, duration: 0.8 },
                             { type: "e6", width: 256, height: 256, duration: 0.9, overlap: 0.9 },
                             { type: "e6", width: 256, height: 256, duration: 0.5, overlap: 0.5 },
+                        ];
+                        break;
+                    case "blast-pulse-light":
+                        sequence = [
+                            { type: "e19", width: 256, height: 256, duration: 1.0 },
+                            { type: "e20", width: 64, height: 64, duration: 0.50, overlap: 1.0 },
                         ];
                         break;
                     case "blast-pulse-medium":

@@ -149,10 +149,12 @@ function Weapon(weaponType) {
             ammo           : 5
         },
         "lightpulse"       : {
-            longName       : "Light Pulse Laser",
+            longName       : "Light Pulse Beam",
             shortName      : "LT. PULSE",
             class          : "light",
-            damage         : "1 + 2d2", // EV=4, slightly better than a lightlaser
+            damage         : "1 + (1d3 + 1d5)", // EV=6, slightly better than a mediumlaser
+            explosion      : "blast-pulse-light",
+            duration       : 500, //700,
             ammoPerRound   : 0,
             ammo           : 1
         },
@@ -180,7 +182,7 @@ function Weapon(weaponType) {
             longName       : "Mortar Cannon",
             shortName      : "MORTAR",
             class          : "medium",
-            damage         : "1 + (1d4*1d4)", // EV=just 7.25, a wee bit better than 2D6.  But 2 of them together are better than a Gauss Gun!
+            damage         : "1 + (1d4)^2", // EV=just 7.25, a wee bit better than 2D6.  But 2 of them together are better than a Gauss Gun!
             ammoPerRound   : 1,
             ammo           : 6
         },
