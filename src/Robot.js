@@ -107,7 +107,7 @@ function Robot(robotType) {
                     " strong suit, so make sure your pilots plan ahead.</p>"
             },
             "ullr"           : {
-                modelNumber  : "Galaxian V03",
+                modelNumber  : "Galaxian v03",
                 longName     : "Ullr",
                 idPattern    : "[00025-99999]|03",
                 class        : "light",
@@ -115,7 +115,7 @@ function Robot(robotType) {
                 hitpoints    : 20,
                 armor        : "1d12",
                 jump         : false,
-                speed        : 12,
+                speed        : 8,
                 score        : 15,
                 image        : "./assets/images/bots/350px-ModalMechanica - Mecha - Ullr-02.png",
                 description  : "<p>A common sight during law enforcement operations, the Ullr is undeniably built for close-quarter combat.  It is protected by <strong>thick layers of composite armor</strong> which do not afford much space for weapon mounts.  To address the demands for warfare in the vacuum of space, the design team exchanged the standard particle rifle/bayonet and anti-personnel weaponry for a much stronger pulse laser and deadly <strong>mortar rounds</strong>.</p>"
@@ -135,7 +135,7 @@ function Robot(robotType) {
                 description  : "<p>With large feet, an armored frame, and a low" +
                     " center of gravity, Series 300 units are ideal for brief" +
                     " skirmishes over sandy terrain.  While the <strong>SRM" +
-                    " A-model</strong> weapon boasts a significant punch, the" +
+                    " A-model</strong> weapon has copious firepower, the" +
                     " Nomad chassis simply isn't robust enough to carry more" +
                     " than a handful of these shells for <strong>tactical" +
                     " purposes</strong>.</p>"

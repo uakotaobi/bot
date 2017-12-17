@@ -851,12 +851,12 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
         //
         // A contemporary M1A2 Abrams main battle tank has about 1300mm of
         // armor in its most protected places.  I say that corresponds to an
-        // armor rating of 2.9 in this game.
+        // armor rating of 3.9 in this game.
         //
         // I also say, so says I, that no bot has less than three inches of armor
         // plating.
         const minArmorMillimeters = 25.4 * 3;
-        const armor_to_mm = 1300/2.9;
+        const armor_to_mm = 1300/3.9;
         let damageObject = Weapon.calculateDamage(robotData.armor, Weapon.useExpectedValues);
         let armorRatingMillimeters = Math.max(minArmorMillimeters, damageObject.damage * armor_to_mm);
         let armorString = String.format("{0} mm (approx.)",
