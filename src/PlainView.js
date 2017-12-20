@@ -504,13 +504,13 @@ function PlainView(controller) {
                         break;
                 }
 
-                // Let off s3 smoke ring explosions to mimic our "jump
+                // Let off s4 smoke ring explosions to mimic our "jump
                 // thrusters" impacting "the ground" while "burning hot."
                 //
                 // If the jump is too short (with a cheating, hard-coded
                 // definition of "too short"), then use gray smoke from s2 to
                 // represent a misfire.
-                let smokeEffect = (explosionDurationMilliseconds <= 200 ? "s2" : "s3");
+                let smokeEffect = (explosionDurationMilliseconds <= 200 ? "s2" : "s4");
                 for (let w=128, h=128, i=0; i < smokeRings; ++i) {
                     let x = random(imageDivWidth/2 - robotImageWidth/2, imageDivWidth/2 + robotImageWidth/2);
                     let y = random(robotImageBottomY - 10, robotImageBottomY + 10);
@@ -1090,11 +1090,12 @@ function PlainView(controller) {
                         //
                         // Give up the search and just select that sole
                         // weapon, regardless of its ammo.
-                        console.debug("PlainView.keyboardHandler/selectNextWeapon():" +
-                                      " %s %s's other weapons are out of" +
-                                      " ammo.  Selection unchanged.",
-                                      currentRobot.longName,
-                                      currentRobot.id);
+
+                        // console.debug("PlainView.keyboardHandler/selectNextWeapon():" +
+                        //               " %s %s's other weapons are out of" +
+                        //               " ammo.  Selection unchanged.",
+                        //               currentRobot.longName,
+                        //               currentRobot.id);
 
                     } else if (currentRobot.arsenal[index].ammo < currentRobot.arsenal[index].ammoPerRound) {
                         // We don't want to select weapons that are out of

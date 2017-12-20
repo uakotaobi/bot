@@ -118,7 +118,7 @@ function Robot(robotType) {
                 speed        : 8,
                 score        : 15,
                 image        : "./assets/images/bots/350px-ModalMechanica - Mecha - Ullr-02.png",
-                description  : "<p>A common sight during law enforcement operations, the Ullr is undeniably built for close-quarter combat.  It is protected by <strong>thick layers of composite armor</strong> which do not afford much space for weapon mounts.  To address the demands for warfare in the vacuum of space, the design team exchanged the standard particle rifle/bayonet and anti-personnel weaponry for a much stronger pulse laser and deadly <strong>mortar rounds</strong>.</p>"
+                description  : "<p>A common sight during law enforcement operations, the Ullr is undeniably built for close-quarter combat.  It is protected by <strong>thick layers of composite armor</strong> which leave little spare room for weapon mounts.  To address the demands for warfare in the vacuum of space, the design team exchanged the standard particle rifle/bayonet and anti-personnel weaponry for a much stronger pulse laser and deadly <strong>mortar rounds</strong>.</p>"
             },
             "nomad"          : {
                 modelNumber  : "Encom Series 300",
