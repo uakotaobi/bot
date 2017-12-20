@@ -561,6 +561,7 @@ function PlainView(controller) {
             case "blast-pulse-medium":
             case "blast-pulse-assault":
             case "blast-emf":
+            case "blast-emp":
             {
                 // These are not explosions, either, but one-off sprite
                 // effects that are used to provide the impression of being
@@ -593,6 +594,10 @@ function PlainView(controller) {
                 //
                 // Negative overlaps are allowed.  They're equivalent to
                 // adding an intentional delay.
+                //
+                // A blast with the same overlap and duration is essentially
+                // an "injected blast" -- it doesn't affect the timing of
+                // anything that comes after it, so it "gets in for free."
 
                 switch(explosionType) {
                     case "blast-lrm":
@@ -654,6 +659,7 @@ function PlainView(controller) {
                         ];
                         break;
                     case "blast-pulse-assault":
+                    {
                         // Cluster a bunch of e17 spark showers around the
                         // same point.
                         let w = 256;
@@ -682,8 +688,10 @@ function PlainView(controller) {
                             { type: "s5", width: 196, height: 190, duration: 0.8, overlap: 0.8 },
                         ];
                         break;
+                    }
                     case "blast-emf":
-                        // Lower the radius.
+                        // Position the blast in a circle of lower radius so
+                        // that it's more likely to be seen it its entirety.
                         pos = {
                             x: robotImageWidth/2  + random(0, 0.5 * radius * Math.cos(theta)),
                             y: robotImageHeight/2 + random(0, 0.5 * radius * Math.sin(theta))
@@ -710,6 +718,80 @@ function PlainView(controller) {
                             { type: "e10", width: 256, height: 256, duration: 0.05, overlap: -0.2 },
                         ];
                         break;
+                    case "blast-emp":
+                    {
+                        // Position the blast in a circle of lower radius so
+                        // that it's more likely to be seen it its entirety.
+                        pos = {
+                            x: robotImageWidth/2  + random(0, 0.35 * radius * Math.cos(theta)),
+                            y: robotImageHeight/2 + random(0, 0.35 * radius * Math.sin(theta))
+                        };
+                        sequence = [
+                            // We have four seconds (4000 ms).
+
+                            // Phase 1: Electricity.
+                            //
+                            // We repeat this three times to make the loop
+                            // faster.  (Duration 0.75 would last just as
+                            // long, but the loop would be slow.  It's
+                            // originally rated at 24fps.)
+                            //
+                            // The first 0.25 (the first three blasts) are
+                            // timed so there is a gap between them, like an
+                            // electric flicker.
+                            { type: "e22", width: 256, height: 256, duration: 0.07 },
+                            { type: "e22", width: 256, height: 256, duration: 0.07, overlap: -0.03 },
+                            { type: "e22", width: 256, height: 256, duration: 0.05, overlap: -0.03 },
+
+                            { type: "e22", width: 256, height: 256, duration: 0.25 },
+                            { type: "e22", width: 256, height: 256, duration: 0.25 },
+
+                            // Phases 2 and 3: Add fireball loop.  We repeat
+                            // it twice; each fireball will take 1 second to
+                            // loop through its 32 frames (at half native
+                            // speed) so the loop should be seamless.
+                            { type: "e21", width: 256, height: 256, duration: 0.25, overlap: 0.50 },
+                            { type: "e21", width: 256, height: 256, duration: 0.25 },
+
+                            // Phase 1.5: Inject an e6 just after the first
+                            // phase to help the transition into the second
+                            // phase look better.
+                            { type: "e6", width: 256, height: 256, duration: 0.2, overlap: 0.55 },
+                        ];
+
+                        // Phase 4.
+                        //
+                        // For the finisher, which is executed at
+                        // 0.75 * explosionDurationMilliseconds if you'll
+                        // recall, we create a constellation of small e20
+                        // blasts, clustered mostly at the center (pos.x,
+                        // pos.y).  The further from the center a blast is,
+                        // the longer it lasts, up to the maximum of 0.25 *
+                        // explosionDurationMilliseconds.
+                        let w = 64;
+                        let h = 64;
+                        let count = Math.round(15 * (robotArea / (w * h))) + 6;
+                        let maxRadius = Math.min(robotImageWidth, robotImageHeight) / 2;
+                        let maxDuration = explosionDurationMilliseconds * 0.25;
+                        let startOffset = explosionDurationMilliseconds * (0.75 - 0.08); // Overlap just a tad.
+
+                        for (let i = 0; i < count; ++i) {
+                            let currentOffset = 2*i;
+                            let durationMilliseconds = maxDuration - currentOffset;
+
+                            let theta = Math.random() * 2 * Math.PI;
+                            let scaleFactor = Math.random() * Math.random();
+                            let x = pos.x + scaleFactor * maxRadius * Math.cos(theta);
+                            let y = pos.y + scaleFactor * maxRadius * Math.sin(theta);
+                            this.createEffect(imageDiv, "e20",
+                                              x,
+                                              y,
+                                              durationMilliseconds * (scaleFactor+1)/2,
+                                              startOffset + currentOffset);
+
+                        }
+                        break;
+                    }
                 }
                 for (let i = 0, delay = 0; i < sequence.length; ++i) {
                     let durationMilliseconds = explosionDurationMilliseconds * sequence[i].duration;

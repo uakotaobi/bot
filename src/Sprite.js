@@ -526,7 +526,7 @@ function SpecialEffectSprite(effectName) {
             let sprite = new SpriteBase(256, 256);
             sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC-BY-4.0] [CC-BY-3.0] [GPL-3.0] [GPL-2.0] ashishlko11 - Free Game FX Vol.02 (5) [openGameArt].png", 3, 4);
             sprite.loop = true;
-            sprite.framesPerSecond = 25;
+            sprite.framesPerSecond = 24;
             return sprite;
         }
         // 100x100, 30 frames: Burns fiery and hot before quickly turning
@@ -629,6 +629,27 @@ function SpecialEffectSprite(effectName) {
             sprite.loop = false;
             sprite.maxFrameCount = 12;
             sprite.framesPerSecond = 30;
+            return sprite;
+        }
+        // 256x256, 32 frames; a lingering fireball that never fades.
+        // Though it was clearly meant to loop, the loop will only look good
+        // if it's played for an exact multiple of
+        // sprite.totalFrames/sprite.framesPerSecond seconds (currently 0.5.)
+        case "e21":
+        {
+            let sprite = new SpriteBase(256, 256);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC-BY-4.0] [CC-BY-3.0] [GPL-3.0] [GPL-2.0] ashishlko11 - Free Game FX Vol.03 (1) [OpenGameArt].png", 4, 8);
+            sprite.loop = true;
+            sprite.framesPerSecond = 64;
+            return sprite;
+        }
+        // 256x256, 12 frames; a repeating, convergent corona of purple electric discharges.
+        case "e22":
+        {
+            let sprite = new SpriteBase(256, 256);
+            sprite.addFramesFromSpriteSheet("./assets/images/effects/[CC-BY-4.0] [CC-BY-3.0] [GPL-3.0] [GPL-2.0] ashishlko11 - Free Game FX Vol.02 (4) [openGameArt].png", 3, 4);
+            sprite.loop = true;
+            sprite.framesPerSecond = 24;
             return sprite;
         }
         default:

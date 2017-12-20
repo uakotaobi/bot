@@ -267,6 +267,8 @@ function Weapon(weaponType) {
             shortName      : "EMP",
             class          : "assault",
             damage         : "3d2*3d2", // EV=20.25, with a high probability of dealing the average damage.
+            explosion      : "blast-emp",
+            duration       : 2000, //4000,
             ammoPerRound   : 1,
             ammo           : 1
         },
