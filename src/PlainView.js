@@ -1942,6 +1942,14 @@ function PlainView(controller) {
                                       " That leaves us unable to select this" +
                                       " weapon, which should not happen.",
                                       index, currentRobot.arsenal.length);
+                    } else if (currentRobot.arsenal[index].ammo <= 0) {
+                        // Don't allow users to click on empty weapons.
+                        //
+                        // console.debug("%s %s is out of ammo for the '%s' weapon.",
+                        //               currentRobot.longName,
+                        //               currentRobot.id,
+                        //               currentRobot.arsenal[index].longName);
+                        return;
                     } else {
                         controller.setCurrentRobotWeapon(currentRobot.arsenal[index].internalName);
                     }
