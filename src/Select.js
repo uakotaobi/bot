@@ -441,9 +441,19 @@ function Select(controller, view, maxPlayers, allowAiOnly) {
     // in the game.
     let setupRobotRowTemplate = function() {
 
+        // Force the factions in the robot select drop-down to be sorted from
+        // light to assault, regardless of the order in which they are
+        // encountered in the Robot.dataTable.
+        //
+        // EcmaScript hashtable keys are always iterated in insertion order.
+        let classToInternalNameList = {};
+        classToInternalNameList["light"]   = [];
+        classToInternalNameList["medium"]  = [];
+        classToInternalNameList["heavy"]   = [];
+        classToInternalNameList["assault"] = [];
+
         // We can get everything we need from the list of possible robots, but
         // right now, there's only one place where that is stored.
-        let classToInternalNameList = {};
         for (let robotInternalName in Robot.dataTable) {
             if (robotInternalName === "invalid" || robotInternalName === "invalid2") {
                 // Skip the Ukulele test bots.
