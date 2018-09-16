@@ -2529,7 +2529,7 @@ function PlainView(controller) {
                             } else {
                                 // The defender failed to jump, had armor to
                                 // protect it, and still blew up.
-                                narrative += String.format(".  Its {0}armor prevents {1} point{2} of damage, bur this is <strong>not enough</strong>.",
+                                narrative += String.format(".  Its {0}armor prevents {1} point{2} of damage, but this is <strong>not enough</strong>.",
                                                            armorAdjective,
                                                            damageReport.armorDamage.damage,
                                                            (damageReport.armorDamage.damage > 1 ? "s" : ""));
