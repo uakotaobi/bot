@@ -112,7 +112,7 @@ JavaScript console on your web browser.
 
      ```javascript
      robot.arsenal[0].shortName = "BB GUN"
-     robot.arsenal[0].dmaage = "5d20"
+     robot.arsenal[0].damage = "5d20"
      g.view().updateRobots()
      ```
 
